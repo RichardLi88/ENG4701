@@ -15,12 +15,12 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-// POST / Compile Endpoint
-// Body:    { source: string }   - contents of the .c file
-// Returns: { ir: string }       - contents of the generated .ll file
+// ── POST /compile ──────────────────────────────────────────────────
+// Body:    { source: string, filename?: string }  — contents of the .c/.cpp file
+// Returns: { ir: string }                          — contents of the generated .ll file
 
 app.post("/compile", async (req, res) => {
-  const { source } = req.body;
+  const { source, filename = "input.c" } = req.body;
 
   if (!source || typeof source !== "string") {
     return res.status(400).json({ error: "source is required" });
@@ -30,15 +30,19 @@ app.post("/compile", async (req, res) => {
     return res.status(400).json({ error: "source exceeds 50,000 character limit" });
   }
 
+  const isCpp    = filename.endsWith(".cpp");
+  const compiler = isCpp ? "clang++" : "clang";
+  const ext      = isCpp ? ".cpp" : ".c";
+
   const id      = crypto.randomUUID();
-  const srcPath = join(tmpdir(), `${id}.c`);
+  const srcPath = join(tmpdir(), `${id}${ext}`);
   const irPath  = join(tmpdir(), `${id}.ll`);
 
   try {
     await writeFile(srcPath, source);
 
     await execAsync(
-      `clang -O0 -Xclang -disable-O0-optnone -S -emit-llvm "${srcPath}" -o "${irPath}"`,
+      `${compiler} -O0 -Xclang -disable-O0-optnone -S -emit-llvm "${srcPath}" -o "${irPath}"`,
       { timeout: 10_000 }
     );
 
@@ -48,7 +52,6 @@ app.post("/compile", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   } finally {
-    // Always clean up temp files
     await Promise.allSettled([unlink(srcPath), unlink(irPath)]);
   }
 });

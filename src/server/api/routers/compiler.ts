@@ -12,7 +12,8 @@ export const compilerRouter = createTRPCRouter({
   compile: publicProcedure
     .input(
       z.object({
-        source: z.string().min(1).max(50_000),
+        source:   z.string().min(1).max(50_000),
+        filename: z.string().regex(/\.(c|cpp)$/).optional(),
       })
     )
     .mutation(async ({ input }) => {
