@@ -11,15 +11,12 @@
 
 # On Linux and macOS you can run this script directly - `./start-llvm.sh`
 
-# import env variables from .env when available
-if [ -f .env ]; then
-  set -a
-  source .env
-  set +a
-fi
+# import env variables from .env
+set -a
+source .env
 
-LLVM_IMAGE_NAME="eng4701-llvm-service"
-LLVM_CONTAINER_NAME="eng4701-llvm-service"
+LLVM_IMAGE_NAME="llvm-service"
+LLVM_CONTAINER_NAME="llvm-service"
 LLVM_DEFAULT_PORT=3001
 
 # Use LLVM_SERVICE_URL from .env if present, otherwise default to 3001
