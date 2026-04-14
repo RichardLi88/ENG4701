@@ -5,7 +5,7 @@ import { env } from "~/env";
 
 const LLVM_URL = env.LLVM_SERVICE_URL;
 
-// Shared fetch helper — calls the LLVM service and throws a TRPCError on failure
+// Shared fetch helper - calls the LLVM service and throws a TRPCError on failure
 async function callLlvmService<T>(
   endpoint: string,
   body: unknown,
@@ -70,11 +70,8 @@ async function callLlvmService<T>(
 }
 
 export const compilerRouter = createTRPCRouter({
-
-  // ── compile ───────────────────────────────────────────────────────
-  // Converts a .c or .cpp source file into unoptimised LLVM IR using:
-  // clang -O0 -Xclang -disable-O0-optnone -S -emit-llvm filename.c -o filename.ll
-  //
+  // compile ------------------------------------------------
+  // Converts a .c or .cpp source file into unoptimised LLVM IR using: `clang -O0 -Xclang -disable-O0-optnone -S -emit-llvm filename.c -o filename.ll`
   // Returns: { ir: string }
   compile: publicProcedure
     .input(
@@ -91,13 +88,8 @@ export const compilerRouter = createTRPCRouter({
       );
     }),
 
-  // ── optimise ──────────────────────────────────────────────────────
-  // Optimises LLVM IR using the O1 pass pipeline with full before/after logging:
-  // opt -passes="default<O1>" -print-before-all -print-after-all filename.ll
-  //
-  // -print-before-all and -print-after-all emit IR before and after every pass
-  // to stderr, giving a complete trace of what each pass changed.
-  //
+  // optimise ------------------------------------------------
+  // Optimises LLVM IR using the O1 pass pipeline with full before/after logging: `opt -passes="default<O1>" -print-before-all -print-after-all filename.ll`
   // Returns: { optimisedIr: string, beforeAfterLog: string }
   optimise: publicProcedure
     .input(
@@ -109,7 +101,7 @@ export const compilerRouter = createTRPCRouter({
       return callLlvmService<{ optimisedIr: string; beforeAfterLog: string }>(
         "optimise",
         { ir: input.ir },
-        35_000, // longer timeout — print-before/after-all produces a lot of output
+        35_000, // longer timeout - print-before/after-all produces a lot of output
       );
     }),
 });
