@@ -56,6 +56,52 @@ app.post("/compile", async (req, res) => {
   }
 });
 
+// POST /optimise
+// Body: { ir: string }
+// Returns: { optimisedIr: string, beforeAfterLog: string }
+
+app.post("/optimise", async (req, res) => {
+  const { ir } = req.body;
+
+  if (!ir || typeof ir !== "string") {
+    return res.status(400).json({ error: "ir is required" });
+  }
+
+  const id = crypto.randomUUID();
+  const inPath = join(tmpdir(), `${id}_in.ll`);
+  const outPath = join(tmpdir(), `${id}_out.ll`);
+
+  try {
+    await writeFile(inPath, ir);
+
+    const { stdout, stderr } = await execAsync(
+      `opt -passes="default<O1>" -print-before-all -print-after-all -S "${inPath}" -o "${outPath}"`,
+      { timeout: 30_000, maxBuffer: 50 * 1024 * 1024 },
+    );
+
+    const optimisedIr = await readFile(outPath, "utf-8");
+
+    res.json({
+      optimisedIr,
+      beforeAfterLog: stderr,
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown LLVM error";
+    res.status(500).json({ error: message });
+  } finally {
+    await Promise.allSettled([unlink(inPath), unlink(outPath)]);
+  }
+});
+
+app.use((_req, res) => {
+  res.status(404).json({ error: "Not found" });
+});
+
+app.use((err, _req, res, _next) => {
+  console.error(err);
+  res.status(500).json({ error: err instanceof Error ? err.message : "Internal server error" });
+});
+
 // Start Server
 
 const PORT = process.env.PORT ?? 3001;
