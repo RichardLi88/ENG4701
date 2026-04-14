@@ -21,14 +21,16 @@ cp .env.example .env
 
 4. If you are on Windows, check `./start-database.sh` first for Windows/WSL setup instructions.
 
-5. Start the local database container:
+5. Start the local database and LLVM service:
 ```bash
 ./start-database.sh
+./start-llvm.sh
 ```
 Notes:
-- First run: creates the Postgres container.
+- First run: creates the Postgres and LLVM container.
 - Later runs: only needed when the container is not already running (for example after restart).
 - If the container is already running, the script exits without changes.
+- The LLVM service runs on port 3001 by default (configurable via `LLVM_SERVICE_URL` in `.env`)
 
 6. Apply Prisma schema to the database:
 ```bash
