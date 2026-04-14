@@ -15,8 +15,8 @@
 set -a
 source .env
 
-LLVM_IMAGE_NAME="llvm-service"
-LLVM_CONTAINER_NAME="llvm-service"
+LLVM_IMAGE_NAME="eng4701-llvm-service"
+LLVM_CONTAINER_NAME="eng4701-llvm-service"
 LLVM_DEFAULT_PORT=3001
 
 # Use LLVM_SERVICE_URL from .env if present, otherwise default to 3001
@@ -43,6 +43,22 @@ if ! $DOCKER_CMD info > /dev/null 2>&1; then
   exit 1
 fi
 
+if $DOCKER_CMD container inspect "$LLVM_CONTAINER_NAME" >/dev/null 2>&1; then
+  IS_RUNNING="$($DOCKER_CMD inspect -f '{{.State.Running}}' "$LLVM_CONTAINER_NAME" 2>/dev/null)"
+  if [ "$IS_RUNNING" = "true" ]; then
+    echo "LLVM service container '$LLVM_CONTAINER_NAME' already running"
+    exit 0
+  fi
+fi
+
+PORT_OWNER_CONTAINER="$($DOCKER_CMD ps -q -f publish=$LLVM_PORT)"
+if [ -n "$PORT_OWNER_CONTAINER" ]; then
+  PORT_OWNER_NAME="$($DOCKER_CMD ps --filter "id=$PORT_OWNER_CONTAINER" --format '{{.Names}}')"
+  echo "Port $LLVM_PORT is already in use by container '${PORT_OWNER_NAME:-$PORT_OWNER_CONTAINER}'."
+  echo "Stop that container and rerun this script."
+  exit 1
+fi
+
 if command -v nc >/dev/null 2>&1; then
   if nc -z localhost "$LLVM_PORT" 2>/dev/null; then
     echo "Port $LLVM_PORT is already in use."
@@ -57,15 +73,14 @@ else
   fi
 fi
 
-if [ "$($DOCKER_CMD ps -q -f name=$LLVM_CONTAINER_NAME)" ]; then
-  echo "LLVM service container '$LLVM_CONTAINER_NAME' already running"
-  exit 0
-fi
-
-if [ "$($DOCKER_CMD ps -q -a -f name=$LLVM_CONTAINER_NAME)" ]; then
-  $DOCKER_CMD start "$LLVM_CONTAINER_NAME"
-  echo "Existing LLVM service container '$LLVM_CONTAINER_NAME' started"
-  exit 0
+if $DOCKER_CMD container inspect "$LLVM_CONTAINER_NAME" >/dev/null 2>&1; then
+  if $DOCKER_CMD start "$LLVM_CONTAINER_NAME" >/dev/null; then
+    echo "Existing LLVM service container '$LLVM_CONTAINER_NAME' started"
+    exit 0
+  else
+    echo "Failed to start existing LLVM service container '$LLVM_CONTAINER_NAME'"
+    exit 1
+  fi
 fi
 
 if ! [ "$($DOCKER_CMD images -q $LLVM_IMAGE_NAME)" ]; then
