@@ -4,6 +4,7 @@
 # TO RUN ON WINDOWS:
 # 1. Install WSL (Windows Subsystem for Linux) - https://learn.microsoft.com/en-us/windows/wsl/install
 # 2. Install Docker Desktop or Podman Deskop
+# 2. Install Docker Desktop or Podman Desktop
 # - Docker Desktop for Windows - https://docs.docker.com/docker-for-windows/install/
 # - Podman Desktop - https://podman.io/getting-started/installation
 # 3. Open WSL - `wsl`
@@ -15,8 +16,8 @@
 set -a
 source .env
 
-LLVM_IMAGE_NAME="eng4701-llvm-service"
-LLVM_CONTAINER_NAME="eng4701-llvm-service"
+LLVM_IMAGE_NAME="llvm-service"
+LLVM_CONTAINER_NAME="ENG4701-llvm-service"
 LLVM_DEFAULT_PORT=3001
 
 # Use LLVM_SERVICE_URL from .env if present, otherwise default to 3001
@@ -43,11 +44,17 @@ if ! $DOCKER_CMD info > /dev/null 2>&1; then
   exit 1
 fi
 
+echo "Building LLVM image '$LLVM_IMAGE_NAME' from dockerfile.llvm..."
+$DOCKER_CMD build -f dockerfile.llvm -t "$LLVM_IMAGE_NAME" . || {
+  echo "Failed to build LLVM image '$LLVM_IMAGE_NAME'"
+  exit 1
+}
+
 if $DOCKER_CMD container inspect "$LLVM_CONTAINER_NAME" >/dev/null 2>&1; then
-  IS_RUNNING="$($DOCKER_CMD inspect -f '{{.State.Running}}' "$LLVM_CONTAINER_NAME" 2>/dev/null)"
-  if [ "$IS_RUNNING" = "true" ]; then
-    echo "LLVM service container '$LLVM_CONTAINER_NAME' already running"
-    exit 0
+  echo "Removing existing LLVM service container '$LLVM_CONTAINER_NAME'..."
+  if ! $DOCKER_CMD rm -f "$LLVM_CONTAINER_NAME" >/dev/null; then
+    echo "Failed to remove existing LLVM service container '$LLVM_CONTAINER_NAME'"
+    exit 1
   fi
 fi
 
@@ -71,24 +78,6 @@ else
     echo "Aborting."
     exit 1
   fi
-fi
-
-if $DOCKER_CMD container inspect "$LLVM_CONTAINER_NAME" >/dev/null 2>&1; then
-  if $DOCKER_CMD start "$LLVM_CONTAINER_NAME" >/dev/null; then
-    echo "Existing LLVM service container '$LLVM_CONTAINER_NAME' started"
-    exit 0
-  else
-    echo "Failed to start existing LLVM service container '$LLVM_CONTAINER_NAME'"
-    exit 1
-  fi
-fi
-
-if ! [ "$($DOCKER_CMD images -q $LLVM_IMAGE_NAME)" ]; then
-  echo "LLVM image '$LLVM_IMAGE_NAME' not found. Building from dockerfile.llvm..."
-  $DOCKER_CMD build -f dockerfile.llvm -t "$LLVM_IMAGE_NAME" . || {
-    echo "Failed to build LLVM image '$LLVM_IMAGE_NAME'"
-    exit 1
-  }
 fi
 
 $DOCKER_CMD run -d \
