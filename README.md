@@ -27,9 +27,10 @@ cp .env.example .env
 ./start-llvm.sh
 ```
 Notes:
-- First run: creates the Postgres and LLVM container.
-- Later runs: only needed when the container is not already running (for example after restart).
-- If the container is already running, the script exits without changes.
+- First run: creates the Postgres and LLVM containers.
+- Later runs: use these scripts when you need to start the services again (for example after a restart).
+- `./start-database.sh` exits without changes if the database container is already running.
+- `./start-llvm.sh` rebuilds the image and removes/recreates the LLVM container if it already exists.
 - The LLVM service runs on port 3001 by default (configurable via `LLVM_SERVICE_URL` in `.env`)
 
 6. Apply Prisma schema to the database:
