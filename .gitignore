@@ -14,6 +14,9 @@
 /generated
 db.sqlite
 
+# llvm service
+/llvm-service/node_modules
+
 # next.js
 /.next/
 /out/

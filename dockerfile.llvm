@@ -1,0 +1,35 @@
+
+# LLVM Service Container
+# Provides clang + opt binaries via a lightweight
+# Express HTTP API consumed by the Next.js tRPC layer
+
+FROM ubuntu:22.04
+
+# Prevent interactive prompts during apt installs
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install LLVM toolchain + Node.js (for the service server)
+RUN apt-get update && apt-get install -y \
+    llvm \
+    clang \
+    curl \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy and install service dependencies
+COPY llvm-service/package*.json ./
+RUN npm install --production
+
+# Copy service source
+COPY llvm-service/ .
+
+# Run as non-root user for security
+RUN useradd -m llvmuser && chown -R llvmuser /app
+USER llvmuser
+
+EXPOSE 3001
+
+CMD ["node", "server.js"]
