@@ -1,66 +1,40 @@
 import type { OptimisationPassViewProps } from "../_lib/optimisation-types";
+import {
+  describePassScope,
+  formatMetricDelta,
+  formatMetricValue,
+  getPassMetric,
+  PASS_METRIC_DEFINITIONS,
+} from "../_lib/pass-detail-display";
+import { IrDiffViewer } from "./ir-diff-viewer";
 
-function scopeLabel(pass: OptimisationPassViewProps["pass"]) {
-  switch (pass.scope.level) {
-    case "module":
-      return "Module";
-    case "function":
-      return `Function · ${pass.scope.functionName}`;
-    case "loop":
-      return `Loop · ${pass.scope.loopId}`;
-    case "unknown":
-      return "Unknown scope";
-  }
-}
-
-type IrPanelProps = Readonly<{
-  label: string;
-  code: string;
-  accent: "before" | "after";
-}>;
-
-function IrPanel({ label, code, accent }: IrPanelProps) {
-  return (
-    <section
-      className="flex min-h-80 min-w-0 flex-col overflow-hidden rounded-xl border border-slate-800 bg-[#070b12] lg:min-h-[30rem]"
-      aria-label={`${label} optimisation IR`}
-    >
-      <div className="flex items-center gap-2 border-b border-slate-800 bg-slate-900/80 px-4 py-3">
-        <span
-          className={`size-2 rounded-full ${accent === "before" ? "bg-amber-300" : "bg-emerald-300"}`}
-          aria-hidden="true"
-        />
-        <h3 className="font-mono text-xs font-semibold tracking-[0.14em] text-slate-300 uppercase">
-          {label}
-        </h3>
-      </div>
-      <div
-        className="min-h-0 flex-1 overflow-auto overscroll-contain focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:outline-none focus-visible:ring-inset"
-        tabIndex={0}
-        role="region"
-        aria-label={`${label} IR, read only`}
-      >
-        <pre className="min-w-max p-4 font-mono text-[0.78rem] leading-6 text-slate-300">
-          <code>{code}</code>
-        </pre>
-      </div>
-    </section>
-  );
-}
+const NOT_AVAILABLE = "Not available";
 
 export function PassDetail({ pass }: OptimisationPassViewProps) {
-  const displayName =
-    pass.fullName.status === "available" ? pass.fullName.data : pass.name;
-  const scope = scopeLabel(pass);
-  const availability = [
-    { label: "Metrics", value: pass.metrics.status },
-    { label: "Control-flow graph", value: pass.cfg.status },
-    { label: "Transformation", value: pass.transformation.status },
-    { label: "Dependencies", value: pass.dependencies.status },
+  const scope = describePassScope(pass);
+  const localPosition =
+    pass.position.withinFunction.status === "available"
+      ? String(pass.position.withinFunction.data + 1)
+      : NOT_AVAILABLE;
+  const overviewItems = [
+    { label: "Name", value: pass.name, mono: true },
+    {
+      label: "Full name",
+      value:
+        pass.fullName.status === "available"
+          ? pass.fullName.data
+          : NOT_AVAILABLE,
+      mono: true,
+    },
+    {
+      label: "Global order",
+      value: String(pass.position.global + 1),
+      mono: false,
+    },
+    { label: "Function order", value: localPosition, mono: false },
+    { label: "Type", value: pass.type, mono: false },
+    { label: "Scope", value: scope, mono: false },
   ] as const;
-  const hasPartialData = availability.some(
-    (item) => item.value === "unavailable",
-  );
 
   return (
     <article className="min-w-0" aria-labelledby="pass-detail-heading">
@@ -90,67 +64,200 @@ export function PassDetail({ pass }: OptimisationPassViewProps) {
         <h2
           id="pass-detail-heading"
           className="mt-3 text-2xl font-semibold tracking-tight break-words text-slate-50 sm:text-3xl"
-          title={displayName}
+          title={pass.name}
         >
-          {displayName}
+          {pass.name}
         </h2>
-        {pass.transformation.status === "available" ? (
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
-            {pass.transformation.data.summary}
-          </p>
-        ) : null}
       </header>
 
       <section
-        aria-labelledby="pass-data-heading"
+        aria-labelledby="pass-overview-heading"
         className="mb-5 rounded-xl border border-slate-800 bg-slate-950/50 p-3"
       >
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h3
-            id="pass-data-heading"
-            className="text-xs font-semibold tracking-[0.14em] text-slate-400 uppercase"
-          >
-            Optional pass data
-          </h3>
-          <span className="text-xs text-slate-500">
-            {hasPartialData ? "Partial data" : "Complete data"}
-          </span>
-        </div>
-        <dl className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {availability.map((item) => (
+        <h3
+          id="pass-overview-heading"
+          className="text-xs font-semibold tracking-[0.14em] text-slate-400 uppercase"
+        >
+          Pass details
+        </h3>
+        <dl className="mt-3 grid gap-x-6 gap-y-4 sm:grid-cols-2 xl:grid-cols-3">
+          {overviewItems.map((item) => (
             <div key={item.label} className="min-w-0">
-              <dt
-                className="truncate text-xs text-slate-500"
-                title={item.label}
-              >
-                {item.label}
-              </dt>
+              <dt className="text-xs text-slate-500">{item.label}</dt>
               <dd
-                className={`mt-1 text-xs font-medium ${
-                  item.value === "available"
-                    ? "text-emerald-300"
-                    : "text-amber-300"
-                }`}
+                className={`mt-1 text-sm break-words text-slate-200 ${item.mono ? "font-mono" : "capitalize"}`}
+                title={item.value}
               >
-                {item.value === "available" ? "Available" : "Not provided"}
+                {item.value}
               </dd>
             </div>
           ))}
         </dl>
       </section>
 
-      <div className="mb-3 flex items-center justify-between gap-4">
-        <h3 className="text-xs font-semibold tracking-[0.18em] text-slate-400 uppercase">
-          Intermediate representation
-        </h3>
-        <p className="hidden text-xs text-slate-600 sm:block">
-          Scroll each pane independently
-        </p>
+      <section aria-labelledby="pass-metrics-heading" className="mb-5">
+        <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h3
+              id="pass-metrics-heading"
+              className="text-xs font-semibold tracking-[0.14em] text-slate-400 uppercase"
+            >
+              Core metrics
+            </h3>
+            <p className="mt-1 text-xs text-slate-500">
+              Before and after this Pass; delta is after minus before.
+            </p>
+          </div>
+          {pass.metrics.status === "unavailable" ? (
+            <span className="text-xs font-medium text-amber-300">
+              {NOT_AVAILABLE}
+            </span>
+          ) : null}
+        </div>
+        <div className="overflow-x-auto rounded-xl border border-slate-800">
+          <table className="w-full min-w-[34rem] border-collapse text-left text-sm">
+            <thead className="bg-slate-950/70 text-xs text-slate-500">
+              <tr>
+                <th scope="col" className="px-4 py-3 font-medium">
+                  Metric
+                </th>
+                <th scope="col" className="px-4 py-3 text-right font-medium">
+                  Before
+                </th>
+                <th scope="col" className="px-4 py-3 text-right font-medium">
+                  After
+                </th>
+                <th scope="col" className="px-4 py-3 text-right font-medium">
+                  Delta
+                </th>
+                <th scope="col" className="px-4 py-3 font-medium">
+                  Quality
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800">
+              {PASS_METRIC_DEFINITIONS.map(({ key, label }) => {
+                const metric = getPassMetric(pass, key);
+
+                return (
+                  <tr key={key} className="bg-slate-900/30">
+                    <th
+                      scope="row"
+                      className="px-4 py-3 font-medium text-slate-300"
+                    >
+                      {label}
+                    </th>
+                    {metric.status === "available" ? (
+                      <>
+                        <td className="px-4 py-3 text-right font-mono text-slate-200 tabular-nums">
+                          {formatMetricValue(metric.data.before)}
+                        </td>
+                        <td className="px-4 py-3 text-right font-mono text-slate-200 tabular-nums">
+                          {formatMetricValue(metric.data.after)}
+                        </td>
+                        <td
+                          className={`px-4 py-3 text-right font-mono tabular-nums ${
+                            metric.data.delta < 0
+                              ? "text-emerald-300"
+                              : metric.data.delta > 0
+                                ? "text-amber-300"
+                                : "text-slate-400"
+                          }`}
+                        >
+                          {formatMetricDelta(metric.data.delta)}
+                        </td>
+                        <td className="px-4 py-3">
+                          {metric.data.estimated ? (
+                            <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-1 text-xs font-medium text-amber-200">
+                              Estimated
+                            </span>
+                          ) : (
+                            <span className="text-xs text-slate-500">
+                              Measured
+                            </span>
+                          )}
+                        </td>
+                      </>
+                    ) : (
+                      <td
+                        colSpan={4}
+                        className="px-4 py-3 text-sm text-amber-300"
+                      >
+                        {NOT_AVAILABLE}
+                      </td>
+                    )}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div className="mb-5 grid gap-4 xl:grid-cols-2">
+        <section
+          aria-labelledby="transformation-heading"
+          className="rounded-xl border border-slate-800 bg-slate-950/50 p-4"
+        >
+          <h3
+            id="transformation-heading"
+            className="text-xs font-semibold tracking-[0.14em] text-slate-400 uppercase"
+          >
+            Transformation
+          </h3>
+          {pass.transformation.status === "available" ? (
+            <div className="mt-3">
+              <p className="text-xs font-medium text-cyan-300">
+                {pass.transformation.data.category}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-300">
+                {pass.transformation.data.summary}
+              </p>
+            </div>
+          ) : (
+            <p className="mt-3 text-sm text-amber-300">{NOT_AVAILABLE}</p>
+          )}
+        </section>
+
+        <section
+          aria-labelledby="dependencies-heading"
+          className="rounded-xl border border-slate-800 bg-slate-950/50 p-4"
+        >
+          <h3
+            id="dependencies-heading"
+            className="text-xs font-semibold tracking-[0.14em] text-slate-400 uppercase"
+          >
+            Dependencies and relations
+          </h3>
+          {pass.dependencies.status === "available" ? (
+            pass.dependencies.data.length > 0 ? (
+              <ul className="mt-3 space-y-2">
+                {pass.dependencies.data.map((dependency, index) => (
+                  <li
+                    key={`${dependency.passId}:${dependency.relation}:${index}`}
+                    className="flex min-w-0 flex-wrap items-center gap-2 text-sm"
+                  >
+                    <span className="rounded-full border border-slate-700 px-2 py-0.5 text-xs font-medium text-slate-300 capitalize">
+                      {dependency.relation}
+                    </span>
+                    <code className="break-all text-slate-400">
+                      {dependency.passId}
+                    </code>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-3 text-sm text-slate-400">
+                No dependencies reported.
+              </p>
+            )
+          ) : (
+            <p className="mt-3 text-sm text-amber-300">{NOT_AVAILABLE}</p>
+          )}
+        </section>
       </div>
-      <div className="grid min-w-0 gap-3 xl:grid-cols-2">
-        <IrPanel label="Before" code={pass.ir.before} accent="before" />
-        <IrPanel label="After" code={pass.ir.after} accent="after" />
-      </div>
+
+      <IrDiffViewer before={pass.ir.before} after={pass.ir.after} />
     </article>
   );
 }

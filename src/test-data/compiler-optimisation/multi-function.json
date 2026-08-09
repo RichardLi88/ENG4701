@@ -38,6 +38,7 @@
       "id": "pass:000001:aW5zdGNvbWJpbmU",
       "order": 1,
       "name": "instcombine",
+      "fullName": "InstCombinePass",
       "type": "transform",
       "scope": {
         "level": "function",
@@ -55,10 +56,21 @@
           "delta": -1,
           "estimated": false
         },
+        "memoryOperations": {
+          "before": 0,
+          "after": 0,
+          "delta": 0
+        },
         "basicBlocks": {
           "before": 1,
           "after": 1,
           "delta": 0
+        },
+        "cyclomaticComplexity": {
+          "before": 1,
+          "after": 1,
+          "delta": 0,
+          "estimated": true
         }
       },
       "cfg": {
