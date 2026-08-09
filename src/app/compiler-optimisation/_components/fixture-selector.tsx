@@ -2,11 +2,13 @@ import Link from "next/link";
 
 const fixtureOptions = [
   { key: "multi", label: "Multi-function" },
+  { key: "real", label: "Real backend" },
   { key: "partial", label: "Partial data" },
   { key: "empty-passes", label: "No passes" },
   { key: "empty-functions", label: "No functions" },
   { key: "invalid", label: "Invalid data" },
   { key: "long-content", label: "Long content" },
+  { key: "many-passes", label: "Many passes" },
 ] as const;
 
 type FixtureSelectorProps = Readonly<{

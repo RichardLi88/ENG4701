@@ -7,6 +7,12 @@
 - `empty-passes.json`: one function with no associated Passes.
 - `empty-functions.json`: no functions and no Passes.
 - `long-content.json`: deliberately long names, signature, source path and IR lines for overflow testing.
+- `many-passes.ts`: generated 60-Pass function with mixed types, scopes and change states for timeline scrolling and navigation testing.
+- `real-backend.json`: sanitised LLVM 14 output captured through the real
+  `/compile` and `/optimise` service endpoints. It preserves complete IR for
+  four representative raw Pass events; raw log positions remain embedded in
+  stable IDs. Metrics and other optional blocks are omitted because the
+  backend did not provide them.
 - `invalid.json`: intentionally invalid because `schemaVersion` is missing and `passes[0].order` is a string.
 
 The optional values in `multi-function.json` describe only the explicit hand-written IR in that fixture. Other fixtures omit unavailable optional data instead of supplying placeholders.
