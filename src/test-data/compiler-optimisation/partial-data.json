@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1.0.0",
+  "meta": {
+    "sourceFile": "partial-data.c",
+    "optimisationLevel": "O1",
+    "totalPasses": 1
+  },
+  "functions": [
+    {
+      "id": "fn:YWRk",
+      "name": "add"
+    }
+  ],
+  "passes": [
+    {
+      "id": "pass:000000:aW5zdGNvbWJpbmU",
+      "order": 0,
+      "name": "instcombine",
+      "type": "transform",
+      "scope": {
+        "level": "function",
+        "functionId": "fn:YWRk"
+      },
+      "changed": true,
+      "ir": {
+        "before": "define i32 @add() {\n  %result = add i32 20, 22\n  ret i32 %result\n}",
+        "after": "define i32 @add() {\n  ret i32 42\n}"
+      }
+    }
+  ]
+}

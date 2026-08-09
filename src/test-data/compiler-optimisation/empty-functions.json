@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0.0",
+  "meta": {
+    "sourceFile": "empty-functions.c",
+    "optimisationLevel": "O1",
+    "totalPasses": 0
+  },
+  "functions": [],
+  "passes": []
+}

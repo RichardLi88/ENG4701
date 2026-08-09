@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "1.0.0",
+  "meta": {
+    "sourceFile": "a-deliberately-long-source-file-name-used-to-check-workspace-overflow-behaviour.c",
+    "optimisationLevel": "O3",
+    "totalPasses": 1
+  },
+  "functions": [
+    {
+      "id": "fn:bG9uZy1uYW1l",
+      "name": "function_with_a_deliberately_extremely_long_name_that_must_not_expand_the_workspace_sidebar_beyond_its_assigned_width",
+      "signature": "i64 (ptr, ptr, i64, i64, i64, i64, i64, i64, i64, i64)"
+    }
+  ],
+  "passes": [
+    {
+      "id": "pass:000000:bG9uZy1wYXNz",
+      "order": 0,
+      "name": "a-deliberately-long-optimisation-pass-name-that-must-wrap-without-breaking-the-detail-layout",
+      "fullName": "A deliberately long optimisation pass name used to verify truncation, wrapping, and independent IR scrolling",
+      "type": "transform",
+      "scope": {
+        "level": "function",
+        "functionId": "fn:bG9uZy1uYW1l"
+      },
+      "changed": true,
+      "ir": {
+        "before": "define i64 @function_with_a_deliberately_extremely_long_name_that_must_not_expand_the_workspace_sidebar_beyond_its_assigned_width(ptr %first_input_pointer, ptr %second_input_pointer, i64 %first_value, i64 %second_value, i64 %third_value, i64 %fourth_value, i64 %fifth_value, i64 %sixth_value, i64 %seventh_value, i64 %eighth_value) {\n  %result = add i64 %first_value, %second_value\n  ret i64 %result\n}",
+        "after": "define i64 @function_with_a_deliberately_extremely_long_name_that_must_not_expand_the_workspace_sidebar_beyond_its_assigned_width(ptr %first_input_pointer, ptr %second_input_pointer, i64 %first_value, i64 %second_value, i64 %third_value, i64 %fourth_value, i64 %fifth_value, i64 %sixth_value, i64 %seventh_value, i64 %eighth_value) {\n  %result = add nuw i64 %first_value, %second_value\n  ret i64 %result\n}"
+      }
+    }
+  ]
+}

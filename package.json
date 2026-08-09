@@ -18,6 +18,8 @@
     "lint:fix": "next lint --fix",
     "preview": "next build && next start",
     "start": "next start",
+    "test:optimisation-schema": "node --experimental-strip-types --test src/app/compiler-optimisation/_lib/optimisation-schema.test.mjs",
+    "test:optimisation-adapter": "node --experimental-strip-types --test src/app/compiler-optimisation/_lib/optimisation-adapter.test.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

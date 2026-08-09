@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "1.0.0",
+  "meta": {
+    "sourceFile": "multi-function.c",
+    "optimisationLevel": "O1",
+    "totalPasses": 5
+  },
+  "functions": [
+    {
+      "id": "fn:bWFpbg",
+      "name": "main",
+      "signature": "i32 ()"
+    },
+    {
+      "id": "fn:aGVscGVy",
+      "name": "helper",
+      "signature": "i32 (i32)"
+    }
+  ],
+  "passes": [
+    {
+      "id": "pass:000000:dmVyaWZ5",
+      "order": 0,
+      "name": "verify",
+      "fullName": "VerifierPass",
+      "type": "analysis",
+      "scope": {
+        "level": "module"
+      },
+      "changed": false,
+      "ir": {
+        "before": "; ModuleID = 'multi-function.c'\ndefine i32 @main() { ret i32 0 }\ndefine i32 @helper(i32 %x) { ret i32 %x }",
+        "after": "; ModuleID = 'multi-function.c'\ndefine i32 @main() { ret i32 0 }\ndefine i32 @helper(i32 %x) { ret i32 %x }"
+      },
+      "dependencies": []
+    },
+    {
+      "id": "pass:000001:aW5zdGNvbWJpbmU",
+      "order": 1,
+      "name": "instcombine",
+      "type": "transform",
+      "scope": {
+        "level": "function",
+        "functionId": "fn:bWFpbg"
+      },
+      "changed": true,
+      "ir": {
+        "before": "define i32 @main() {\n  %sum = add i32 1, 1\n  ret i32 %sum\n}",
+        "after": "define i32 @main() {\n  ret i32 2\n}"
+      },
+      "metrics": {
+        "instructions": {
+          "before": 2,
+          "after": 1,
+          "delta": -1,
+          "estimated": false
+        },
+        "basicBlocks": {
+          "before": 1,
+          "after": 1,
+          "delta": 0
+        }
+      },
+      "cfg": {
+        "before": {
+          "nodes": [
+            {
+              "id": "main:entry",
+              "label": "entry"
+            }
+          ],
+          "edges": []
+        },
+        "after": {
+          "nodes": [
+            {
+              "id": "main:entry",
+              "label": "entry"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "transformation": {
+        "category": "instruction-combine",
+        "summary": "Folded a constant integer addition."
+      },
+      "dependencies": [
+        {
+          "passId": "pass:000000:dmVyaWZ5",
+          "relation": "requires"
+        }
+      ]
+    },
+    {
+      "id": "pass:000002:c2ltcGxpZnljZmc",
+      "order": 2,
+      "name": "simplifycfg",
+      "type": "transform",
+      "scope": {
+        "level": "function",
+        "functionId": "fn:aGVscGVy"
+      },
+      "changed": false,
+      "ir": {
+        "before": "define i32 @helper(i32 %x) {\n  ret i32 %x\n}",
+        "after": "define i32 @helper(i32 %x) {\n  ret i32 %x\n}"
+      }
+    },
+    {
+      "id": "pass:000003:bG9vcC1kZWxldGU",
+      "order": 3,
+      "name": "loop-delete",
+      "type": "transform",
+      "scope": {
+        "level": "loop",
+        "functionId": "fn:bWFpbg",
+        "loopId": "loop:fn:bWFpbg:0"
+      },
+      "changed": true,
+      "ir": {
+        "before": "define i32 @main() {\nentry:\n  br label %loop\nloop:\n  br i1 false, label %loop, label %exit\nexit:\n  ret i32 2\n}",
+        "after": "define i32 @main() {\nentry:\n  ret i32 2\n}"
+      }
+    },
+    {
+      "id": "pass:000004:ZnV0dXJlLXBhc3M",
+      "order": 4,
+      "name": "future-pass",
+      "type": "unknown",
+      "scope": {
+        "level": "unknown",
+        "functionId": "fn:aGVscGVy"
+      },
+      "changed": false,
+      "ir": {
+        "before": "define i32 @helper(i32 %x) {\n  ret i32 %x\n}",
+        "after": "define i32 @helper(i32 %x) {\n  ret i32 %x\n}"
+      }
+    }
+  ]
+}
