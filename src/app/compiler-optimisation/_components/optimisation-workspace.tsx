@@ -3,46 +3,104 @@
 import { useState, type ReactNode } from "react";
 
 import type { OptimisationWorkspaceProps } from "../_lib/optimisation-types";
+import {
+  calculatePassFilterCounts,
+  clearWorkspacePassFilters,
+  createInitialWorkspaceState,
+  deriveWorkspaceSelection,
+  selectAdjacentWorkspacePass,
+  selectWorkspaceFunction,
+  selectWorkspacePass,
+  setWorkspacePassChangeFilter,
+  setWorkspacePassTypeFilter,
+  type PassChangeFilter,
+  type PassTypeFilter,
+} from "../_lib/workspace-state";
 import { FunctionSelector } from "./function-selector";
 import { OptimisationSummary } from "./optimisation-summary";
 import { PassDetail } from "./pass-detail";
+import { PassFiltersControl } from "./pass-filters";
 import { PassList } from "./pass-list";
 import { StatusPanel } from "./status-panel";
 
 type InteractiveOptimisationWorkspaceProps = OptimisationWorkspaceProps &
-  Readonly<{ children?: ReactNode }>;
+  Readonly<{
+    /** Stable identity for one loaded result; changing it resets navigation. */
+    resultKey: string;
+    children?: ReactNode;
+  }>;
 
 export function OptimisationWorkspace({
   model,
+  resultKey,
   children,
 }: InteractiveOptimisationWorkspaceProps) {
-  const [selectedFunctionId, setSelectedFunctionId] = useState<
-    string | undefined
-  >(() => model.functions[0]?.id);
-  const [selectedPassId, setSelectedPassId] = useState<string | undefined>(
-    () => model.functions[0]?.passes[0]?.id,
+  return (
+    <OptimisationWorkspaceSession key={resultKey} model={model}>
+      {children}
+    </OptimisationWorkspaceSession>
   );
-  const selectedFunction =
-    (selectedFunctionId === undefined
-      ? undefined
-      : model.functionsById[selectedFunctionId]) ?? model.functions[0];
-  const selectedPass = selectedFunction?.passes.find(
-    (pass) => pass.id === selectedPassId,
+}
+
+function OptimisationWorkspaceSession({
+  model,
+  children,
+}: OptimisationWorkspaceProps & Readonly<{ children?: ReactNode }>) {
+  const [workspaceState, setWorkspaceState] = useState(() =>
+    createInitialWorkspaceState(model),
   );
+  const { selectedFunction, selectedPass, visiblePasses } =
+    deriveWorkspaceSelection(model, workspaceState);
+  const filterCounts = calculatePassFilterCounts(
+    selectedFunction?.passes ?? [],
+    workspaceState.passFilters,
+  );
+  const hasActiveFilters =
+    workspaceState.passFilters.type !== "all" ||
+    workspaceState.passFilters.change !== "all";
+  const selectedPassIndex = selectedPass
+    ? visiblePasses.findIndex((pass) => pass.id === selectedPass.id)
+    : -1;
+  const canSelectPreviousPass = selectedPassIndex > 0;
+  const canSelectNextPass =
+    selectedPassIndex >= 0 && selectedPassIndex < visiblePasses.length - 1;
 
   function selectFunction(functionId: string) {
-    const nextFunction = model.functionsById[functionId];
-
-    if (nextFunction === undefined) return;
-
-    setSelectedFunctionId(nextFunction.id);
-    setSelectedPassId(nextFunction.passes[0]?.id);
+    setWorkspaceState((state) =>
+      selectWorkspaceFunction(model, state, functionId),
+    );
   }
 
   function selectPass(passId: string) {
-    if (selectedFunction?.passes.some((pass) => pass.id === passId)) {
-      setSelectedPassId(passId);
-    }
+    setWorkspaceState((state) => selectWorkspacePass(model, state, passId));
+  }
+
+  function selectPreviousPass() {
+    setWorkspaceState((state) =>
+      selectAdjacentWorkspacePass(model, state, "previous"),
+    );
+  }
+
+  function selectNextPass() {
+    setWorkspaceState((state) =>
+      selectAdjacentWorkspacePass(model, state, "next"),
+    );
+  }
+
+  function setTypeFilter(filter: PassTypeFilter) {
+    setWorkspaceState((state) =>
+      setWorkspacePassTypeFilter(model, state, filter),
+    );
+  }
+
+  function setChangeFilter(filter: PassChangeFilter) {
+    setWorkspaceState((state) =>
+      setWorkspacePassChangeFilter(model, state, filter),
+    );
+  }
+
+  function clearFilters() {
+    setWorkspaceState((state) => clearWorkspacePassFilters(model, state));
   }
 
   return (
@@ -105,18 +163,50 @@ export function OptimisationWorkspace({
             <aside className="min-w-0 space-y-7 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-2">
               <FunctionSelector
                 functions={model.functions}
-                selectedFunctionId={selectedFunction.id}
+                selectedFunctionId={workspaceState.selectedFunctionId}
                 onSelect={selectFunction}
               />
+              <PassFiltersControl
+                filters={workspaceState.passFilters}
+                counts={filterCounts}
+                onTypeChange={setTypeFilter}
+                onChangeChange={setChangeFilter}
+              />
               <PassList
-                passes={selectedFunction.passes}
+                passes={visiblePasses}
                 selectedPassId={selectedPass?.id}
+                selectedPassIndex={selectedPassIndex}
                 onSelect={selectPass}
+                onPrevious={selectPreviousPass}
+                onNext={selectNextPass}
+                canPrevious={canSelectPreviousPass}
+                canNext={canSelectNextPass}
+                hasActiveFilters={hasActiveFilters}
+                onClearFilters={clearFilters}
               />
             </aside>
 
             <section className="min-w-0 rounded-2xl border border-slate-800 bg-slate-900/30 p-4 sm:p-6 lg:p-7">
-              {selectedPass === undefined ? (
+              {selectedPass === undefined &&
+              visiblePasses.length === 0 &&
+              selectedFunction.passes.length > 0 ? (
+                <div className="space-y-4">
+                  <StatusPanel
+                    eyebrow="Filtered timeline"
+                    title="No Passes match the current filters"
+                    description="Adjust the type or change filters, or clear both filters to continue inspecting this function."
+                    tone="empty"
+                    compact
+                  />
+                  <button
+                    type="button"
+                    onClick={clearFilters}
+                    className="rounded-lg border border-cyan-400/50 bg-cyan-400/10 px-4 py-2.5 text-sm font-semibold text-cyan-200 transition hover:bg-cyan-400/20 focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:outline-none"
+                  >
+                    Clear filters
+                  </button>
+                </div>
+              ) : selectedPass === undefined ? (
                 <StatusPanel
                   eyebrow="No passes"
                   title={`${selectedFunction.name} has no optimisation passes`}

@@ -27,6 +27,9 @@ export function FunctionSelector({
       <ul className="space-y-2">
         {functions.map((fn) => {
           const selected = fn.id === selectedFunctionId;
+          const passCountLabel = `${fn.passes.length} ${
+            fn.passes.length === 1 ? "Pass" : "Passes"
+          }`;
 
           return (
             <li key={fn.id}>
@@ -52,6 +55,9 @@ export function FunctionSelector({
                   >
                     {fn.name}
                   </p>
+                  <span className="ml-auto shrink-0 rounded-full bg-slate-800 px-2 py-0.5 font-mono text-[0.65rem] text-slate-400">
+                    {passCountLabel}
+                  </span>
                 </div>
                 <p
                   className="mt-1.5 truncate pl-3.5 font-mono text-xs text-slate-500"
