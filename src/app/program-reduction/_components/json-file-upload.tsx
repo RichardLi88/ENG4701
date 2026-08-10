@@ -2,22 +2,9 @@
 
 import { useRef, useState } from "react";
 
-import {
-  getJsonRootType,
-  type JsonRootType,
-  type JsonValue,
-} from "../../_helpers/json";
+import { getJsonRootType, type JsonValue } from "../../_helpers/json";
 import { jsonFileUploadContent, jsonRootTypeLabels, units } from "../content";
-
-type UploadState =
-  | { status: "idle" }
-  | {
-      status: "loaded";
-      fileName: string;
-      size: number;
-      topLevelType: JsonRootType;
-    }
-  | { status: "error"; code: keyof typeof jsonFileUploadContent.errors };
+import type { UploadState } from "../models/json-file-upload.types";
 
 export function JsonFileUpload() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -62,7 +49,7 @@ export function JsonFileUpload() {
   };
 
   return (
-    <div className="rounded-lg border border-slate-300 bg-white p-6 shadow-sm">
+    <div className="rounded-lg border border-[var(--app-border)] bg-[var(--app-surface)] p-6 shadow-[var(--app-shadow)] shadow-sm transition-colors">
       <input
         ref={fileInputRef}
         type="file"
@@ -73,27 +60,29 @@ export function JsonFileUpload() {
 
       <button
         type="button"
-        className="rounded-md bg-violet-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-800 focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:outline-none"
+        className="rounded-md bg-[var(--app-accent)] px-5 py-3 text-sm font-semibold text-[var(--app-accent-text)] transition hover:bg-[var(--app-accent-hover)] focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2 focus:ring-offset-[var(--app-surface)] focus:outline-none"
         onClick={() => fileInputRef.current?.click()}
       >
         {jsonFileUploadContent.uploadButton}
       </button>
 
-      <div className="mt-5 min-h-16 rounded-md border border-slate-200 bg-slate-50 p-4 text-sm">
+      <div className="mt-5 min-h-16 rounded-md border border-[var(--app-border-subtle)] bg-[var(--app-panel)] p-4 text-sm transition-colors">
         {uploadState.status === "idle" ? (
-          <p className="text-slate-600">{jsonFileUploadContent.idleMessage}</p>
+          <p className="text-[var(--app-text-muted)]">
+            {jsonFileUploadContent.idleMessage}
+          </p>
         ) : null}
 
         {uploadState.status === "loaded" ? (
-          <dl className="grid gap-2 text-slate-700 sm:grid-cols-3">
+          <dl className="grid gap-2 text-[var(--app-text-secondary)] sm:grid-cols-3">
             <div>
-              <dt className="font-semibold text-slate-950">
+              <dt className="font-semibold text-[var(--app-text-primary)]">
                 {jsonFileUploadContent.labels.file}
               </dt>
               <dd className="break-all">{uploadState.fileName}</dd>
             </div>
             <div>
-              <dt className="font-semibold text-slate-950">
+              <dt className="font-semibold text-[var(--app-text-primary)]">
                 {jsonFileUploadContent.labels.size}
               </dt>
               <dd>
@@ -101,7 +90,7 @@ export function JsonFileUpload() {
               </dd>
             </div>
             <div>
-              <dt className="font-semibold text-slate-950">
+              <dt className="font-semibold text-[var(--app-text-primary)]">
                 {jsonFileUploadContent.labels.jsonRoot}
               </dt>
               <dd>{jsonRootTypeLabels[uploadState.topLevelType]}</dd>
@@ -110,7 +99,7 @@ export function JsonFileUpload() {
         ) : null}
 
         {uploadState.status === "error" ? (
-          <p className="font-medium text-red-700">
+          <p className="font-medium text-[var(--app-error)]">
             {jsonFileUploadContent.errors[uploadState.code]}
           </p>
         ) : null}

@@ -47,6 +47,11 @@
 - Use `"use client"` only for components that require it.
 - Use tRPC client helpers from `src/trpc/server.ts` for server components and `src/trpc/react.tsx` for client components.
 - Keep UI changes consistent with the existing app structure and styling.
+- Keep route pages focused on composition. Move interactive UI into feature components under a local `_components` folder.
+- Put shared frontend helpers in `src/app/_helpers` when they can be reused by more than one route section.
+- Keep feature-level user-facing copy in a local `content.ts` file. Split generic values, labels, errors, and feature headings into separate exported objects when they have different ownership.
+- For scalable light/dark styling, prefer scoped CSS variables on a `data-*` theme attribute instead of duplicating Tailwind color classes throughout components.
+- Theme toggles should use explicit typed modes, accessible switch semantics, and labels from the relevant content file.
 
 ## Verification
 
