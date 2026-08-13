@@ -12,6 +12,24 @@ To develop in this repository:
 
 Keep pull requests short, ideally under 1000 lines per PR.
 
+## Code Style
+
+- Keep route pages focused on composition and move interactive UI into colocated `_components` folders.
+- Keep user-facing strings in a `content.ts` or constants file instead of inline JSX or event handlers.
+- Split content by ownership. For example, feature headings, upload labels, errors, units, and theme toggle labels should be separate exported objects when they are used for different purposes.
+- Put shared frontend helpers in `src/app/_helpers` when they can be reused by multiple route sections.
+- Avoid `unknown` in TypeScript. Define an explicit type or validate data into a known shape. The Prisma global client singleton cast in `src/server/db.ts` is the exception.
+- Prefer scoped CSS variables for scalable light/dark themes. Components should consume theme tokens instead of duplicating light and dark color classes.
+- Theme toggles should use typed modes, accessible switch semantics, and labels from the appropriate content file.
+
+## Verification
+
+Before opening a merge request, run the relevant checks:
+
+- `npm run typecheck` for TypeScript changes.
+- `npx prettier --check <changed-files>` for formatting-sensitive changes.
+- Prisma generation or migration commands when `prisma/schema.prisma` changes.
+
 ## Next.js Routing
 
 Use the Next.js App Router convention consistently:
