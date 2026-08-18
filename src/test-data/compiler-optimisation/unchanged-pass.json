@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1.0.0",
+  "meta": {
+    "sourceFile": "unchanged.c",
+    "optimisationLevel": "O1",
+    "totalPasses": 1
+  },
+  "functions": [
+    {
+      "id": "fn:aWRlbnRpdHk",
+      "name": "identity"
+    }
+  ],
+  "passes": [
+    {
+      "id": "pass:000000:c2ltcGxpZnljZmc",
+      "order": 0,
+      "name": "simplifycfg",
+      "type": "transform",
+      "scope": {
+        "level": "function",
+        "functionId": "fn:aWRlbnRpdHk"
+      },
+      "changed": false,
+      "ir": {
+        "before": "define i32 @identity(i32 %value) {\n  ret i32 %value\n}",
+        "after": "define i32 @identity(i32 %value) {\n  ret i32 %value\n}"
+      }
+    }
+  ]
+}

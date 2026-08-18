@@ -1,7 +1,11 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
+
 import { env } from "~/env";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import realBackendPayload from "~/test-data/compiler-optimisation/real-backend.json";
+
+import { optimisationResultSchema } from "~/app/compiler-optimisation/_lib/optimisation-schema";
 
 const LLVM_URL = env.LLVM_SERVICE_URL;
 
@@ -59,10 +63,9 @@ async function callLlvmService<T>(
   if (typeof parsedBody !== "object" || parsedBody === null) {
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
-      message:
-        `LLVM service returned invalid JSON for ${endpoint}${
-          responseText ? `: ${responseText.slice(0, 500)}` : ""
-        }`,
+      message: `LLVM service returned invalid JSON for ${endpoint}${
+        responseText ? `: ${responseText.slice(0, 500)}` : ""
+      }`,
     });
   }
 
@@ -70,15 +73,24 @@ async function callLlvmService<T>(
 }
 
 export const compilerRouter = createTRPCRouter({
+  // Temporary Day 4 integration entry. The saved payload was captured from
+  // the real LLVM 14 service, sanitised, and is validated at this boundary.
+  getRealOptimisationPayload: publicProcedure.query(() =>
+    optimisationResultSchema.parse(realBackendPayload),
+  ),
+
   // compile ------------------------------------------------
   // Converts a .c or .cpp source file into unoptimised LLVM IR using: `clang -O0 -Xclang -disable-O0-optnone -S -emit-llvm filename.c -o filename.ll`
   // Returns: { ir: string }
   compile: publicProcedure
     .input(
       z.object({
-        source:   z.string().min(1).max(50_000),
-        filename: z.string().regex(/\.(c|cpp)$/).optional(),
-      })
+        source: z.string().min(1).max(50_000),
+        filename: z
+          .string()
+          .regex(/\.(c|cpp)$/)
+          .optional(),
+      }),
     )
     .mutation(async ({ input }) => {
       return callLlvmService<{ ir: string }>(
@@ -95,7 +107,7 @@ export const compilerRouter = createTRPCRouter({
     .input(
       z.object({
         ir: z.string().min(1),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       return callLlvmService<{ optimisedIr: string; beforeAfterLog: string }>(

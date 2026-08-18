@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "1.0.0",
+  "meta": {
+    "sourceFile": "<redacted>/day4-real.c",
+    "optimisationLevel": "O1",
+    "totalPasses": 4
+  },
+  "functions": [
+    {
+      "id": "fn:sum_to_n",
+      "name": "sum_to_n",
+      "signature": "i32 (i32)"
+    },
+    {
+      "id": "fn:main",
+      "name": "main",
+      "signature": "i32 ()"
+    }
+  ],
+  "passes": [
+    {
+      "id": "llvm14:raw-0005:simplifycfg:sum_to_n",
+      "order": 0,
+      "name": "simplifycfg",
+      "fullName": "SimplifyCFGPass",
+      "type": "transform",
+      "scope": {
+        "level": "function",
+        "functionId": "fn:sum_to_n"
+      },
+      "changed": true,
+      "ir": {
+        "before": "; Function Attrs: noinline nounwind uwtable\ndefine dso_local i32 @sum_to_n(i32 noundef %0) #0 {\n  %2 = alloca i32, align 4\n  %3 = alloca i32, align 4\n  %4 = alloca i32, align 4\n  store i32 %0, i32* %2, align 4\n  store i32 0, i32* %3, align 4\n  store i32 0, i32* %4, align 4\n  br label %5\n\n5:                                                ; preds = %13, %1\n  %6 = load i32, i32* %4, align 4\n  %7 = load i32, i32* %2, align 4\n  %8 = icmp slt i32 %6, %7\n  br i1 %8, label %9, label %16\n\n9:                                                ; preds = %5\n  %10 = load i32, i32* %4, align 4\n  %11 = load i32, i32* %3, align 4\n  %12 = add nsw i32 %11, %10\n  store i32 %12, i32* %3, align 4\n  br label %13\n\n13:                                               ; preds = %9\n  %14 = load i32, i32* %4, align 4\n  %15 = add nsw i32 %14, 1\n  store i32 %15, i32* %4, align 4\n  br label %5, !llvm.loop !6\n\n16:                                               ; preds = %5\n  %17 = load i32, i32* %3, align 4\n  ret i32 %17\n}",
+        "after": "; Function Attrs: noinline nounwind uwtable\ndefine dso_local i32 @sum_to_n(i32 noundef %0) #0 {\n  %2 = alloca i32, align 4\n  %3 = alloca i32, align 4\n  %4 = alloca i32, align 4\n  store i32 %0, i32* %2, align 4\n  store i32 0, i32* %3, align 4\n  store i32 0, i32* %4, align 4\n  br label %5\n\n5:                                                ; preds = %9, %1\n  %6 = load i32, i32* %4, align 4\n  %7 = load i32, i32* %2, align 4\n  %8 = icmp slt i32 %6, %7\n  br i1 %8, label %9, label %15\n\n9:                                                ; preds = %5\n  %10 = load i32, i32* %4, align 4\n  %11 = load i32, i32* %3, align 4\n  %12 = add nsw i32 %11, %10\n  store i32 %12, i32* %3, align 4\n  %13 = load i32, i32* %4, align 4\n  %14 = add nsw i32 %13, 1\n  store i32 %14, i32* %4, align 4\n  br label %5, !llvm.loop !6\n\n15:                                               ; preds = %5\n  %16 = load i32, i32* %3, align 4\n  ret i32 %16\n}"
+      }
+    },
+    {
+      "id": "llvm14:raw-0006:sroa:sum_to_n",
+      "order": 1,
+      "name": "sroa",
+      "fullName": "SROAPass",
+      "type": "transform",
+      "scope": {
+        "level": "function",
+        "functionId": "fn:sum_to_n"
+      },
+      "changed": true,
+      "ir": {
+        "before": "; Function Attrs: noinline nounwind uwtable\ndefine dso_local i32 @sum_to_n(i32 noundef %0) #0 {\n  %2 = alloca i32, align 4\n  %3 = alloca i32, align 4\n  %4 = alloca i32, align 4\n  store i32 %0, i32* %2, align 4\n  store i32 0, i32* %3, align 4\n  store i32 0, i32* %4, align 4\n  br label %5\n\n5:                                                ; preds = %9, %1\n  %6 = load i32, i32* %4, align 4\n  %7 = load i32, i32* %2, align 4\n  %8 = icmp slt i32 %6, %7\n  br i1 %8, label %9, label %15\n\n9:                                                ; preds = %5\n  %10 = load i32, i32* %4, align 4\n  %11 = load i32, i32* %3, align 4\n  %12 = add nsw i32 %11, %10\n  store i32 %12, i32* %3, align 4\n  %13 = load i32, i32* %4, align 4\n  %14 = add nsw i32 %13, 1\n  store i32 %14, i32* %4, align 4\n  br label %5, !llvm.loop !6\n\n15:                                               ; preds = %5\n  %16 = load i32, i32* %3, align 4\n  ret i32 %16\n}",
+        "after": "; Function Attrs: noinline nounwind uwtable\ndefine dso_local i32 @sum_to_n(i32 noundef %0) #0 {\n  br label %2\n\n2:                                                ; preds = %4, %1\n  %.06 = phi i32 [ 0, %1 ], [ %5, %4 ]\n  %.0 = phi i32 [ 0, %1 ], [ %6, %4 ]\n  %3 = icmp slt i32 %.0, %0\n  br i1 %3, label %4, label %7\n\n4:                                                ; preds = %2\n  %5 = add nsw i32 %.06, %.0\n  %6 = add nsw i32 %.0, 1\n  br label %2, !llvm.loop !6\n\n7:                                                ; preds = %2\n  ret i32 %.06\n}"
+      }
+    },
+    {
+      "id": "llvm14:raw-0011:sroa:main",
+      "order": 2,
+      "name": "sroa",
+      "fullName": "SROAPass",
+      "type": "transform",
+      "scope": {
+        "level": "function",
+        "functionId": "fn:main"
+      },
+      "changed": true,
+      "ir": {
+        "before": "; Function Attrs: noinline nounwind uwtable\ndefine dso_local i32 @main() #0 {\n  %1 = alloca i32, align 4\n  store i32 0, i32* %1, align 4\n  %2 = call i32 @sum_to_n(i32 noundef 4)\n  ret i32 %2\n}",
+        "after": "; Function Attrs: noinline nounwind uwtable\ndefine dso_local i32 @main() #0 {\n  %1 = call i32 @sum_to_n(i32 noundef 4)\n  ret i32 %1\n}"
+      }
+    },
+    {
+      "id": "llvm14:raw-0026:invalidate-aa:sum_to_n",
+      "order": 3,
+      "name": "invalidate-aa",
+      "fullName": "InvalidateAnalysisPass<llvm::AAManager>",
+      "type": "analysis",
+      "scope": {
+        "level": "function",
+        "functionId": "fn:sum_to_n"
+      },
+      "changed": false,
+      "ir": {
+        "before": "; Function Attrs: noinline nounwind uwtable\ndefine dso_local i32 @sum_to_n(i32 noundef %0) local_unnamed_addr #0 {\n  br label %2\n\n2:                                                ; preds = %4, %1\n  %.06 = phi i32 [ 0, %1 ], [ %5, %4 ]\n  %.0 = phi i32 [ 0, %1 ], [ %6, %4 ]\n  %3 = icmp slt i32 %.0, %0\n  br i1 %3, label %4, label %7\n\n4:                                                ; preds = %2\n  %5 = add nuw nsw i32 %.06, %.0\n  %6 = add nuw nsw i32 %.0, 1\n  br label %2, !llvm.loop !6\n\n7:                                                ; preds = %2\n  ret i32 %.06\n}",
+        "after": "; Function Attrs: noinline nounwind uwtable\ndefine dso_local i32 @sum_to_n(i32 noundef %0) local_unnamed_addr #0 {\n  br label %2\n\n2:                                                ; preds = %4, %1\n  %.06 = phi i32 [ 0, %1 ], [ %5, %4 ]\n  %.0 = phi i32 [ 0, %1 ], [ %6, %4 ]\n  %3 = icmp slt i32 %.0, %0\n  br i1 %3, label %4, label %7\n\n4:                                                ; preds = %2\n  %5 = add nuw nsw i32 %.06, %.0\n  %6 = add nuw nsw i32 %.0, 1\n  br label %2, !llvm.loop !6\n\n7:                                                ; preds = %2\n  ret i32 %.06\n}"
+      }
+    }
+  ]
+}

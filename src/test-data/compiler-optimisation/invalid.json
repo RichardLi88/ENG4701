@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "sourceFile": "invalid.c",
+    "optimisationLevel": "O1",
+    "totalPasses": 1
+  },
+  "functions": [
+    {
+      "id": "fn:bWFpbg",
+      "name": "main"
+    }
+  ],
+  "passes": [
+    {
+      "id": "pass:000000:aW5zdGNvbWJpbmU",
+      "order": "first",
+      "name": "instcombine",
+      "type": "transform",
+      "scope": {
+        "level": "function",
+        "functionId": "fn:bWFpbg"
+      },
+      "changed": true,
+      "ir": {
+        "before": "define i32 @main() { ret i32 1 }",
+        "after": "define i32 @main() { ret i32 2 }"
+      }
+    }
+  ]
+}
