@@ -1,6 +1,41 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
+  --font-sans:
+    var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+[data-app-theme="light"] {
+  --app-page-bg: #f1f5f9;
+  --app-surface: #ffffff;
+  --app-panel: #f8fafc;
+  --app-border: #cbd5e1;
+  --app-border-subtle: #e2e8f0;
+  --app-text-primary: #020617;
+  --app-text-secondary: #334155;
+  --app-text-muted: #64748b;
+  --app-accent: #6d28d9;
+  --app-accent-hover: #5b21b6;
+  --app-accent-text: #ffffff;
+  --app-focus: #8b5cf6;
+  --app-error: #b91c1c;
+  --app-shadow: rgb(15 23 42 / 0.08);
+}
+
+[data-app-theme="dark"] {
+  --app-page-bg: #09090b;
+  --app-surface: #18181b;
+  --app-panel: #09090b;
+  --app-border: #3f3f46;
+  --app-border-subtle: #27272a;
+  --app-text-primary: #fafafa;
+  --app-text-secondary: #d4d4d8;
+  --app-text-muted: #a1a1aa;
+  --app-accent: #8b5cf6;
+  --app-accent-hover: #a78bfa;
+  --app-accent-text: #ffffff;
+  --app-focus: #c4b5fd;
+  --app-error: #fca5a5;
+  --app-shadow: rgb(0 0 0 / 0.3);
 }
