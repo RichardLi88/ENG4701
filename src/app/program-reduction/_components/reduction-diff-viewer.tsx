@@ -57,7 +57,7 @@ function DiffPane({ side, rows, paneRef, onScroll }: DiffPaneProps) {
 
   return (
     <section
-      className="flex min-h-[32rem] min-w-0 flex-col overflow-hidden bg-[#070b12] first:border-r first:border-slate-800"
+      className="flex h-[32rem] min-w-0 flex-col overflow-hidden bg-[#070b12] first:border-r first:border-slate-800"
       aria-label={label}
     >
       <header className="border-b border-slate-800 bg-slate-900 px-4 py-3 font-mono text-xs font-semibold tracking-wider text-slate-200 uppercase">
