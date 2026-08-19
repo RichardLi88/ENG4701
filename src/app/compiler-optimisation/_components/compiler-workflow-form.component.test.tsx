@@ -37,13 +37,12 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 
-async function pasteSource(
-  user: ReturnType<typeof userEvent.setup>,
-  source: string,
-) {
-  const sourceInput = screen.getByRole("textbox", { name: "Source code" });
-  await user.click(sourceInput);
-  await user.paste(source);
+function createSourceFile(name: string, source: string) {
+  const file = new File([source], name, { type: "text/plain" });
+  Object.defineProperty(file, "text", {
+    value: vi.fn().mockResolvedValue(source),
+  });
+  return file;
 }
 
 describe("CompilerWorkflowForm", () => {
@@ -52,18 +51,13 @@ describe("CompilerWorkflowForm", () => {
     mutationMocks.optimise.mockReset();
   });
 
-  test("rejects an unsupported filename before calling the service", async () => {
-    const user = userEvent.setup();
+  test("rejects an unsupported file before calling the service", async () => {
+    const user = userEvent.setup({ applyAccept: false });
     render(<CompilerWorkflowForm onRunStart={vi.fn()} onResult={vi.fn()} />);
 
-    await user.clear(screen.getByRole("textbox", { name: "Filename" }));
-    await user.type(
-      screen.getByRole("textbox", { name: "Filename" }),
-      "input.txt",
-    );
-    await pasteSource(user, "int main() { return 0; }");
-    await user.click(
-      screen.getByRole("button", { name: "Compile and optimise" }),
+    await user.upload(
+      screen.getByLabelText("Upload C/C++ file"),
+      createSourceFile("input.txt", "int main() { return 0; }"),
     );
 
     expect(
@@ -72,35 +66,45 @@ describe("CompilerWorkflowForm", () => {
     expect(mutationMocks.compile).not.toHaveBeenCalled();
   });
 
+  test("collapses to a secondary upload action when a result is visible", () => {
+    render(
+      <CompilerWorkflowForm onRunStart={vi.fn()} onResult={vi.fn()} compact />,
+    );
+
+    expect(screen.getByLabelText("Upload another file")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "Upload C/C++ source" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(".c and .cpp files up to 50,000 characters"),
+    ).not.toBeInTheDocument();
+  });
+
   test("prevents duplicate submission while compilation is pending", async () => {
     const user = userEvent.setup();
     const compilation = deferred<{ ir: string }>();
     mutationMocks.compile.mockReturnValue(compilation.promise);
     render(<CompilerWorkflowForm onRunStart={vi.fn()} onResult={vi.fn()} />);
 
-    await pasteSource(user, "int main() { return 0; }");
-    await user.click(
-      screen.getByRole("button", { name: "Compile and optimise" }),
+    await user.upload(
+      screen.getByLabelText("Upload C/C++ file"),
+      createSourceFile("input.c", "int main() { return 0; }"),
     );
 
     expect(
       screen.getByRole("heading", { name: "Compiling source" }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Running workflow…" }),
-    ).toBeDisabled();
+    expect(screen.getByLabelText("Processing file…")).toBeDisabled();
     expect(mutationMocks.compile).toHaveBeenCalledTimes(1);
 
     await act(async () => {
       compilation.reject({ data: { code: "SERVICE_UNAVAILABLE" } });
     });
 
-    expect(
-      screen.getByRole("button", { name: "Compile and optimise" }),
-    ).toBeEnabled();
+    expect(screen.getByLabelText("Upload C/C++ file")).toBeEnabled();
   });
 
-  test("shows a service error, preserves source, and restores submission", async () => {
+  test("uploads the selected file automatically and restores the control after an error", async () => {
     const user = userEvent.setup();
     mutationMocks.compile.mockRejectedValue({
       data: { code: "SERVICE_UNAVAILABLE", zodError: null },
@@ -108,9 +112,9 @@ describe("CompilerWorkflowForm", () => {
     render(<CompilerWorkflowForm onRunStart={vi.fn()} onResult={vi.fn()} />);
     const source = "int main() { return 0; }";
 
-    await pasteSource(user, source);
-    await user.click(
-      screen.getByRole("button", { name: "Compile and optimise" }),
+    await user.upload(
+      screen.getByLabelText("Upload C/C++ file"),
+      createSourceFile("program.cpp", source),
     );
 
     expect(
@@ -118,11 +122,10 @@ describe("CompilerWorkflowForm", () => {
         "The LLVM service is unavailable. Check the local service, then try again.",
       ),
     ).toBeInTheDocument();
-    expect(screen.getByRole("textbox", { name: "Source code" })).toHaveValue(
+    expect(mutationMocks.compile).toHaveBeenCalledWith({
+      filename: "program.cpp",
       source,
-    );
-    expect(
-      screen.getByRole("button", { name: "Compile and optimise" }),
-    ).toBeEnabled();
+    });
+    expect(screen.getByLabelText("Upload C/C++ file")).toBeEnabled();
   });
 });

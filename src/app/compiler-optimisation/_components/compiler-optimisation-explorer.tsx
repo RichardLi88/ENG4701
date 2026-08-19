@@ -32,7 +32,11 @@ export function CompilerOptimisationExplorer() {
       className="min-h-screen bg-slate-950 text-slate-100 transition-colors"
     >
       <div className="mx-auto w-full max-w-[112rem] px-4 pt-6 sm:px-6 lg:px-8 lg:pt-8">
-        <CompilerWorkflowForm onRunStart={startRun} onResult={loadResult} />
+        <CompilerWorkflowForm
+          onRunStart={startRun}
+          onResult={loadResult}
+          compact={displayResult !== undefined}
+        />
       </div>
 
       {displayResult !== undefined ? (

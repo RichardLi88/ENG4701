@@ -1,21 +1,18 @@
 export const compilerWorkflowContent = {
-  eyebrow: "Run a program",
-  heading: "Compile and optimise C/C++ source",
+  heading: "Upload C/C++ source",
   description:
-    "Enter source code or choose a local file, then send it through the LLVM compile and structured optimisation workflow.",
-  labels: {
-    filename: "Filename",
-    source: "Source code",
-    file: "Choose C/C++ file",
-  },
+    "Choose a local source file to compile and inspect its LLVM optimisation passes.",
+  uploadHelp: ".c and .cpp files up to 50,000 characters",
+  compactRegionLabel: "Source file actions",
   actions: {
-    submit: "Compile and optimise",
-    submitting: "Running workflow…",
+    upload: "Upload C/C++ file",
+    uploadAnother: "Upload another file",
+    uploading: "Processing file…",
   },
   status: {
     idle: {
-      title: "Ready for source code",
-      description: "Choose a .c or .cpp filename and enter code to begin.",
+      title: "Ready for a source file",
+      description: "Choose a .c or .cpp file to begin.",
     },
     validating: {
       title: "Validating input",
@@ -45,9 +42,9 @@ export const compilerWorkflowContent = {
     sourceTooLarge: "Source code must not exceed 50,000 characters.",
     fileReadFailed: "The selected file could not be read. Choose it again.",
     compileFailed:
-      "Compilation failed. Check the source code, then edit it and try again.",
+      "Compilation failed. Check the selected file, then choose it again.",
     optimiseFailed:
-      "Optimisation failed. Your source code is still available so you can try again.",
+      "Optimisation failed. Choose the source file again to retry.",
     serviceUnavailable:
       "The LLVM service is unavailable. Check the local service, then try again.",
     requestTimedOut:
