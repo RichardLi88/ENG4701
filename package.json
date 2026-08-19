@@ -22,6 +22,7 @@
     "test:optimisation-adapter": "node --experimental-strip-types --test src/app/compiler-optimisation/_lib/optimisation-adapter.test.mjs",
     "test:optimisation-diff": "node --experimental-strip-types --test src/app/compiler-optimisation/_lib/optimisation-diff.test.mjs",
     "test:pass-detail-display": "node --experimental-strip-types --test src/app/compiler-optimisation/_lib/pass-detail-display.test.mjs",
+    "test:program-reduction": "node --experimental-strip-types --test src/app/program-reduction/_lib/reduction-trace-adapter.test.mjs",
     "test:real-backend-payload": "node --experimental-strip-types --test src/app/compiler-optimisation/_lib/real-backend-payload.test.mjs",
     "test:workspace-state": "node --experimental-strip-types --test src/app/compiler-optimisation/_lib/workspace-state.test.mjs",
     "typecheck": "tsc --noEmit"
