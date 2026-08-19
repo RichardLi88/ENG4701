@@ -2,11 +2,21 @@
 
 import { useRef, useState } from "react";
 
-import { getJsonRootType, type JsonValue } from "../../_helpers/json";
-import { jsonFileUploadContent, jsonRootTypeLabels, units } from "../content";
+import type { JsonValue } from "../../_helpers/json";
+import { jsonFileUploadContent, units } from "../content";
+import { parseReductionTrace } from "../_lib/reduction-trace-adapter";
+import type { ReductionTraceViewModel } from "../_lib/reduction-trace-adapter";
 import type { UploadState } from "../models/json-file-upload.types";
 
-export function JsonFileUpload() {
+type JsonFileUploadProps = Readonly<{
+  hasLoadedTrace: boolean;
+  onTraceLoaded: (model: ReductionTraceViewModel, fileName: string) => void;
+}>;
+
+export function JsonFileUpload({
+  hasLoadedTrace,
+  onTraceLoaded,
+}: JsonFileUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadState, setUploadState] = useState<UploadState>({
     status: "idle",
@@ -31,13 +41,23 @@ export function JsonFileUpload() {
 
     try {
       const parsedJson = JSON.parse(await file.text()) as JsonValue;
+      const result = parseReductionTrace(parsedJson);
+
+      if (!result.ok) {
+        setUploadState({
+          status: "error",
+          code: "invalidTrace",
+          detail: result.message,
+        });
+        return;
+      }
 
       setUploadState({
         status: "loaded",
         fileName: file.name,
         size: file.size,
-        topLevelType: getJsonRootType(parsedJson),
       });
+      onTraceLoaded(result.data, file.name);
     } catch {
       setUploadState({
         status: "error",
@@ -63,7 +83,9 @@ export function JsonFileUpload() {
         className="rounded-md bg-[var(--app-accent)] px-5 py-3 text-sm font-semibold text-[var(--app-accent-text)] transition hover:bg-[var(--app-accent-hover)] focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2 focus:ring-offset-[var(--app-surface)] focus:outline-none"
         onClick={() => fileInputRef.current?.click()}
       >
-        {jsonFileUploadContent.uploadButton}
+        {hasLoadedTrace
+          ? jsonFileUploadContent.replaceButton
+          : jsonFileUploadContent.uploadButton}
       </button>
 
       <div className="mt-5 min-h-16 rounded-md border border-[var(--app-border-subtle)] bg-[var(--app-panel)] p-4 text-sm transition-colors">
@@ -74,7 +96,7 @@ export function JsonFileUpload() {
         ) : null}
 
         {uploadState.status === "loaded" ? (
-          <dl className="grid gap-2 text-[var(--app-text-secondary)] sm:grid-cols-3">
+          <dl className="grid gap-2 text-[var(--app-text-secondary)] sm:grid-cols-2">
             <div>
               <dt className="font-semibold text-[var(--app-text-primary)]">
                 {jsonFileUploadContent.labels.file}
@@ -89,19 +111,20 @@ export function JsonFileUpload() {
                 {uploadState.size.toLocaleString()} {units.bytes}
               </dd>
             </div>
-            <div>
-              <dt className="font-semibold text-[var(--app-text-primary)]">
-                {jsonFileUploadContent.labels.jsonRoot}
-              </dt>
-              <dd>{jsonRootTypeLabels[uploadState.topLevelType]}</dd>
-            </div>
           </dl>
         ) : null}
 
         {uploadState.status === "error" ? (
-          <p className="font-medium text-[var(--app-error)]">
-            {jsonFileUploadContent.errors[uploadState.code]}
-          </p>
+          <div role="alert" className="text-[var(--app-error)]">
+            <p className="font-medium">
+              {jsonFileUploadContent.errors[uploadState.code]}
+            </p>
+            {uploadState.detail !== undefined ? (
+              <p className="mt-1 font-mono text-xs break-words">
+                {uploadState.detail}
+              </p>
+            ) : null}
+          </div>
         ) : null}
       </div>
     </div>
