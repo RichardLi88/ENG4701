@@ -12,7 +12,6 @@ import type { OptimisationViewModel } from "../_lib/optimisation-types";
 import {
   classifyCompilerWorkflowFailure,
   isCompilerWorkflowPending,
-  MAX_SOURCE_LENGTH,
   type CompilerWorkflowRemoteStage,
   type CompilerWorkflowState,
   validateCompilerInput,
@@ -24,14 +23,14 @@ const initialWorkflowState: CompilerWorkflowState = { status: "idle" };
 type CompilerWorkflowFormProps = Readonly<{
   onRunStart: () => void;
   onResult: (model: OptimisationViewModel) => void;
+  compact?: boolean;
 }>;
 
 export function CompilerWorkflowForm({
   onRunStart,
   onResult,
+  compact = false,
 }: CompilerWorkflowFormProps) {
-  const [filename, setFilename] = useState("input.c");
-  const [source, setSource] = useState("");
   const [workflowState, setWorkflowState] =
     useState<CompilerWorkflowState>(initialWorkflowState);
   const submissionInProgressRef = useRef(false);
@@ -61,31 +60,28 @@ export function CompilerWorkflowForm({
       return;
     }
 
-    try {
-      const fileSource = await file.text();
+    submissionInProgressRef.current = true;
+    setWorkflowState({ status: "validating" });
 
-      if (mountedRef.current) {
-        setFilename(file.name);
-        setSource(fileSource);
-        setWorkflowState(initialWorkflowState);
-      }
+    let fileSource: string;
+
+    try {
+      fileSource = await file.text();
     } catch {
       if (mountedRef.current) {
         setWorkflowState({ status: "failure", code: "fileReadFailed" });
       }
-    }
-  }
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    if (submissionInProgressRef.current) {
+      submissionInProgressRef.current = false;
       return;
     }
 
-    submissionInProgressRef.current = true;
-    setWorkflowState({ status: "validating" });
-    const validation = validateCompilerInput(filename, source);
+    if (!mountedRef.current) {
+      submissionInProgressRef.current = false;
+      return;
+    }
+
+    const validation = validateCompilerInput(file.name, fileSource);
 
     if (!validation.ok) {
       setWorkflowState({ status: "failure", code: validation.code });
@@ -157,83 +153,92 @@ export function CompilerWorkflowForm({
         }
       : compilerWorkflowContent.status[workflowState.status];
 
+  if (compact) {
+    return (
+      <section
+        aria-label={compilerWorkflowContent.compactRegionLabel}
+        className="flex justify-end"
+      >
+        <label className="inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-slate-200 transition-colors focus-within:ring-2 focus-within:ring-cyan-300 focus-within:outline-none hover:border-slate-600 hover:bg-slate-800 has-disabled:cursor-not-allowed has-disabled:opacity-50">
+          <UploadIcon />
+          {isPending
+            ? compilerWorkflowContent.actions.uploading
+            : compilerWorkflowContent.actions.uploadAnother}
+          <input
+            type="file"
+            accept=".c,.cpp,text/x-c,text/x-c++"
+            disabled={isPending}
+            onChange={handleFileSelect}
+            className="sr-only"
+          />
+        </label>
+      </section>
+    );
+  }
+
   return (
-    <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6">
-      <div className="max-w-3xl">
-        <p className="text-xs font-semibold tracking-[0.18em] text-cyan-300 uppercase">
-          {compilerWorkflowContent.eyebrow}
-        </p>
-        <h2 className="mt-2 text-xl font-semibold text-white">
+    <section className="mx-auto max-w-3xl rounded-2xl border border-slate-800 bg-slate-900/60 p-6 sm:p-8">
+      <div className="max-w-2xl">
+        <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
           {compilerWorkflowContent.heading}
-        </h2>
-        <p className="mt-2 text-sm leading-6 text-slate-400">
+        </h1>
+        <p className="mt-3 text-sm leading-6 text-slate-400 sm:text-base">
           {compilerWorkflowContent.description}
         </p>
       </div>
 
-      <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
-        <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
-          <label className="block min-w-0 text-sm font-medium text-slate-200">
-            {compilerWorkflowContent.labels.filename}
-            <input
-              value={filename}
-              onChange={(event) => setFilename(event.target.value)}
-              disabled={isPending}
-              spellCheck={false}
-              className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 font-mono text-sm text-slate-100 focus-visible:border-cyan-400 focus-visible:ring-2 focus-visible:ring-cyan-400/30 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
-            />
-          </label>
-          <label className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-slate-600 bg-slate-800 px-4 py-2.5 text-sm font-semibold text-slate-100 transition focus-within:ring-2 focus-within:ring-cyan-300 focus-within:outline-none hover:border-slate-500 hover:bg-slate-700 has-disabled:cursor-not-allowed has-disabled:opacity-60">
-            {compilerWorkflowContent.labels.file}
-            <input
-              type="file"
-              accept=".c,.cpp,text/x-c,text/x-c++"
-              disabled={isPending}
-              onChange={handleFileSelect}
-              className="sr-only"
-            />
-          </label>
-        </div>
-
-        <label className="block text-sm font-medium text-slate-200">
-          {compilerWorkflowContent.labels.source}
-          <textarea
-            value={source}
-            onChange={(event) => setSource(event.target.value)}
+      <div className="mt-6">
+        <label className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-cyan-400/10 px-5 py-3 text-sm font-semibold text-cyan-100 transition-colors focus-within:ring-2 focus-within:ring-cyan-300 focus-within:ring-offset-2 focus-within:ring-offset-slate-900 focus-within:outline-none hover:bg-cyan-400/20 has-disabled:cursor-not-allowed has-disabled:opacity-50 sm:w-auto">
+          <UploadIcon />
+          {isPending
+            ? compilerWorkflowContent.actions.uploading
+            : compilerWorkflowContent.actions.upload}
+          <input
+            type="file"
+            accept=".c,.cpp,text/x-c,text/x-c++"
             disabled={isPending}
-            rows={10}
-            maxLength={MAX_SOURCE_LENGTH + 1}
-            spellCheck={false}
-            className="mt-2 w-full resize-y rounded-lg border border-slate-700 bg-slate-950 px-3 py-3 font-mono text-sm leading-6 text-slate-100 focus-visible:border-cyan-400 focus-visible:ring-2 focus-visible:ring-cyan-400/30 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+            onChange={handleFileSelect}
+            aria-describedby="compiler-upload-help"
+            className="sr-only"
           />
         </label>
-
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs text-slate-500">
-            {source.length.toLocaleString()} /{" "}
-            {MAX_SOURCE_LENGTH.toLocaleString()} characters
-          </p>
-          <button
-            type="submit"
-            disabled={isPending}
-            className="rounded-lg border border-cyan-400/50 bg-cyan-400/10 px-4 py-2.5 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-400/20 focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isPending
-              ? compilerWorkflowContent.actions.submitting
-              : compilerWorkflowContent.actions.submit}
-          </button>
-        </div>
-      </form>
-
-      <div className="mt-5">
-        <StatusPanel
-          eyebrow={workflowState.status}
-          title={statusContent.title}
-          description={statusContent.description}
-          tone={workflowState.status === "failure" ? "error" : "info"}
-          compact
-        />
+        <p
+          id="compiler-upload-help"
+          className="mt-3 text-xs leading-5 text-slate-500"
+        >
+          {compilerWorkflowContent.uploadHelp}
+        </p>
       </div>
+
+      {workflowState.status !== "idle" ? (
+        <div className="mt-6">
+          <StatusPanel
+            eyebrow={workflowState.status}
+            title={statusContent.title}
+            description={statusContent.description}
+            tone={workflowState.status === "failure" ? "error" : "info"}
+            compact
+          />
+        </div>
+      ) : null}
     </section>
+  );
+}
+
+function UploadIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="size-5"
+    >
+      <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5" />
+      <path d="M5 14.5v3A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5v-3" />
+    </svg>
   );
 }
