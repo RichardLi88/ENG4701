@@ -9,9 +9,7 @@ import multiFunctionFixture from "~/test-data/compiler-optimisation/multi-functi
 import partialDataFixture from "~/test-data/compiler-optimisation/partial-data.json";
 import { api } from "~/trpc/server";
 
-import { FixtureSelector } from "./_components/fixture-selector";
-import { OptimisationWorkspace } from "./_components/optimisation-workspace";
-import { StatusPanel } from "./_components/status-panel";
+import { CompilerOptimisationExplorer } from "./_components/compiler-optimisation-explorer";
 import { parseOptimisationResult } from "./_lib/optimisation-adapter";
 import type { OptimisationViewModel } from "./_lib/optimisation-types";
 
@@ -64,34 +62,22 @@ export default async function CompilerOptimisationPage({
 
   if (!result.ok) {
     return (
-      <main className="min-h-screen bg-slate-950 px-4 py-8 text-slate-100 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl">
-          <FixtureSelector selectedFixture={fixtureKey} />
-          <div className="mt-8">
-            <StatusPanel
-              eyebrow="Invalid data"
-              title="The optimisation result could not be displayed"
-              description={`${result.error.message} ${result.error.issues
-                .slice(0, 3)
-                .map(
-                  (issue) =>
-                    `${issue.path.join(".") || "payload"}: ${issue.message}`,
-                )
-                .join("; ")}`}
-              tone="error"
-            />
-          </div>
-        </div>
-      </main>
+      <CompilerOptimisationExplorer
+        fixtureKey={fixtureKey}
+        initialError={`${result.error.message} ${result.error.issues
+          .slice(0, 3)
+          .map(
+            (issue) => `${issue.path.join(".") || "payload"}: ${issue.message}`,
+          )
+          .join("; ")}`}
+      />
     );
   }
 
   return (
-    <OptimisationWorkspace
-      model={toClientViewModel(result.data)}
-      resultKey={fixtureKey}
-    >
-      <FixtureSelector selectedFixture={fixtureKey} />
-    </OptimisationWorkspace>
+    <CompilerOptimisationExplorer
+      fixtureKey={fixtureKey}
+      initialModel={toClientViewModel(result.data)}
+    />
   );
 }

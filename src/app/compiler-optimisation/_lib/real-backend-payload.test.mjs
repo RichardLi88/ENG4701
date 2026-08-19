@@ -9,6 +9,10 @@ const fixtureUrl = new URL(
   "../../../test-data/compiler-optimisation/real-backend.json",
   import.meta.url,
 );
+const day2FixtureUrl = new URL(
+  "../../../test-data/compiler-optimisation/day2-real-backend.json",
+  import.meta.url,
+);
 
 function readFixtureText() {
   return readFileSync(fixtureUrl, "utf8");
@@ -103,4 +107,17 @@ test("special function and Pass names remain literal UI data", () => {
       .functionName,
     'operator<< <T> & "quoted"',
   );
+});
+
+test("Day 2 end-to-end payload is complete, sanitised, and adaptable", () => {
+  const fixtureText = readFileSync(day2FixtureUrl, "utf8");
+  const payload = optimisationResultSchema.parse(JSON.parse(fixtureText));
+  const result = parseOptimisationResult(payload);
+
+  assert.equal(result.ok, true, result.ok ? undefined : result.error.message);
+  assert.equal(payload.meta.sourceFile, "e2e-multi-function.c");
+  assert.equal(payload.functions.length, 2);
+  assert.equal(payload.passes.length, 153);
+  assert.equal(fixtureText.includes("/tmp/"), false);
+  assert.ok(result.data.summary.changedPassCount > 0);
 });

@@ -13,6 +13,10 @@
   four representative raw Pass events; raw log positions remain embedded in
   stable IDs. Metrics and other optional blocks are omitted because the
   backend did not provide them.
+- `day2-real-backend.json`: complete Day 2 regression payload captured from
+  `e2e-multi-function.c` through the local LLVM 14 `/compile` and
+  `/optimise-structured` endpoints. It contains the full paired pass stream
+  after temporary paths are sanitised.
 - `invalid.json`: intentionally invalid because `schemaVersion` is missing and `passes[0].order` is a string.
 
 The optional values in `multi-function.json` describe only the explicit hand-written IR in that fixture. Other fixtures omit unavailable optional data instead of supplying placeholders.

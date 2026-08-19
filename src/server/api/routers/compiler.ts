@@ -5,16 +5,22 @@ import { env } from "~/env";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import realBackendPayload from "~/test-data/compiler-optimisation/real-backend.json";
 
+import type { JsonValue } from "~/app/_helpers/json";
 import { optimisationResultSchema } from "~/app/compiler-optimisation/_lib/optimisation-schema";
 
 const LLVM_URL = env.LLVM_SERVICE_URL;
+const compilationResponseSchema = z.object({ ir: z.string().min(1) });
+const rawOptimisationResponseSchema = z.object({
+  optimisedIr: z.string().min(1),
+  beforeAfterLog: z.string().min(1),
+});
 
 // Shared fetch helper - calls the LLVM service and throws a TRPCError on failure
-async function callLlvmService<T>(
+async function callLlvmService(
   endpoint: string,
-  body: unknown,
+  body: JsonValue,
   timeoutMs: number,
-): Promise<T> {
+): Promise<JsonValue> {
   let res: Response;
 
   try {
@@ -25,51 +31,56 @@ async function callLlvmService<T>(
       signal: AbortSignal.timeout(timeoutMs),
     });
   } catch (err) {
+    console.error(`[LLVM ${endpoint}] request failed`, err);
+
+    if (err instanceof Error && err.name === "TimeoutError") {
+      throw new TRPCError({
+        code: "TIMEOUT",
+        message: "The LLVM service request timed out.",
+      });
+    }
+
     throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      message: `Could not reach LLVM service: ${String(err)}`,
+      code: "SERVICE_UNAVAILABLE",
+      message: "The LLVM service is currently unavailable.",
     });
   }
 
   const responseText = await res.text();
   const contentType = res.headers.get("content-type") ?? "";
 
-  let parsedBody: unknown = responseText;
+  let parsedBody: JsonValue = responseText;
   if (contentType.includes("application/json") && responseText.length > 0) {
     try {
-      parsedBody = JSON.parse(responseText) as unknown;
+      parsedBody = JSON.parse(responseText) as JsonValue;
     } catch {
       parsedBody = responseText;
     }
   }
 
   if (!res.ok) {
-    const errorMessage =
-      typeof parsedBody === "object" && parsedBody !== null
-        ? ((parsedBody as { error?: string; message?: string }).error ??
-          (parsedBody as { error?: string; message?: string }).message)
-        : undefined;
+    console.error(
+      `[LLVM ${endpoint}] returned ${res.status} ${res.statusText}`,
+      responseText.slice(0, 2_000),
+    );
 
     throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
+      code: endpoint === "compile" ? "BAD_REQUEST" : "INTERNAL_SERVER_ERROR",
       message:
-        errorMessage ??
-        `LLVM service returned ${res.status} ${res.statusText}${
-          responseText ? `: ${responseText.slice(0, 500)}` : ""
-        }`,
+        endpoint === "compile"
+          ? "LLVM could not compile the submitted source."
+          : "LLVM could not optimise the compiled program.",
     });
   }
 
   if (typeof parsedBody !== "object" || parsedBody === null) {
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
-      message: `LLVM service returned invalid JSON for ${endpoint}${
-        responseText ? `: ${responseText.slice(0, 500)}` : ""
-      }`,
+      message: "The LLVM service returned an invalid response.",
     });
   }
 
-  return parsedBody as T;
+  return parsedBody;
 }
 
 export const compilerRouter = createTRPCRouter({
@@ -88,16 +99,21 @@ export const compilerRouter = createTRPCRouter({
         source: z.string().min(1).max(50_000),
         filename: z
           .string()
-          .regex(/\.(c|cpp)$/)
+          .regex(/\.(c|cpp)$/i)
           .optional(),
       }),
     )
     .mutation(async ({ input }) => {
-      return callLlvmService<{ ir: string }>(
+      const payload = await callLlvmService(
         "compile",
-        { source: input.source, filename: input.filename },
+        {
+          source: input.source,
+          ...(input.filename === undefined ? {} : { filename: input.filename }),
+        },
         15_000,
       );
+
+      return compilationResponseSchema.parse(payload);
     }),
 
   // optimise ------------------------------------------------
@@ -110,10 +126,33 @@ export const compilerRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
-      return callLlvmService<{ optimisedIr: string; beforeAfterLog: string }>(
+      const payload = await callLlvmService(
         "optimise",
         { ir: input.ir },
         35_000, // longer timeout - print-before/after-all produces a lot of output
       );
+
+      return rawOptimisationResponseSchema.parse(payload);
+    }),
+
+  // Structured optimisation boundary used by the end-to-end UI workflow.
+  // The LLVM service owns conversion from the raw pass log to this payload;
+  // tRPC rejects an incompatible response before it reaches the client.
+  optimiseStructured: publicProcedure
+    .input(
+      z.object({
+        ir: z.string().min(1),
+        filename: z.string().regex(/\.(c|cpp)$/i),
+      }),
+    )
+    .output(optimisationResultSchema)
+    .mutation(async ({ input }) => {
+      const payload = await callLlvmService(
+        "optimise-structured",
+        { ir: input.ir, filename: input.filename },
+        35_000,
+      );
+
+      return optimisationResultSchema.parse(payload);
     }),
 });
