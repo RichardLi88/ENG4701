@@ -3,7 +3,6 @@ import { z } from "zod";
 import { env } from "~/env";
 import { callLlvmService } from "~/server/api/llvm-service-client";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import realBackendPayload from "~/test-data/compiler-optimisation/real-backend.json";
 
 import { optimisationResultSchema } from "~/app/compiler-optimisation/_lib/optimisation-schema";
 
@@ -15,12 +14,6 @@ const rawOptimisationResponseSchema = z.object({
 });
 
 export const compilerRouter = createTRPCRouter({
-  // Temporary Day 4 integration entry. The saved payload was captured from
-  // the real LLVM 14 service, sanitised, and is validated at this boundary.
-  getRealOptimisationPayload: publicProcedure.query(() =>
-    optimisationResultSchema.parse(realBackendPayload),
-  ),
-
   // compile ------------------------------------------------
   // Converts a .c or .cpp source file into unoptimised LLVM IR using: `clang -O0 -Xclang -disable-O0-optnone -S -emit-llvm filename.c -o filename.ll`
   // Returns: { ir: string }

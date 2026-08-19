@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const CURRENT_OPTIMISATION_SCHEMA_VERSION = "1.0.0" as const;
+export const CURRENT_OPTIMISATION_SCHEMA_VERSION = "1.1.0" as const;
 export const SUPPORTED_OPTIMISATION_SCHEMA_MAJOR = 1 as const;
 
 const MAX_ID_LENGTH = 1_024;
@@ -9,6 +9,7 @@ const MAX_IR_LENGTH = 10_000_000;
 const MAX_FUNCTIONS = 10_000;
 const MAX_PASSES = 100_000;
 const MAX_GRAPH_ITEMS = 100_000;
+const MAX_DIFF_LINES = 1_000_000;
 
 const nonBlankString = (maximum: number) =>
   z
@@ -64,10 +65,112 @@ export const optimisationPassScopeSchema = z.discriminatedUnion("level", [
   }),
 ]);
 
-export const passIrSchema = z.object({
-  before: z.string().min(1).max(MAX_IR_LENGTH),
-  after: z.string().min(1).max(MAX_IR_LENGTH),
-});
+export const irDiffLineKindSchema = z.enum(["unchanged", "added", "removed"]);
+
+export const irDiffLineSchema = z
+  .object({
+    kind: irDiffLineKindSchema,
+    content: z.string().max(MAX_IR_LENGTH),
+    beforeLineNumber: z.number().int().positive().nullable(),
+    afterLineNumber: z.number().int().positive().nullable(),
+    endsWithNewline: z.boolean(),
+  })
+  .superRefine((line, ctx) => {
+    if (line.kind === "added" && line.beforeLineNumber !== null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["beforeLineNumber"],
+        message: "Added lines must not have a before line number",
+      });
+    }
+    if (line.kind !== "added" && line.beforeLineNumber === null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["beforeLineNumber"],
+        message: "Expected a before line number",
+      });
+    }
+    if (line.kind === "removed" && line.afterLineNumber !== null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["afterLineNumber"],
+        message: "Removed lines must not have an after line number",
+      });
+    }
+    if (line.kind !== "removed" && line.afterLineNumber === null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["afterLineNumber"],
+        message: "Expected an after line number",
+      });
+    }
+  });
+
+function reconstructIrFromDiff(
+  lines: ReadonlyArray<z.infer<typeof irDiffLineSchema>>,
+  side: "before" | "after",
+): string {
+  return lines
+    .filter((line) =>
+      side === "before" ? line.kind !== "added" : line.kind !== "removed",
+    )
+    .map((line) => `${line.content}${line.endsWithNewline ? "\n" : ""}`)
+    .join("");
+}
+
+function normaliseIrLineEndings(value: string): string {
+  return value.replace(/\r\n?/g, "\n");
+}
+
+export const passIrSchema = z
+  .object({
+    before: z.string().min(1).max(MAX_IR_LENGTH),
+    after: z.string().min(1).max(MAX_IR_LENGTH),
+    diff: z.array(irDiffLineSchema).min(1).max(MAX_DIFF_LINES).optional(),
+  })
+  .superRefine((ir, ctx) => {
+    let expectedBeforeLineNumber = 1;
+    let expectedAfterLineNumber = 1;
+
+    ir.diff?.forEach((line, index) => {
+      if (
+        line.kind !== "added" &&
+        line.beforeLineNumber !== expectedBeforeLineNumber
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["diff", index, "beforeLineNumber"],
+          message: `Expected before line ${expectedBeforeLineNumber}`,
+        });
+      }
+      if (
+        line.kind !== "removed" &&
+        line.afterLineNumber !== expectedAfterLineNumber
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["diff", index, "afterLineNumber"],
+          message: `Expected after line ${expectedAfterLineNumber}`,
+        });
+      }
+      if (line.kind !== "added") expectedBeforeLineNumber += 1;
+      if (line.kind !== "removed") expectedAfterLineNumber += 1;
+    });
+
+    if (
+      ir.diff !== undefined &&
+      (reconstructIrFromDiff(ir.diff, "before") !==
+        normaliseIrLineEndings(ir.before) ||
+        reconstructIrFromDiff(ir.diff, "after") !==
+          normaliseIrLineEndings(ir.after))
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["diff"],
+        message: "Structured Diff does not reconstruct the IR snapshots",
+      });
+    }
+  });
 
 export const beforeAfterMetricSchema = z.object({
   before: finiteMetricValue,
@@ -261,6 +364,20 @@ export const optimisationResultSchema = z
         }
       });
     });
+
+    const [, minorVersion = "0"] = result.schemaVersion.split(".");
+    if (Number(minorVersion) >= 1) {
+      result.passes.forEach((pass, passIndex) => {
+        if (pass.changed && pass.ir.diff === undefined) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["passes", passIndex, "ir", "diff"],
+            message:
+              "Schema 1.1 or later requires a structured Diff for changed passes",
+          });
+        }
+      });
+    }
   });
 
 /** Validate untrusted service data at the external payload boundary. */

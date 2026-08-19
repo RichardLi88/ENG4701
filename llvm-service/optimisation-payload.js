@@ -45,6 +45,7 @@ const {
   TRANSFORMATION_CATEGORIES,
   transformationSummary,
 } = require("./optimisation-content");
+const { createStructuredDiff } = require("./structured-diff");
 
 function sanitiseIr(ir, sourceFile) {
   return ir
@@ -535,6 +536,9 @@ function createOptimisationPayload({
       name,
       metrics,
     );
+    const diff = changed
+      ? createStructuredDiff(before.ir, after.ir)
+      : undefined;
 
     passes.push({
       id: `llvm14:${String(order).padStart(4, "0")}:${name}`,
@@ -544,7 +548,11 @@ function createOptimisationPayload({
       type,
       scope,
       changed,
-      ir: { before: before.ir, after: after.ir },
+      ir: {
+        before: before.ir,
+        after: after.ir,
+        ...(diff ? { diff } : {}),
+      },
       ...(metrics ? { metrics } : {}),
       ...(cfg ? { cfg } : {}),
       ...(transformation ? { transformation } : {}),
@@ -557,7 +565,7 @@ function createOptimisationPayload({
   }
 
   return {
-    schemaVersion: "1.0.0",
+    schemaVersion: "1.1.0",
     meta: {
       sourceFile,
       optimisationLevel: "O1",

@@ -153,8 +153,45 @@ test("missing optional data remains explicitly unavailable", () => {
     status: "unavailable",
     reason: "not-provided",
   });
+  assert.deepEqual(pass.ir.diff, {
+    status: "unavailable",
+    reason: "not-provided",
+  });
   assert.equal("data" in pass.metrics, false);
   assert.equal("data" in pass.cfg, false);
+});
+
+test("Adapter preserves a structured Diff behind an availability boundary", () => {
+  const input = readFixture("minimal.json");
+  input.schemaVersion = "1.1.0";
+  input.passes[0].ir = {
+    before: "old",
+    after: "new",
+    diff: [
+      {
+        kind: "removed",
+        content: "old",
+        beforeLineNumber: 1,
+        afterLineNumber: null,
+        endsWithNewline: false,
+      },
+      {
+        kind: "added",
+        content: "new",
+        beforeLineNumber: null,
+        afterLineNumber: 1,
+        endsWithNewline: false,
+      },
+    ],
+  };
+
+  const model = expectSuccess(parseOptimisationResult(input));
+  const diff = model.passes[0].ir.diff;
+
+  assert.equal(diff.status, "available");
+  assert.deepEqual(diff.data, input.passes[0].ir.diff);
+  assert.notEqual(diff.data, input.passes[0].ir.diff);
+  assert.notEqual(diff.data[0], input.passes[0].ir.diff[0]);
 });
 
 test("partial metric blocks preserve unavailable individual metrics", () => {

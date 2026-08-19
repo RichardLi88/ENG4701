@@ -275,6 +275,9 @@ export const PassDetail = memo(function PassDetail({
       <IrDiffViewer
         before={pass.ir.before}
         after={pass.ir.after}
+        structuredDiff={
+          pass.ir.diff.status === "available" ? pass.ir.diff.data : undefined
+        }
         mode={diffMode}
         onModeChange={onDiffModeChange}
       />

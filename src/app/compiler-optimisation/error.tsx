@@ -14,7 +14,10 @@ export default function CompilerOptimisationError({
   reset,
 }: CompilerOptimisationErrorProps) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-10 text-slate-100 sm:px-6 lg:px-8">
+    <main
+      data-compiler-theme
+      className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-10 text-slate-100 transition-colors sm:px-6 lg:px-8"
+    >
       <section
         className="w-full max-w-2xl rounded-2xl border border-rose-400/30 bg-rose-400/10 p-6 shadow-2xl shadow-black/20 sm:p-8"
         role="alert"

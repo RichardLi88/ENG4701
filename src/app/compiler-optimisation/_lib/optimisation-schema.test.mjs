@@ -2,7 +2,13 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import optimisationPayloadModule from "../../../../llvm-service/optimisation-payload.js";
+
+import { parseOptimisationResult } from "./optimisation-adapter.ts";
+import { createIrDiff } from "./optimisation-diff.ts";
 import { optimisationResultSchema } from "./optimisation-schema.ts";
+
+const { createOptimisationPayload } = optimisationPayloadModule;
 
 const fixtureDirectory = new URL(
   "../../../test-data/compiler-optimisation/",
@@ -127,4 +133,117 @@ test("a string order fails at the precise nested path", () => {
   const paths = issuePaths(optimisationResultSchema.safeParse(input));
 
   assert.ok(paths.includes("passes.0.order"));
+});
+
+test("schema 1.1 requires a structured Diff for every changed Pass", () => {
+  const input = readFixture("minimal.json");
+  input.schemaVersion = "1.1.0";
+
+  const paths = issuePaths(optimisationResultSchema.safeParse(input));
+
+  assert.ok(paths.includes("passes.0.ir.diff"));
+});
+
+test("schema 1.1 accepts a sequential structured Diff", () => {
+  const input = readFixture("minimal.json");
+  input.schemaVersion = "1.1.0";
+  input.passes[0].ir = {
+    before: "old",
+    after: "new",
+    diff: [
+      {
+        kind: "removed",
+        content: "old",
+        beforeLineNumber: 1,
+        afterLineNumber: null,
+        endsWithNewline: false,
+      },
+      {
+        kind: "added",
+        content: "new",
+        beforeLineNumber: null,
+        afterLineNumber: 1,
+        endsWithNewline: false,
+      },
+    ],
+  };
+
+  assert.equal(optimisationResultSchema.safeParse(input).success, true);
+});
+
+test("rejects invalid structured Diff line-number semantics", () => {
+  const input = readFixture("minimal.json");
+  input.passes[0].ir.diff = [
+    {
+      kind: "added",
+      content: "new",
+      beforeLineNumber: 1,
+      afterLineNumber: 2,
+      endsWithNewline: false,
+    },
+  ];
+
+  const paths = issuePaths(optimisationResultSchema.safeParse(input));
+
+  assert.ok(paths.includes("passes.0.ir.diff.0.beforeLineNumber"));
+  assert.ok(paths.includes("passes.0.ir.diff.0.afterLineNumber"));
+});
+
+test("rejects a structured Diff that cannot reconstruct both IR snapshots", () => {
+  const input = readFixture("minimal.json");
+  input.passes[0].ir = {
+    before: "old",
+    after: "new",
+    diff: [
+      {
+        kind: "removed",
+        content: "wrong-old",
+        beforeLineNumber: 1,
+        afterLineNumber: null,
+        endsWithNewline: false,
+      },
+      {
+        kind: "added",
+        content: "wrong-new",
+        beforeLineNumber: null,
+        afterLineNumber: 1,
+        endsWithNewline: false,
+      },
+    ],
+  };
+
+  const paths = issuePaths(optimisationResultSchema.safeParse(input));
+
+  assert.ok(paths.includes("passes.0.ir.diff"));
+});
+
+test("LLVM structured Diff crosses the protocol and View Model boundaries", () => {
+  const payload = createOptimisationPayload({
+    sourceFile: "contract.c",
+    unoptimisedIr: "define i32 @main() {\n  ret i32 0\n}",
+    beforeAfterLog: `*** IR Dump Before InstCombinePass on main ***
+define i32 @main() {
+  %sum = add i32 1, 1
+  ret i32 %sum
+}
+*** IR Dump After InstCombinePass on main ***
+define i32 @main() {
+  ret i32 2
+}`,
+  });
+
+  const validated = optimisationResultSchema.parse(payload);
+  const model = parseOptimisationResult(validated);
+  assert.equal(model.ok, true);
+
+  const pass = model.data.passes[0];
+  assert.equal(pass.ir.diff.status, "available");
+  assert.equal(
+    createIrDiff({
+      before: pass.ir.before,
+      after: pass.ir.after,
+      structuredDiff: pass.ir.diff.data,
+    }).source,
+    "structured",
+  );
 });

@@ -4,6 +4,7 @@ import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 
 import { ThemeProvider } from "./_components/theme-provider";
+import { THEME_INITIALISATION_SCRIPT } from "./_helpers/theme";
 import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
@@ -21,7 +22,17 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${geist.variable}`}>
+    <html
+      lang="en"
+      className={`${geist.variable}`}
+      data-app-theme="light"
+      suppressHydrationWarning
+    >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: THEME_INITIALISATION_SCRIPT }}
+        />
+      </head>
       <body>
         <TRPCReactProvider>
           <ThemeProvider>{children}</ThemeProvider>
