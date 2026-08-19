@@ -132,6 +132,10 @@ app.use((_req, res) => {
 });
 
 app.use((err, _req, res, _next) => {
+  if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+    return res.status(400).json({ error: "invalid JSON body" });
+  }
+
   console.error(err);
   res.status(500).json({
     error: err instanceof Error ? err.message : "Internal server error",
