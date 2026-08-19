@@ -1,324 +1,557 @@
 "use client";
 
-import { memo, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { cfgContent } from "../content";
 import {
-  CFG_NODE_DIMENSIONS,
-  createCfgDisplayModel,
+  createCfgComparisonDisplayModels,
   type CfgChange,
-  type CfgDiagram,
 } from "../_lib/cfg-display";
 import type {
-  ControlFlowGraphSnapshotViewModel,
   DataAvailability,
   PassControlFlowGraphViewModel,
 } from "../_lib/optimisation-types";
+import {
+  CfgGraphPane,
+  type CfgGraphPaneHandle,
+  type CfgViewport,
+} from "./cfg-graph-pane";
+import { CfgIcon } from "./cfg-icons";
+import { CfgNodeInspector } from "./cfg-node-inspector";
 
 type CfgViewProps = Readonly<{
   cfg: DataAvailability<PassControlFlowGraphViewModel>;
 }>;
 
-const SCALE_STEPS = [0.75, 1, 1.25, 1.5] as const;
+type CfgSide = "before" | "after";
+type CfgViewMode = "split" | CfgSide;
+type ScaleState = Readonly<Record<CfgSide, number>>;
 
-const changeStyles: Readonly<
-  Record<CfgChange, Readonly<{ node: string; edge: string; text: string }>>
-> = {
-  unchanged: {
-    node: "fill-slate-900 stroke-slate-600",
-    edge: "stroke-slate-500",
-    text: "text-slate-400",
-  },
-  added: {
-    node: "fill-emerald-950 stroke-emerald-400",
-    edge: "stroke-emerald-400",
-    text: "text-emerald-300",
-  },
-  removed: {
-    node: "fill-rose-950 stroke-rose-400",
-    edge: "stroke-rose-400",
-    text: "text-rose-300",
-  },
-  changed: {
-    node: "fill-amber-950 stroke-amber-400",
-    edge: "stroke-amber-400",
-    text: "text-amber-300",
-  },
+const MIN_SCALE = 0.35;
+const MAX_SCALE = 1.75;
+const SCALE_STEP = 0.15;
+
+const legendStyles: Readonly<Record<CfgChange, string>> = {
+  added: "text-emerald-300",
+  removed: "text-rose-300",
+  changed: "text-amber-300",
+  unchanged: "text-slate-400",
 };
 
-function shortenedLabel(label: string): string {
-  const firstLine = label.split(/\r?\n/, 1)[0] ?? label;
-  return firstLine.length > 28 ? `${firstLine.slice(0, 27)}…` : firstLine;
+function clampScale(scale: number): number {
+  return Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale));
 }
 
-function edgePath(edge: CfgDiagram["edges"][number]): string {
-  if (edge.source === edge.target) {
-    return `M ${edge.sourceX} ${edge.sourceY} C ${edge.sourceX + 90} ${edge.sourceY + 40}, ${edge.targetX + 90} ${edge.targetY - 40}, ${edge.targetX} ${edge.targetY}`;
-  }
-
-  const middleY = (edge.sourceY + edge.targetY) / 2;
-  return `M ${edge.sourceX} ${edge.sourceY} C ${edge.sourceX} ${middleY}, ${edge.targetX} ${middleY}, ${edge.targetX} ${edge.targetY}`;
-}
-
-type GraphListProps = Readonly<{
-  snapshot: ControlFlowGraphSnapshotViewModel;
+type IconButtonProps = Readonly<{
   label: string;
+  icon:
+    | "fit"
+    | "fullscreen"
+    | "exit-fullscreen"
+    | "link"
+    | "unlink"
+    | "minus"
+    | "plus";
+  onClick: () => void;
+  pressed?: boolean;
+  disabled?: boolean;
 }>;
 
-function GraphList({ snapshot, label }: GraphListProps) {
+function IconButton({
+  label,
+  icon,
+  onClick,
+  pressed,
+  disabled = false,
+}: IconButtonProps) {
   return (
-    <div className="grid gap-4 text-sm sm:grid-cols-2">
-      <div>
-        <h5 className="font-semibold text-slate-300">
-          Nodes ({snapshot.nodes.length})
-        </h5>
-        {snapshot.nodes.length === 0 ? (
-          <p className="mt-2 text-slate-500">{cfgContent.empty}</p>
-        ) : (
-          <ul className="mt-2 space-y-2">
-            {snapshot.nodes.map((node, index) => (
-              <li
-                key={`${node.id}:${index}`}
-                className="rounded-lg border border-slate-800 bg-slate-950/60 p-2"
-              >
-                <code className="text-xs break-all text-cyan-300">
-                  {node.id}
-                </code>
-                <pre className="mt-1 overflow-x-auto text-xs whitespace-pre-wrap text-slate-400">
-                  {node.label}
-                </pre>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-      <div>
-        <h5 className="font-semibold text-slate-300">
-          Directed edges ({snapshot.edges.length})
-        </h5>
-        {snapshot.edges.length === 0 ? (
-          <p className="mt-2 text-slate-500">No directed edges reported.</p>
-        ) : (
-          <ul className="mt-2 space-y-2 font-mono text-xs text-slate-400">
-            {snapshot.edges.map((edge, index) => (
-              <li
-                key={`${edge.source}:${edge.target}:${index}`}
-                className="rounded-lg border border-slate-800 bg-slate-950/60 p-2 break-all"
-              >
-                <span className="text-slate-200">{edge.source}</span>
-                <span aria-label="flows to"> → </span>
-                <span className="text-slate-200">{edge.target}</span>
-                {edge.label.status === "available" ? (
-                  <span className="text-slate-500"> · {edge.label.data}</span>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-      <span className="sr-only">{label} CFG list</span>
+    <button
+      type="button"
+      aria-label={label}
+      aria-pressed={pressed}
+      title={label}
+      onClick={onClick}
+      disabled={disabled}
+      className={`inline-flex size-11 items-center justify-center rounded-lg border text-slate-300 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-35 ${
+        pressed
+          ? "border-cyan-400/60 bg-cyan-400/10 text-cyan-300"
+          : "border-slate-700 bg-slate-950/40 hover:bg-slate-800"
+      }`}
+    >
+      <CfgIcon name={icon} />
+    </button>
+  );
+}
+
+type ModeControlProps = Readonly<{
+  mode: CfgViewMode;
+  onChange: (mode: CfgViewMode) => void;
+}>;
+
+function ModeControl({ mode, onChange }: ModeControlProps) {
+  const modes: ReadonlyArray<Readonly<{ value: CfgViewMode; label: string }>> =
+    [
+      { value: "split", label: cfgContent.controls.split },
+      { value: "before", label: cfgContent.controls.before },
+      { value: "after", label: cfgContent.controls.after },
+    ];
+
+  return (
+    <div
+      className="flex min-h-11 rounded-lg border border-slate-700 bg-slate-950/40 p-1"
+      role="group"
+      aria-label={cfgContent.controls.modesLabel}
+    >
+      {modes.map((item) => (
+        <button
+          key={item.value}
+          type="button"
+          aria-pressed={mode === item.value}
+          onClick={() => onChange(item.value)}
+          className={`min-h-9 rounded-md px-3 text-xs font-semibold focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:outline-none ${
+            item.value === "split"
+              ? "hidden xl:inline-flex xl:items-center"
+              : ""
+          } ${
+            mode === item.value
+              ? "bg-slate-700 text-slate-100"
+              : "text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          {item.label}
+        </button>
+      ))}
     </div>
   );
 }
 
-type CfgPaneProps = Readonly<{
-  side: "before" | "after";
-  snapshot: ControlFlowGraphSnapshotViewModel;
-  comparison: ControlFlowGraphSnapshotViewModel;
+type SearchNode = Readonly<{ id: string; label: string }>;
+
+type CfgToolbarProps = Readonly<{
+  mode: CfgViewMode;
+  linked: boolean;
+  fullscreen: boolean;
+  scale: number;
+  query: string;
+  results: ReadonlyArray<SearchNode>;
+  onModeChange: (mode: CfgViewMode) => void;
+  onLinkedChange: () => void;
+  onFit: () => void;
+  onScaleChange: (delta: number) => void;
+  onScaleReset: () => void;
+  onFullscreenChange: () => void;
+  onQueryChange: (query: string) => void;
+  onSelectResult: (nodeId: string) => void;
 }>;
 
-const CfgPane = memo(function CfgPane({
-  side,
-  snapshot,
-  comparison,
-}: CfgPaneProps) {
-  const [scaleIndex, setScaleIndex] = useState(1);
-  const model = useMemo(
-    () => createCfgDisplayModel(snapshot, comparison, side),
-    [comparison, side, snapshot],
-  );
-  const label = side === "before" ? "Before" : "After";
-  const scale = SCALE_STEPS[scaleIndex] ?? 1;
-
-  if (model.status === "fallback") {
-    return (
-      <section
-        className="min-w-0 rounded-xl border border-amber-400/30 bg-amber-950/10 p-4"
-        aria-label={`${label} CFG fallback`}
-      >
-        <p className="text-xs font-semibold tracking-[0.14em] text-amber-300 uppercase">
-          {label} · {cfgContent.fallback.title}
-        </p>
-        <p className="mt-2 text-sm leading-6 text-amber-100/70">
-          {model.reason === "duplicate-node-id"
-            ? cfgContent.fallback.duplicateNode
-            : cfgContent.fallback.danglingEdge}
-        </p>
-        <div className="mt-4">
-          <GraphList snapshot={snapshot} label={label} />
-        </div>
-      </section>
-    );
-  }
-
+function CfgToolbar({
+  mode,
+  linked,
+  fullscreen,
+  scale,
+  query,
+  results,
+  onModeChange,
+  onLinkedChange,
+  onFit,
+  onScaleChange,
+  onScaleReset,
+  onFullscreenChange,
+  onQueryChange,
+  onSelectResult,
+}: CfgToolbarProps) {
   return (
-    <section
-      className="min-w-0 overflow-hidden rounded-xl border border-slate-800 bg-slate-950/40"
-      aria-label={`${label} control flow graph`}
+    <div
+      className="flex flex-wrap items-center gap-2 border-b border-slate-800 bg-slate-900/80 p-3"
+      role="toolbar"
+      aria-label={cfgContent.controls.toolbarLabel}
     >
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 bg-slate-900/80 px-4 py-3">
-        <div>
-          <h4 className="font-mono text-xs font-semibold tracking-[0.14em] text-slate-200 uppercase">
-            {label}
-          </h4>
-          <p className="mt-1 text-[0.68rem] text-slate-500">
-            {snapshot.nodes.length}{" "}
-            {snapshot.nodes.length === 1 ? "node" : "nodes"} ·{" "}
-            {snapshot.edges.length}{" "}
-            {snapshot.edges.length === 1 ? "edge" : "edges"}
-          </p>
-        </div>
-        <div
-          className="flex items-center gap-1"
-          aria-label={`${label} CFG zoom`}
+      <ModeControl mode={mode} onChange={onModeChange} />
+      <div className="flex items-center gap-1">
+        <IconButton
+          label={cfgContent.controls.fit}
+          icon="fit"
+          onClick={onFit}
+        />
+        <IconButton
+          label={cfgContent.controls.zoomOut}
+          icon="minus"
+          onClick={() => onScaleChange(-SCALE_STEP)}
+          disabled={scale <= MIN_SCALE}
+        />
+        <button
+          type="button"
+          onClick={onScaleReset}
+          aria-label={cfgContent.controls.reset}
+          title={cfgContent.controls.reset}
+          className="min-h-11 min-w-16 rounded-lg border border-slate-700 bg-slate-950/40 px-2 font-mono text-xs text-slate-300 focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:outline-none"
         >
-          <button
-            type="button"
-            onClick={() => setScaleIndex((index) => Math.max(0, index - 1))}
-            disabled={scaleIndex === 0}
-            className="rounded-md border border-slate-700 px-2 py-1 text-xs text-slate-300 focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:outline-none disabled:opacity-35"
-            aria-label={`${cfgContent.controls.zoomOut} ${label} CFG`}
-          >
-            −
-          </button>
-          <button
-            type="button"
-            onClick={() => setScaleIndex(1)}
-            className="min-w-12 rounded-md border border-slate-700 px-2 py-1 font-mono text-[0.68rem] text-slate-400 focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:outline-none"
-            aria-label={`${cfgContent.controls.reset} ${label} CFG`}
-          >
-            {Math.round(scale * 100)}%
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              setScaleIndex((index) =>
-                Math.min(SCALE_STEPS.length - 1, index + 1),
-              )
+          {Math.round(scale * 100)}%
+        </button>
+        <IconButton
+          label={cfgContent.controls.zoomIn}
+          icon="plus"
+          onClick={() => onScaleChange(SCALE_STEP)}
+          disabled={scale >= MAX_SCALE}
+        />
+      </div>
+      <IconButton
+        label={linked ? cfgContent.controls.unlink : cfgContent.controls.link}
+        icon={linked ? "link" : "unlink"}
+        onClick={onLinkedChange}
+        pressed={linked}
+      />
+      <div className="relative min-w-52 flex-1 sm:max-w-sm">
+        <CfgIcon
+          name="search"
+          className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-500"
+        />
+        <input
+          type="search"
+          value={query}
+          aria-label={cfgContent.controls.search}
+          placeholder={cfgContent.controls.searchPlaceholder}
+          onChange={(event) => onQueryChange(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && results[0] !== undefined) {
+              event.preventDefault();
+              onSelectResult(results[0].id);
             }
-            disabled={scaleIndex === SCALE_STEPS.length - 1}
-            className="rounded-md border border-slate-700 px-2 py-1 text-xs text-slate-300 focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:outline-none disabled:opacity-35"
-            aria-label={`${cfgContent.controls.zoomIn} ${label} CFG`}
+          }}
+          className="min-h-11 w-full rounded-lg border border-slate-700 bg-slate-950/60 pr-3 pl-10 text-sm text-slate-200 placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none"
+        />
+        {query.trim().length > 0 ? (
+          <ul
+            aria-label={cfgContent.search.resultLabel}
+            className="absolute top-full right-0 left-0 z-30 mt-2 max-h-60 overflow-auto rounded-xl border border-slate-700 bg-slate-900 p-1 shadow-lg shadow-black/30"
           >
-            +
-          </button>
-        </div>
-      </header>
-
-      {model.nodes.length === 0 ? (
-        <p className="p-5 text-sm text-slate-500">{cfgContent.empty}</p>
-      ) : (
-        <div
-          className="max-h-[34rem] min-h-72 overflow-auto overscroll-contain focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:outline-none focus-visible:ring-inset"
-          tabIndex={0}
-          role="region"
-          aria-label={`${label} CFG canvas; use scrolling to pan`}
-        >
-          <svg
-            width={model.width * scale}
-            height={model.height * scale}
-            viewBox={`0 0 ${model.width} ${model.height}`}
-            role="img"
-            aria-label={`${label} directed control flow graph with ${model.nodes.length} nodes and ${model.edges.length} edges`}
-          >
-            <defs>
-              <marker
-                id={`cfg-arrow-${side}`}
-                viewBox="0 0 10 10"
-                refX="9"
-                refY="5"
-                markerWidth="7"
-                markerHeight="7"
-                orient="auto-start-reverse"
-              >
-                <path d="M 0 0 L 10 5 L 0 10 z" className="fill-slate-400" />
-              </marker>
-            </defs>
-
-            {model.edges.map((edge) => (
-              <g key={edge.id}>
-                <path
-                  d={edgePath(edge)}
-                  fill="none"
-                  strokeWidth="2"
-                  markerEnd={`url(#cfg-arrow-${side})`}
-                  className={changeStyles[edge.change].edge}
-                >
-                  <title>{`${edge.source} to ${edge.target}${
-                    edge.label.status === "available"
-                      ? `: ${edge.label.data}`
-                      : ""
-                  }`}</title>
-                </path>
-                {edge.label.status === "available" ? (
-                  <text
-                    x={(edge.sourceX + edge.targetX) / 2}
-                    y={(edge.sourceY + edge.targetY) / 2 - 6}
-                    textAnchor="middle"
-                    className="fill-slate-400 text-[10px]"
+            {results.length > 0 ? (
+              results.map((result) => (
+                <li key={result.id}>
+                  <button
+                    type="button"
+                    onClick={() => onSelectResult(result.id)}
+                    className="w-full rounded-lg px-3 py-2 text-left hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:outline-none"
                   >
-                    {shortenedLabel(edge.label.data)}
-                  </text>
-                ) : null}
-              </g>
-            ))}
-
-            {model.nodes.map((node) => (
-              <g key={node.id}>
-                <rect
-                  x={node.x}
-                  y={node.y}
-                  width={CFG_NODE_DIMENSIONS.width}
-                  height={CFG_NODE_DIMENSIONS.height}
-                  rx="10"
-                  strokeWidth="2"
-                  className={changeStyles[node.change].node}
-                >
-                  <title>{node.label}</title>
-                </rect>
-                <text
-                  x={node.x + 14}
-                  y={node.y + 25}
-                  className="fill-slate-100 font-mono text-[12px] font-semibold"
-                >
-                  {shortenedLabel(node.label)}
-                </text>
-                <text
-                  x={node.x + 14}
-                  y={node.y + 49}
-                  className="fill-slate-500 font-mono text-[10px]"
-                >
-                  {node.role} · {node.change}
-                </text>
-              </g>
-            ))}
-          </svg>
-        </div>
-      )}
-
-      <details className="border-t border-slate-800 px-4 py-3">
-        <summary className="cursor-pointer text-xs font-semibold text-slate-400 focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:outline-none">
-          Accessible node and edge list
-        </summary>
-        <div className="mt-4">
-          <GraphList snapshot={snapshot} label={label} />
-        </div>
-      </details>
-    </section>
+                    <span className="block font-mono text-xs text-slate-200">
+                      {result.label}
+                    </span>
+                    <span className="mt-0.5 block truncate text-[0.68rem] text-slate-500">
+                      {result.id}
+                    </span>
+                  </button>
+                </li>
+              ))
+            ) : (
+              <li className="px-3 py-3 text-sm text-slate-500">
+                {cfgContent.search.noMatches}
+              </li>
+            )}
+          </ul>
+        ) : null}
+      </div>
+      <IconButton
+        label={
+          fullscreen
+            ? cfgContent.controls.exitFullscreen
+            : cfgContent.controls.fullscreen
+        }
+        icon={fullscreen ? "exit-fullscreen" : "fullscreen"}
+        onClick={onFullscreenChange}
+      />
+    </div>
   );
-});
+}
+
+function legend() {
+  return (
+    <ul className="flex flex-wrap gap-x-3 gap-y-1 text-[0.68rem] text-slate-500">
+      {(Object.keys(cfgContent.legend) as Array<CfgChange>).map((change) => (
+        <li key={change} className={legendStyles[change]}>
+          <span aria-hidden="true">●</span> {cfgContent.legend[change]}
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export function CfgView({ cfg }: CfgViewProps) {
+  const workspaceRef = useRef<HTMLDivElement>(null);
+  const beforePaneRef = useRef<CfgGraphPaneHandle>(null);
+  const afterPaneRef = useRef<CfgGraphPaneHandle>(null);
+  const [mode, setMode] = useState<CfgViewMode>("split");
+  const [linked, setLinked] = useState(true);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [fitRequest, setFitRequest] = useState(0);
+  const [wideEnoughForSplit, setWideEnoughForSplit] = useState(true);
+  const [scales, setScales] = useState<ScaleState>({ before: 1, after: 1 });
+
+  const models = useMemo(
+    () =>
+      cfg.status === "available"
+        ? createCfgComparisonDisplayModels(cfg.data.before, cfg.data.after)
+        : undefined,
+    [cfg],
+  );
+
+  useEffect(() => {
+    const element = workspaceRef.current;
+    if (element === null) return;
+    const update = (width: number) => {
+      if (width > 0) setWideEnoughForSplit(width >= 1080);
+    };
+    update(element.getBoundingClientRect().width);
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry !== undefined) update(entry.contentRect.width);
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [cfg.status, fullscreen]);
+
+  useEffect(() => {
+    if (!fullscreen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setFullscreen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [fullscreen]);
+
+  const effectiveMode: CfgViewMode =
+    mode === "split" && !wideEnoughForSplit ? "before" : mode;
+
+  const updateScale = useCallback(
+    (side: CfgSide, scale: number) => {
+      const nextScale = clampScale(scale);
+      setScales((current) =>
+        linked
+          ? { before: nextScale, after: nextScale }
+          : { ...current, [side]: nextScale },
+      );
+    },
+    [linked],
+  );
+
+  const updateBeforeScale = useCallback(
+    (scale: number) => updateScale("before", scale),
+    [updateScale],
+  );
+  const updateAfterScale = useCallback(
+    (scale: number) => updateScale("after", scale),
+    [updateScale],
+  );
+
+  const syncViewport = useCallback(
+    (source: CfgSide, viewport: CfgViewport) => {
+      if (!linked) return;
+      if (source === "before") afterPaneRef.current?.setViewport(viewport);
+      else beforePaneRef.current?.setViewport(viewport);
+    },
+    [linked],
+  );
+
+  const changeVisibleScales = (delta: number) => {
+    setScales((current) => {
+      if (effectiveMode === "before") {
+        const next = clampScale(current.before + delta);
+        return linked
+          ? { before: next, after: next }
+          : { ...current, before: next };
+      }
+      if (effectiveMode === "after") {
+        const next = clampScale(current.after + delta);
+        return linked
+          ? { before: next, after: next }
+          : { ...current, after: next };
+      }
+      return {
+        before: clampScale(current.before + delta),
+        after: clampScale(current.after + delta),
+      };
+    });
+  };
+
+  const resetVisibleScales = () => {
+    setScales((current) => {
+      if (effectiveMode === "before" && !linked)
+        return { ...current, before: 1 };
+      if (effectiveMode === "after" && !linked) return { ...current, after: 1 };
+      return { before: 1, after: 1 };
+    });
+  };
+
+  const searchNodes = useMemo(() => {
+    if (models === undefined) return [];
+    const nodes = new Map<string, SearchNode>();
+    for (const model of [models.before, models.after]) {
+      for (const node of model.nodes) {
+        if (!nodes.has(node.id)) {
+          nodes.set(node.id, {
+            id: node.id,
+            label: node.label.split(/\r?\n/, 1)[0] ?? node.id,
+          });
+        }
+      }
+    }
+    return [...nodes.values()];
+  }, [models]);
+  const searchResults = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    if (normalizedQuery.length === 0) return [];
+    return searchNodes
+      .filter(
+        (node) =>
+          node.id.toLowerCase().includes(normalizedQuery) ||
+          node.label.toLowerCase().includes(normalizedQuery),
+      )
+      .slice(0, 7);
+  }, [query, searchNodes]);
+
+  const selectNode = (nodeId: string) => {
+    setSelectedNodeId(nodeId);
+    setQuery("");
+    requestAnimationFrame(() => {
+      beforePaneRef.current?.focusNode(nodeId);
+      afterPaneRef.current?.focusNode(nodeId);
+    });
+  };
+
+  const renderWorkspace = () => {
+    if (cfg.status !== "available" || models === undefined) return null;
+    const beforeDiagram =
+      models.before.status === "diagram" ? models.before : undefined;
+    const afterDiagram =
+      models.after.status === "diagram" ? models.after : undefined;
+    const showBefore = effectiveMode === "split" || effectiveMode === "before";
+    const showAfter = effectiveMode === "split" || effectiveMode === "after";
+    const activeScale =
+      effectiveMode === "after" ? scales.after : scales.before;
+
+    return (
+      <div
+        ref={workspaceRef}
+        className={
+          fullscreen
+            ? "fixed inset-0 z-50 flex min-h-0 flex-col bg-slate-950 text-slate-100"
+            : "overflow-hidden rounded-xl border border-slate-800 bg-slate-900/30"
+        }
+      >
+        {fullscreen ? (
+          <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 px-4 py-3">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-100">
+                {cfgContent.heading}
+              </h3>
+              <p className="mt-1 text-xs text-slate-500">
+                {cfgContent.description}
+              </p>
+            </div>
+            {legend()}
+          </header>
+        ) : null}
+        <CfgToolbar
+          mode={effectiveMode}
+          linked={linked}
+          fullscreen={fullscreen}
+          scale={activeScale}
+          query={query}
+          results={searchResults}
+          onModeChange={setMode}
+          onLinkedChange={() => setLinked((current) => !current)}
+          onFit={() => setFitRequest((current) => current + 1)}
+          onScaleChange={changeVisibleScales}
+          onScaleReset={resetVisibleScales}
+          onFullscreenChange={() => {
+            setFullscreen((current) => !current);
+            setFitRequest((current) => current + 1);
+          }}
+          onQueryChange={setQuery}
+          onSelectResult={selectNode}
+        />
+        <div
+          className={
+            fullscreen &&
+            beforeDiagram !== undefined &&
+            afterDiagram !== undefined
+              ? "grid min-h-0 flex-1 xl:grid-cols-[minmax(0,1fr)_22rem]"
+              : ""
+          }
+        >
+          <div
+            className={`grid min-h-0 min-w-0 gap-3 p-3 ${
+              effectiveMode === "split" ? "xl:grid-cols-2" : "grid-cols-1"
+            }`}
+          >
+            {showBefore ? (
+              <CfgGraphPane
+                ref={beforePaneRef}
+                side="before"
+                snapshot={cfg.data.before}
+                model={models.before}
+                scale={scales.before}
+                selectedNodeId={selectedNodeId}
+                fitRequest={fitRequest}
+                fullscreen={fullscreen}
+                onScaleChange={updateBeforeScale}
+                onSelectNode={selectNode}
+                onViewportChange={(viewport) =>
+                  syncViewport("before", viewport)
+                }
+              />
+            ) : null}
+            {showAfter ? (
+              <CfgGraphPane
+                ref={afterPaneRef}
+                side="after"
+                snapshot={cfg.data.after}
+                model={models.after}
+                scale={scales.after}
+                selectedNodeId={selectedNodeId}
+                fitRequest={fitRequest}
+                fullscreen={fullscreen}
+                onScaleChange={updateAfterScale}
+                onSelectNode={selectNode}
+                onViewportChange={(viewport) => syncViewport("after", viewport)}
+              />
+            ) : null}
+          </div>
+          {fullscreen &&
+          beforeDiagram !== undefined &&
+          afterDiagram !== undefined ? (
+            <CfgNodeInspector
+              selectedNodeId={selectedNodeId}
+              before={beforeDiagram}
+              after={afterDiagram}
+              compact
+            />
+          ) : null}
+        </div>
+        {!fullscreen &&
+        selectedNodeId !== null &&
+        beforeDiagram !== undefined &&
+        afterDiagram !== undefined ? (
+          <div className="px-3 pb-3">
+            <CfgNodeInspector
+              selectedNodeId={selectedNodeId}
+              before={beforeDiagram}
+              after={afterDiagram}
+            />
+          </div>
+        ) : null}
+      </div>
+    );
+  };
+
+  const workspace = renderWorkspace();
+
   return (
     <section className="mt-6" aria-labelledby="cfg-heading">
       <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
@@ -333,17 +566,7 @@ export function CfgView({ cfg }: CfgViewProps) {
             {cfgContent.description}
           </p>
         </div>
-        {cfg.status === "available" ? (
-          <ul className="flex flex-wrap gap-x-3 gap-y-1 text-[0.68rem] text-slate-500">
-            {(Object.keys(cfgContent.legend) as Array<CfgChange>).map(
-              (change) => (
-                <li key={change} className={changeStyles[change].text}>
-                  <span aria-hidden="true">●</span> {cfgContent.legend[change]}
-                </li>
-              ),
-            )}
-          </ul>
-        ) : null}
+        {cfg.status === "available" ? legend() : null}
       </div>
 
       {cfg.status === "unavailable" ? (
@@ -351,18 +574,7 @@ export function CfgView({ cfg }: CfgViewProps) {
           {cfgContent.unavailable}
         </div>
       ) : (
-        <div className="grid min-w-0 gap-4 2xl:grid-cols-2">
-          <CfgPane
-            side="before"
-            snapshot={cfg.data.before}
-            comparison={cfg.data.after}
-          />
-          <CfgPane
-            side="after"
-            snapshot={cfg.data.after}
-            comparison={cfg.data.before}
-          />
-        </div>
+        workspace
       )}
     </section>
   );

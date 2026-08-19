@@ -86,8 +86,16 @@ function assertPayloadInvariants(payload, payloadText, testCase) {
       pass.metrics === undefined
         ? true
         : Object.values(pass.metrics).every(
-            (metric) => metric.estimated === true,
+            (metric) => metric.estimated === false,
           ),
+    ),
+  );
+  assert.ok(
+    payload.passes.every(
+      (pass) =>
+        pass.analysisActivity !== undefined &&
+        Array.isArray(pass.analysisActivity.computed) &&
+        ["all", "not-all"].includes(pass.analysisActivity.preservation),
     ),
   );
   assert.ok(

@@ -207,6 +207,13 @@ function adaptPass(
             category: pass.transformation.category,
             summary: pass.transformation.summary,
           }),
+    analysisActivity:
+      pass.analysisActivity === undefined
+        ? notProvided()
+        : available({
+            computed: [...pass.analysisActivity.computed],
+            preservation: pass.analysisActivity.preservation,
+          }),
     dependencies:
       pass.dependencies === undefined
         ? notProvided()

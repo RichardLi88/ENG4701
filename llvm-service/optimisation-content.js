@@ -10,16 +10,21 @@ const TRANSFORMATION_CATEGORIES = [
 
 const DEFAULT_TRANSFORMATION_CATEGORY = "llvm-transform";
 
+const TRANSFORMATION_DESCRIPTIONS = {
+  "control-flow": "Simplified the control-flow structure.",
+  "instruction-combine": "Combined or simplified LLVM instructions.",
+  loop: "Simplified or prepared loop structures.",
+  inlining: "Updated function-call boundaries through inlining.",
+  "dead-code-elimination":
+    "Removed code that no longer contributes to the result.",
+  memory: "Simplified memory access or promoted memory-backed values.",
+  redundancy: "Removed redundant computations or reused available values.",
+  "llvm-transform": "Applied an LLVM IR transformation.",
+};
+
 const transformationSummary = {
-  unchanged: (fullName) =>
-    `${fullName} ran without changing the LLVM IR snapshot.`,
-  changedWithoutMetrics: (fullName) =>
-    `${fullName} changed the LLVM IR snapshot.`,
-  changed: (fullName, metrics) =>
-    `${fullName} changed the LLVM IR snapshot. Estimated snapshot metrics: ` +
-    `instructions ${metrics.instructions.before} → ${metrics.instructions.after}, ` +
-    `basic blocks ${metrics.basicBlocks.before} → ${metrics.basicBlocks.after}, ` +
-    `branches ${metrics.branches.before} → ${metrics.branches.after}.`,
+  unchanged: "Completed without changing the LLVM IR.",
+  changed: (category) => TRANSFORMATION_DESCRIPTIONS[category],
 };
 
 module.exports = {

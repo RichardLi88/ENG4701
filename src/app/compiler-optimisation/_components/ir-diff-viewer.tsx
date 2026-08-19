@@ -2,8 +2,9 @@
 
 import { useMemo } from "react";
 
-import { irDiffContent } from "../content";
 import { createIrDiff, type IrDiffLine } from "~/app/_helpers/text-diff";
+
+import { irDiffContent } from "../content";
 import type { DiffMode } from "../_lib/workspace-state";
 
 export type IrDiffViewerProps = Readonly<{

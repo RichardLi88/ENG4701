@@ -70,6 +70,28 @@ export const compilerWorkspaceContent = {
   },
 } as const;
 
+export const passDetailContent = {
+  metadata: {
+    fullName: "Full name",
+    globalOrder: "Global",
+    functionOrder: "Function",
+  },
+  analysisContext: {
+    heading: "Analysis & pipeline context",
+    preservation: "Analysis preservation",
+    computed: "Computed on demand",
+    allPreserved: "All preserved",
+    notAllPreserved: "May invalidate cached analyses",
+    noneComputed: "No analyses were recomputed during this Pass.",
+    unavailable: "Runtime analysis activity was not recorded.",
+    previous: "Previous",
+    next: "Next",
+    pipelineStart: "Pipeline start",
+    pipelineEnd: "Pipeline end",
+    more: "more",
+  },
+} as const;
+
 export const routeErrorContent = {
   eyebrow: "Route error",
   title: "The optimisation workspace could not be loaded",
@@ -96,8 +118,7 @@ export const irDiffContent = {
 
 export const cfgContent = {
   heading: "Control flow graph",
-  description:
-    "Directed basic-block flow before and after this Pass. Scroll the canvas to pan.",
+  description: "Topology-aligned basic-block flow before and after this Pass.",
   unavailable: "CFG data was not provided for this Pass.",
   empty: "This CFG snapshot contains no basic blocks.",
   lazy: {
@@ -116,6 +137,49 @@ export const cfgContent = {
     zoomOut: "Zoom out",
     zoomIn: "Zoom in",
     reset: "Reset zoom",
+    fit: "Fit to view",
+    link: "Link views",
+    unlink: "Unlink views",
+    fullscreen: "Open fullscreen workspace",
+    exitFullscreen: "Exit fullscreen workspace",
+    search: "Search CFG nodes",
+    searchPlaceholder: "Find a block or instruction",
+    split: "Split",
+    before: "Before",
+    after: "After",
+    modesLabel: "CFG view mode",
+    toolbarLabel: "CFG workspace controls",
+    keyboardHint: "Drag to pan · 0 to fit · +/− to zoom",
+  },
+  search: {
+    noMatches: "No matching blocks",
+    resultLabel: "CFG search results",
+  },
+  pane: {
+    before: "Before",
+    after: "After",
+    canvasHelp: "Drag or use arrow keys to pan the graph",
+    nodeCount: "nodes",
+    edgeCount: "edges",
+    graphList: "CFG list",
+    flowsTo: "flows to",
+  },
+  inspector: {
+    heading: "Selected block",
+    empty: "Select a block to inspect its IR and control-flow connections.",
+    missing: "Not present in this snapshot",
+    incoming: "Incoming",
+    outgoing: "Outgoing",
+    noEdges: "None",
+    stableId: "Stable ID",
+    before: "Before IR",
+    after: "After IR",
+  },
+  graphData: {
+    heading: "Graph data",
+    nodes: "Nodes",
+    edges: "Directed edges",
+    noEdges: "No directed edges reported.",
   },
   legend: {
     added: "Added",

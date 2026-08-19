@@ -5,7 +5,7 @@ import test from "node:test";
 import optimisationPayloadModule from "../../../../llvm-service/optimisation-payload.js";
 
 import { parseOptimisationResult } from "./optimisation-adapter.ts";
-import { createIrDiff } from "./optimisation-diff.ts";
+import { createIrDiff } from "../../_helpers/text-diff.ts";
 import { optimisationResultSchema } from "./optimisation-schema.ts";
 
 const { createOptimisationPayload } = optimisationPayloadModule;

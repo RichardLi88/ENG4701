@@ -15,6 +15,7 @@ import type {
   optimisationSchemaVersionSchema,
   optimisedFunctionSchema,
   passControlFlowGraphSchema,
+  passAnalysisActivitySchema,
   passDependencyRelationSchema,
   passDependencySchema,
   passIrSchema,
@@ -49,6 +50,7 @@ export type ControlFlowGraphSnapshot = z.infer<
 export type ControlFlowGraphNode = z.infer<typeof controlFlowGraphNodeSchema>;
 export type ControlFlowGraphEdge = z.infer<typeof controlFlowGraphEdgeSchema>;
 export type PassTransformation = z.infer<typeof passTransformationSchema>;
+export type PassAnalysisActivity = z.infer<typeof passAnalysisActivitySchema>;
 export type PassDependency = z.infer<typeof passDependencySchema>;
 export type PassDependencyRelation = z.infer<
   typeof passDependencyRelationSchema
@@ -125,6 +127,11 @@ export type PassTransformationViewModel = Readonly<{
   summary: string;
 }>;
 
+export type PassAnalysisActivityViewModel = Readonly<{
+  computed: ReadonlyArray<string>;
+  preservation: "all" | "not-all";
+}>;
+
 export type PassDependencyViewModel = Readonly<{
   passId: string;
   relation: "requires" | "enables" | "related" | "unknown";
@@ -174,6 +181,7 @@ export type OptimisationPassViewModel = Readonly<{
   metrics: DataAvailability<PassMetricsViewModel>;
   cfg: DataAvailability<PassControlFlowGraphViewModel>;
   transformation: DataAvailability<PassTransformationViewModel>;
+  analysisActivity: DataAvailability<PassAnalysisActivityViewModel>;
   /** Available with an empty array means dependencies were computed as none. */
   dependencies: DataAvailability<ReadonlyArray<PassDependencyViewModel>>;
 }>;

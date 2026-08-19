@@ -61,6 +61,123 @@ function extractFunctionName(ir) {
   return match?.[1] ?? match?.[2];
 }
 
+function splitTopLevel(value, separator) {
+  const parts = [];
+  const openingDelimiters = new Set(["(", "[", "{", "<"]);
+  const closingDelimiters = new Set([")", "]", "}", ">"]);
+  let start = 0;
+  let depth = 0;
+  let quoted = false;
+  let escaped = false;
+
+  for (let index = 0; index < value.length; index += 1) {
+    const character = value[index];
+
+    if (escaped) {
+      escaped = false;
+    } else if (character === "\\" && quoted) {
+      escaped = true;
+    } else if (character === '"') {
+      quoted = !quoted;
+    } else if (!quoted && openingDelimiters.has(character)) {
+      depth += 1;
+    } else if (!quoted && closingDelimiters.has(character)) {
+      depth -= 1;
+    } else if (!quoted && depth === 0 && separator(character)) {
+      const part = value.slice(start, index).trim();
+      if (part) {
+        parts.push(part);
+      }
+      start = index + 1;
+    }
+  }
+
+  const finalPart = value.slice(start).trim();
+  if (finalPart) {
+    parts.push(finalPart);
+  }
+
+  return parts;
+}
+
+function findParameterListEnd(ir, openingParenthesis) {
+  let depth = 0;
+  let quoted = false;
+  let escaped = false;
+
+  for (let index = openingParenthesis; index < ir.length; index += 1) {
+    const character = ir[index];
+
+    if (escaped) {
+      escaped = false;
+    } else if (character === "\\" && quoted) {
+      escaped = true;
+    } else if (character === '"') {
+      quoted = !quoted;
+    } else if (!quoted && character === "(") {
+      depth += 1;
+    } else if (!quoted && character === ")") {
+      depth -= 1;
+      if (depth === 0) {
+        return index;
+      }
+    }
+  }
+
+  return -1;
+}
+
+function extractFunctionSignature(ir, definitionMatch) {
+  const definitionPrefix = definitionMatch[0];
+  const atIndex = definitionPrefix.indexOf("@");
+  const returnTypeParts = splitTopLevel(
+    definitionPrefix.slice("define".length, atIndex).trim(),
+    (character) => /\s/.test(character),
+  );
+  let returnType = returnTypeParts.at(-1);
+
+  if (
+    returnTypeParts.length >= 2 &&
+    /^addrspace\(\d+\)$/.test(returnType ?? "")
+  ) {
+    returnType = `${returnTypeParts.at(-2)} ${returnType}`;
+  }
+
+  const parameterOpeningParenthesis =
+    definitionMatch.index + definitionPrefix.length - 1;
+  const parameterClosingParenthesis = findParameterListEnd(
+    ir,
+    parameterOpeningParenthesis,
+  );
+  if (!returnType || parameterClosingParenthesis === -1) {
+    return undefined;
+  }
+
+  const parameterList = ir.slice(
+    parameterOpeningParenthesis + 1,
+    parameterClosingParenthesis,
+  );
+  const parameterTypes = splitTopLevel(
+    parameterList,
+    (character) => character === ",",
+  ).map((parameter) => {
+    if (parameter === "...") {
+      return parameter;
+    }
+
+    const parts = splitTopLevel(parameter, (character) => /\s/.test(character));
+    return /^addrspace\(\d+\)$/.test(parts[1] ?? "")
+      ? `${parts[0]} ${parts[1]}`
+      : parts[0];
+  });
+
+  if (parameterTypes.some((type) => type === undefined)) {
+    return undefined;
+  }
+
+  return `${returnType} (${parameterTypes.join(", ")})`;
+}
+
 function extractFunctions(ir) {
   const functions = [];
   const names = new Set();
@@ -73,7 +190,12 @@ function extractFunctions(ir) {
 
     if (name && !names.has(name)) {
       names.add(name);
-      functions.push({ id: functionId(name), name });
+      const signature = extractFunctionSignature(ir, match);
+      functions.push({
+        id: functionId(name),
+        name,
+        ...(signature ? { signature } : {}),
+      });
     }
   }
 
@@ -234,11 +356,7 @@ function normaliseIdentifier(identifier) {
     : identifier;
 }
 
-function graphNodeId(functionName, blockName) {
-  return `bb:${encodeURIComponent(functionName)}:${encodeURIComponent(blockName)}`;
-}
-
-function parseFunctionSnapshot({ name, body }) {
+function parseFunctionSnapshot({ body }) {
   const blocks = [];
   let current = { name: "entry", lines: [] };
 
@@ -268,16 +386,6 @@ function parseFunctionSnapshot({ name, body }) {
   }
 
   const blockNames = new Set(blocks.map((block) => block.name));
-  let graphIsValid = blockNames.size === blocks.length;
-
-  const nodes = blocks.map((block) => {
-    const preview = block.lines.slice(0, 4).join("\n");
-    return {
-      id: graphNodeId(name, block.name),
-      label: `${block.name}${preview ? `\n${preview}` : ""}`.slice(0, 1_024),
-    };
-  });
-  const edges = [];
   const edgeIds = new Set();
   let instructions = 0;
   let memoryOperations = 0;
@@ -312,33 +420,24 @@ function parseFunctionSnapshot({ name, body }) {
     while ((target = LABEL_REFERENCE.exec(terminator)) !== null) {
       const targetName = normaliseIdentifier(target[1]);
       if (!blockNames.has(targetName)) {
-        graphIsValid = false;
         continue;
       }
-      const source = graphNodeId(name, block.name);
-      const destination = graphNodeId(name, targetName);
-      const edgeId = `${source}\u0000${destination}`;
-      if (!edgeIds.has(edgeId)) {
-        edgeIds.add(edgeId);
-        edges.push({ source, target: destination });
-      }
+      edgeIds.add(`${block.name}\u0000${targetName}`);
     }
   }
 
   return {
-    graph: graphIsValid ? { nodes, edges } : undefined,
     metrics: {
       instructions,
       memoryOperations,
       basicBlocks: blocks.length,
       branches,
-      cyclomaticComplexity: Math.max(edges.length - blocks.length + 2, 1),
+      cyclomaticComplexity: Math.max(edgeIds.size - blocks.length + 2, 1),
     },
   };
 }
 
 function analyseIr(ir) {
-  const functions = new Map();
   const snapshots = extractFunctionSnapshots(ir);
   const totals = {
     instructions: 0,
@@ -350,49 +449,56 @@ function analyseIr(ir) {
 
   for (const snapshot of snapshots) {
     const analysis = parseFunctionSnapshot(snapshot);
-    functions.set(snapshot.name, analysis);
     for (const key of Object.keys(totals)) {
       totals[key] += analysis.metrics[key];
     }
   }
 
   return {
-    functions,
     metrics: snapshots.length > 0 ? totals : undefined,
   };
 }
 
-function createMetrics(before, after) {
-  if (!before.metrics || !after.metrics) {
+function createMetricComparisons(before, after, estimated) {
+  if (!before || !after) {
     return undefined;
   }
 
   return Object.fromEntries(
-    Object.keys(before.metrics).map((key) => [
+    Object.keys(before).map((key) => [
       key,
       {
-        before: before.metrics[key],
-        after: after.metrics[key],
-        delta: after.metrics[key] - before.metrics[key],
-        estimated: true,
+        before: before[key],
+        after: after[key],
+        delta: after[key] - before[key],
+        estimated,
       },
     ]),
   );
 }
 
-function createCfg(scope, before, after, functionNamesById) {
+function createEstimatedMetrics(before, after) {
+  return createMetricComparisons(before.metrics, after.metrics, true);
+}
+
+function createCfg(
+  scope,
+  beforeCfgByFunction,
+  afterCfgByFunction,
+  functionNamesById,
+) {
   if (!("functionId" in scope) || scope.functionId === undefined) {
     return undefined;
   }
 
   const functionName = functionNamesById.get(scope.functionId);
-  const beforeFunction = functionName && before.functions.get(functionName);
-  const afterFunction = functionName && after.functions.get(functionName);
-  if (!beforeFunction?.graph || !afterFunction?.graph) {
+  const before = functionName && beforeCfgByFunction?.get(functionName);
+  const after = functionName && afterCfgByFunction?.get(functionName);
+  if (!before || !after) {
     return undefined;
   }
 
-  return { before: beforeFunction.graph, after: afterFunction.graph };
+  return { before, after };
 }
 
 function transformationCategory(name) {
@@ -402,18 +508,17 @@ function transformationCategory(name) {
   );
 }
 
-function createTransformation(type, changed, fullName, name, metrics) {
+function createTransformation(type, changed, name) {
   if (type !== "transform") {
     return undefined;
   }
 
+  const category = transformationCategory(name);
   return {
-    category: transformationCategory(name),
+    category,
     summary: changed
-      ? metrics
-        ? transformationSummary.changed(fullName, metrics)
-        : transformationSummary.changedWithoutMetrics(fullName)
-      : transformationSummary.unchanged(fullName),
+      ? transformationSummary.changed(category)
+      : transformationSummary.unchanged,
   };
 }
 
@@ -438,6 +543,7 @@ function parseDumpBlocks(log, sourceFile) {
   const headers = [...log.matchAll(DUMP_HEADER)];
 
   return headers.map((header, index) => ({
+    dumpIndex: index,
     phase: header[1],
     fullName: header[2],
     target: header[3],
@@ -478,7 +584,10 @@ function createScope(target, ir, functionNames, order) {
 }
 
 function createOptimisationPayload({
+  analysesByDump,
   beforeAfterLog,
+  measuredCfgByDump,
+  measuredMetricsByDump,
   sourceFile,
   unoptimisedIr,
 }) {
@@ -522,20 +631,19 @@ function createOptimisationPayload({
     const scope = createScope(before.target, before.ir, functionNames, order);
     const beforeAnalysis = analysisFor(before.ir);
     const afterAnalysis = analysisFor(after.ir);
-    const metrics = createMetrics(beforeAnalysis, afterAnalysis);
+    const metrics =
+      createMetricComparisons(
+        measuredMetricsByDump?.[before.dumpIndex],
+        measuredMetricsByDump?.[after.dumpIndex],
+        false,
+      ) ?? createEstimatedMetrics(beforeAnalysis, afterAnalysis);
     const cfg = createCfg(
       scope,
-      beforeAnalysis,
-      afterAnalysis,
+      measuredCfgByDump?.[before.dumpIndex],
+      measuredCfgByDump?.[after.dumpIndex],
       functionNamesById,
     );
-    const transformation = createTransformation(
-      type,
-      changed,
-      before.fullName,
-      name,
-      metrics,
-    );
+    const transformation = createTransformation(type, changed, name);
     const diff = changed
       ? createStructuredDiff(before.ir, after.ir)
       : undefined;
@@ -556,6 +664,15 @@ function createOptimisationPayload({
       ...(metrics ? { metrics } : {}),
       ...(cfg ? { cfg } : {}),
       ...(transformation ? { transformation } : {}),
+      ...(analysesByDump
+        ? {
+            analysisActivity: {
+              computed: analysesByDump[before.dumpIndex]?.computed ?? [],
+              preservation:
+                analysesByDump[before.dumpIndex]?.preservation ?? "not-all",
+            },
+          }
+        : {}),
     });
     index += 1;
   }

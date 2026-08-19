@@ -217,6 +217,11 @@ export const passTransformationSchema = z.object({
   summary: nonBlankString(10_000),
 });
 
+export const passAnalysisActivitySchema = z.object({
+  computed: z.array(nonEmptyString).max(1_000),
+  preservation: z.enum(["all", "not-all"]),
+});
+
 export const passDependencyRelationSchema = z.enum([
   "requires",
   "enables",
@@ -246,6 +251,7 @@ export const optimisationPassSchema = z
     metrics: passMetricsSchema.optional(),
     cfg: passControlFlowGraphSchema.optional(),
     transformation: passTransformationSchema.optional(),
+    analysisActivity: passAnalysisActivitySchema.optional(),
     dependencies: z.array(passDependencySchema).max(MAX_PASSES).optional(),
   })
   .superRefine((pass, ctx) => {

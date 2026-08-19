@@ -11,7 +11,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install LLVM toolchain + Node.js (for the service server)
 RUN apt-get update && apt-get install -y \
     llvm \
+    llvm-dev \
     clang \
+    build-essential \
     curl \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
@@ -25,6 +27,13 @@ RUN npm install --production
 
 # Copy service source
 COPY llvm-service/ .
+
+# Build the native LLVM 14 IR metrics collector used for exact Before/After
+# measurements. Keep -std=c++17 after llvm-config flags because LLVM's flags
+# may specify an older language standard.
+RUN clang++ $(llvm-config --cxxflags) -std=c++17 -O2 llvm-ir-metrics.cpp \
+    $(llvm-config --ldflags --system-libs --libs core irreader passes analysis) \
+    -o /usr/local/bin/llvm-ir-metrics
 
 # Run as non-root user for security
 RUN useradd -m llvmuser && chown -R llvmuser /app

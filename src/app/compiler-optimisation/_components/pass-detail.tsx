@@ -1,6 +1,10 @@
 import { memo } from "react";
 
-import type { OptimisationPassViewProps } from "../_lib/optimisation-types";
+import { passDetailContent } from "../content";
+import type {
+  OptimisationPassViewModel,
+  OptimisationPassViewProps,
+} from "../_lib/optimisation-types";
 import type { DiffMode } from "../_lib/workspace-state";
 import {
   describePassScope,
@@ -17,12 +21,16 @@ const ignoreDiffModeChange = () => undefined;
 
 type PassDetailProps = OptimisationPassViewProps &
   Readonly<{
+    previousPass?: OptimisationPassViewModel;
+    nextPass?: OptimisationPassViewModel;
     diffMode?: DiffMode;
     onDiffModeChange?: (diffMode: DiffMode) => void;
   }>;
 
 export const PassDetail = memo(function PassDetail({
   pass,
+  previousPass,
+  nextPass,
   diffMode = "side-by-side",
   onDiffModeChange = ignoreDiffModeChange,
 }: PassDetailProps) {
@@ -31,84 +39,83 @@ export const PassDetail = memo(function PassDetail({
     pass.position.withinFunction.status === "available"
       ? String(pass.position.withinFunction.data + 1)
       : NOT_AVAILABLE;
-  const overviewItems = [
-    { label: "Name", value: pass.name, mono: true },
-    {
-      label: "Full name",
-      value:
-        pass.fullName.status === "available"
-          ? pass.fullName.data
-          : NOT_AVAILABLE,
-      mono: true,
-    },
-    {
-      label: "Global order",
-      value: String(pass.position.global + 1),
-      mono: false,
-    },
-    { label: "Function order", value: localPosition, mono: false },
-    { label: "Type", value: pass.type, mono: false },
-    { label: "Scope", value: scope, mono: false },
-  ] as const;
+  const fullName =
+    pass.fullName.status === "available" ? pass.fullName.data : NOT_AVAILABLE;
+  const analysisActivity = pass.analysisActivity;
+  const computedAnalyses =
+    analysisActivity?.status === "available"
+      ? analysisActivity.data.computed
+      : [];
 
   return (
     <article className="min-w-0" aria-labelledby="pass-detail-heading">
-      <header className="mb-5 min-w-0">
-        <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-400">
-          <span className="rounded-full border border-slate-700 px-2.5 py-1">
-            {pass.type}
-          </span>
+      <header className="mb-5 min-w-0 border-b border-slate-800/80 pb-5">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-xs font-medium">
+          <div className="flex min-w-0 items-center gap-2">
+            <span className="font-mono tracking-[0.12em] text-cyan-300 uppercase">
+              {pass.type}
+            </span>
+            <span className="text-slate-700" aria-hidden="true">
+              ·
+            </span>
+            <span className="min-w-0 truncate text-slate-400" title={scope}>
+              {scope}
+            </span>
+          </div>
           <span
-            className="max-w-full min-w-0 truncate rounded-full border border-slate-700 px-2.5 py-1"
-            title={scope}
+            className={`flex shrink-0 items-center gap-2 font-semibold tracking-wide uppercase ${
+              pass.changed ? "text-emerald-300" : "text-slate-400"
+            }`}
           >
-            {scope}
-          </span>
-          <span className="rounded-full border border-slate-700 px-2.5 py-1">
-            Pass {pass.position.global + 1}
-          </span>
-          <span className="text-slate-600" aria-hidden="true">
-            /
-          </span>
-          <span
-            className={pass.changed ? "text-emerald-300" : "text-slate-400"}
-          >
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${
+                pass.changed ? "bg-emerald-300" : "bg-slate-500"
+              }`}
+              aria-hidden="true"
+            />
             {pass.changed ? "IR changed" : "IR unchanged"}
           </span>
         </div>
         <h2
           id="pass-detail-heading"
-          className="mt-3 text-2xl font-semibold tracking-tight break-words text-slate-50 sm:text-3xl"
+          className="mt-4 text-2xl font-semibold tracking-tight break-words text-slate-50 sm:text-3xl"
           title={pass.name}
         >
           {pass.name}
         </h2>
-      </header>
-
-      <section
-        aria-labelledby="pass-overview-heading"
-        className="mb-5 rounded-xl border border-slate-800 bg-slate-950/50 p-3"
-      >
-        <h3
-          id="pass-overview-heading"
-          className="text-xs font-semibold tracking-[0.14em] text-slate-400 uppercase"
-        >
-          Pass details
-        </h3>
-        <dl className="mt-3 grid gap-x-6 gap-y-4 sm:grid-cols-2 xl:grid-cols-3">
-          {overviewItems.map((item) => (
-            <div key={item.label} className="min-w-0">
-              <dt className="text-xs text-slate-500">{item.label}</dt>
-              <dd
-                className={`mt-1 text-sm break-words text-slate-200 ${item.mono ? "font-mono" : "capitalize"}`}
-                title={item.value}
-              >
-                {item.value}
+        <div className="mt-2 flex min-w-0 flex-wrap items-end justify-between gap-x-6 gap-y-3">
+          <code
+            className="min-w-0 truncate text-xs text-slate-400"
+            title={fullName}
+            aria-label={`${passDetailContent.metadata.fullName}: ${fullName}`}
+          >
+            {fullName}
+          </code>
+          <dl className="flex shrink-0 items-center gap-2 text-xs">
+            <div className="flex items-baseline gap-1.5">
+              <dt className="font-medium tracking-wide text-slate-500 uppercase">
+                {passDetailContent.metadata.globalOrder}
+              </dt>
+              <dd className="font-mono text-slate-200 tabular-nums">
+                {pass.position.global + 1}
               </dd>
             </div>
-          ))}
-        </dl>
-      </section>
+            {pass.position.withinFunction.status === "available" ? (
+              <div className="flex items-baseline gap-2">
+                <dt className="flex items-baseline gap-2 font-medium tracking-wide text-slate-500 uppercase">
+                  <span className="font-mono text-cyan-700" aria-hidden="true">
+                    →
+                  </span>
+                  {passDetailContent.metadata.functionOrder}
+                </dt>
+                <dd className="font-mono text-slate-200 tabular-nums">
+                  {localPosition}
+                </dd>
+              </div>
+            ) : null}
+          </dl>
+        </div>
+      </header>
 
       <section aria-labelledby="pass-metrics-heading" className="mb-5">
         <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
@@ -209,68 +216,94 @@ export const PassDetail = memo(function PassDetail({
         </div>
       </section>
 
-      <div className="mb-5 grid gap-4 xl:grid-cols-2">
-        <section
-          aria-labelledby="transformation-heading"
-          className="rounded-xl border border-slate-800 bg-slate-950/50 p-4"
+      <section
+        aria-labelledby="analysis-context-heading"
+        className="mb-5 rounded-xl border border-slate-800 bg-slate-950/50 p-5"
+      >
+        <h3
+          id="analysis-context-heading"
+          className="text-xs font-semibold tracking-[0.14em] text-slate-400 uppercase"
         >
-          <h3
-            id="transformation-heading"
-            className="text-xs font-semibold tracking-[0.14em] text-slate-400 uppercase"
-          >
-            Transformation
-          </h3>
-          {pass.transformation.status === "available" ? (
-            <div className="mt-3">
-              <p className="text-xs font-medium text-cyan-300">
-                {pass.transformation.data.category}
-              </p>
-              <p className="mt-2 text-sm leading-6 text-slate-300">
-                {pass.transformation.data.summary}
-              </p>
-            </div>
-          ) : (
-            <p className="mt-3 text-sm text-amber-300">{NOT_AVAILABLE}</p>
-          )}
-        </section>
-
-        <section
-          aria-labelledby="dependencies-heading"
-          className="rounded-xl border border-slate-800 bg-slate-950/50 p-4"
-        >
-          <h3
-            id="dependencies-heading"
-            className="text-xs font-semibold tracking-[0.14em] text-slate-400 uppercase"
-          >
-            Dependencies and relations
-          </h3>
-          {pass.dependencies.status === "available" ? (
-            pass.dependencies.data.length > 0 ? (
-              <ul className="mt-3 space-y-2">
-                {pass.dependencies.data.map((dependency, index) => (
-                  <li
-                    key={`${dependency.passId}:${dependency.relation}:${index}`}
-                    className="flex min-w-0 flex-wrap items-center gap-2 text-sm"
-                  >
-                    <span className="rounded-full border border-slate-700 px-2 py-0.5 text-xs font-medium text-slate-300 capitalize">
-                      {dependency.relation}
-                    </span>
-                    <code className="break-all text-slate-400">
-                      {dependency.passId}
-                    </code>
-                  </li>
-                ))}
-              </ul>
+          {passDetailContent.analysisContext.heading}
+        </h3>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div className="min-w-0">
+            <p className="text-xs text-slate-500">
+              {passDetailContent.analysisContext.preservation}
+            </p>
+            {analysisActivity?.status === "available" ? (
+              <span
+                className={`mt-1.5 inline-flex rounded-full border px-2.5 py-1 text-xs font-medium ${
+                  analysisActivity.data.preservation === "all"
+                    ? "border-emerald-400/25 bg-emerald-400/10 text-emerald-300"
+                    : "border-amber-400/25 bg-amber-400/10 text-amber-200"
+                }`}
+              >
+                {analysisActivity.data.preservation === "all"
+                  ? passDetailContent.analysisContext.allPreserved
+                  : passDetailContent.analysisContext.notAllPreserved}
+              </span>
             ) : (
-              <p className="mt-3 text-sm text-slate-400">
-                No dependencies reported.
+              <p className="mt-1.5 text-sm text-slate-400">
+                {passDetailContent.analysisContext.unavailable}
               </p>
-            )
-          ) : (
-            <p className="mt-3 text-sm text-amber-300">{NOT_AVAILABLE}</p>
-          )}
-        </section>
-      </div>
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs text-slate-500">
+              {passDetailContent.analysisContext.computed}
+            </p>
+            {computedAnalyses.length > 0 ? (
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {computedAnalyses.slice(0, 4).map((analysis) => (
+                  <code
+                    key={analysis}
+                    className="max-w-full truncate rounded-md bg-slate-800/80 px-2 py-1 text-xs text-slate-300"
+                    title={analysis}
+                  >
+                    {analysis}
+                  </code>
+                ))}
+                {computedAnalyses.length > 4 ? (
+                  <span className="px-1 py-1 text-xs text-slate-500">
+                    +{computedAnalyses.length - 4}{" "}
+                    {passDetailContent.analysisContext.more}
+                  </span>
+                ) : null}
+              </div>
+            ) : analysisActivity?.status === "available" ? (
+              <p className="mt-1.5 text-sm text-slate-400">
+                {passDetailContent.analysisContext.noneComputed}
+              </p>
+            ) : null}
+          </div>
+        </div>
+
+        <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-slate-800/80 pt-4">
+          {[
+            {
+              label: passDetailContent.analysisContext.previous,
+              pass: previousPass,
+              fallback: passDetailContent.analysisContext.pipelineStart,
+            },
+            {
+              label: passDetailContent.analysisContext.next,
+              pass: nextPass,
+              fallback: passDetailContent.analysisContext.pipelineEnd,
+            },
+          ].map((item) => (
+            <div key={item.label} className="min-w-0">
+              <dt className="text-xs text-slate-500">{item.label}</dt>
+              <dd
+                className="mt-1 truncate font-mono text-sm text-slate-300"
+                title={item.pass?.name}
+              >
+                {item.pass?.name ?? item.fallback}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
 
       <IrDiffViewer
         before={pass.ir.before}
