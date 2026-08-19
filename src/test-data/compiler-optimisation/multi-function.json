@@ -79,18 +79,44 @@
             {
               "id": "main:entry",
               "label": "entry"
+            },
+            {
+              "id": "main:sum",
+              "label": "%sum = add i32 1, 1"
+            },
+            {
+              "id": "main:exit",
+              "label": "ret i32 %sum"
             }
           ],
-          "edges": []
+          "edges": [
+            {
+              "source": "main:entry",
+              "target": "main:sum"
+            },
+            {
+              "source": "main:sum",
+              "target": "main:exit"
+            }
+          ]
         },
         "after": {
           "nodes": [
             {
               "id": "main:entry",
               "label": "entry"
+            },
+            {
+              "id": "main:exit",
+              "label": "ret i32 2"
             }
           ],
-          "edges": []
+          "edges": [
+            {
+              "source": "main:entry",
+              "target": "main:exit"
+            }
+          ]
         }
       },
       "transformation": {

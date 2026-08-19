@@ -23,17 +23,13 @@
   both changed and unchanged Passes without temporary paths or UUIDs.
 - `day3-basic.c`, `day3-control-flow.c`, `day3-special-function.c`, and
   `day3-operators.cpp`: stable real-service success cases used by
-  `npm run test:day3-real-cases` together with `e2e-multi-function.c`.
+  `npm run test:e2e:llvm` together with `e2e-multi-function.c`.
 - `invalid.json`: intentionally invalid because `schemaVersion` is missing and `passes[0].order` is a string.
 
 The optional values in `multi-function.json` describe only the explicit hand-written IR in that fixture. Other fixtures omit unavailable optional data instead of supplying placeholders.
 
-Run `npm run test:optimisation-schema`, `npm run test:optimisation-adapter`, and
-`npm run test:real-backend-payload` from the repository root to validate the
-fixtures, protocol boundary cases and UI View Model conversion. With the local
-LLVM service running, use `npm run test:day3-real-cases` to repeat the five
-real compilation and optimisation cases. Use
-`npm run test:day3-failure-cases` for the live empty input, C/C++ syntax,
-filename, malformed JSON, and unsupported Schema version boundaries; the
-HTTP client timeout and unavailable-service cases are covered by
-`npm run test:llvm-service-client`.
+Run `npm test` from the repository root to validate fixtures, protocol boundary
+cases, UI View Model conversion, navigation, filtering, IR Diff, CFG rendering,
+and missing optional data states. With the local LLVM service running, use
+`npm run test:e2e:llvm` to repeat the real C/C++ success and failure cases. The
+HTTP client suite also covers timeout and unavailable-service classification.

@@ -3,12 +3,14 @@
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 
 import type { OptimisationWorkspaceProps } from "../_lib/optimisation-types";
+import { compilerWorkspaceContent } from "../content";
 import {
   calculatePassFilterCounts,
   clearWorkspacePassFilters,
   createInitialWorkspaceState,
   deriveWorkspaceSelection,
   selectAdjacentWorkspacePass,
+  selectWorkspaceGlobalPasses,
   selectWorkspaceFunction,
   selectWorkspacePass,
   setWorkspacePassChangeFilter,
@@ -54,13 +56,24 @@ function OptimisationWorkspaceSession({
     [model, workspaceState],
   );
   const selectedFunctionPasses = selectedFunction?.passes;
+  const selectedScopePasses = useMemo(
+    () =>
+      workspaceState.selectedFunctionId === undefined
+        ? model.globalPasses
+        : (selectedFunctionPasses ?? []),
+    [
+      model.globalPasses,
+      selectedFunctionPasses,
+      workspaceState.selectedFunctionId,
+    ],
+  );
   const filterCounts = useMemo(
     () =>
       calculatePassFilterCounts(
-        selectedFunctionPasses ?? [],
+        selectedScopePasses,
         workspaceState.passFilters,
       ),
-    [selectedFunctionPasses, workspaceState.passFilters],
+    [selectedScopePasses, workspaceState.passFilters],
   );
   const hasActiveFilters =
     workspaceState.passFilters.type !== "all" ||
@@ -84,6 +97,10 @@ function OptimisationWorkspaceSession({
     },
     [model],
   );
+
+  const selectGlobalPasses = useCallback(() => {
+    setWorkspaceState((state) => selectWorkspaceGlobalPasses(model, state));
+  }, [model]);
 
   const selectPass = useCallback(
     (passId: string) => {
@@ -172,12 +189,12 @@ function OptimisationWorkspaceSession({
 
         <OptimisationSummary model={model} />
 
-        {selectedFunction === undefined ? (
+        {model.functions.length === 0 && model.globalPasses.length === 0 ? (
           <div className="mt-6">
             <StatusPanel
-              eyebrow="No functions"
-              title="There is no function IR to inspect"
-              description="This optimisation result did not include any functions. Run the compiler with a source file that emits function-level IR."
+              eyebrow="No Passes"
+              title={compilerWorkspaceContent.empty.noScopesTitle}
+              description={compilerWorkspaceContent.empty.noScopesDescription}
               tone="empty"
             />
           </div>
@@ -186,7 +203,9 @@ function OptimisationWorkspaceSession({
             <aside className="min-w-0 space-y-7 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-2">
               <FunctionSelector
                 functions={model.functions}
+                globalPassCount={model.globalPasses.length}
                 selectedFunctionId={workspaceState.selectedFunctionId}
+                onSelectGlobal={selectGlobalPasses}
                 onSelect={selectFunction}
               />
               <PassFiltersControl
@@ -197,6 +216,10 @@ function OptimisationWorkspaceSession({
               />
               <PassList
                 passes={visiblePasses}
+                scopeName={
+                  selectedFunction?.name ??
+                  compilerWorkspaceContent.scopes.globalName
+                }
                 selectedPassId={selectedPass?.id}
                 selectedPassIndex={selectedPassIndex}
                 onSelect={selectPass}
@@ -212,7 +235,7 @@ function OptimisationWorkspaceSession({
             <section className="min-w-0 rounded-2xl border border-slate-800 bg-slate-900/30 p-4 sm:p-6 lg:p-7">
               {selectedPass === undefined &&
               visiblePasses.length === 0 &&
-              selectedFunction.passes.length > 0 ? (
+              selectedScopePasses.length > 0 ? (
                 <div className="space-y-4">
                   <StatusPanel
                     eyebrow="Filtered timeline"
@@ -232,8 +255,16 @@ function OptimisationWorkspaceSession({
               ) : selectedPass === undefined ? (
                 <StatusPanel
                   eyebrow="No passes"
-                  title={`${selectedFunction.name} has no optimisation passes`}
-                  description="The function is available, but no associated Pass was reported for this run."
+                  title={
+                    selectedFunction === undefined
+                      ? compilerWorkspaceContent.empty.globalNoPassesTitle
+                      : `${selectedFunction.name} has no optimisation passes`
+                  }
+                  description={
+                    selectedFunction === undefined
+                      ? compilerWorkspaceContent.empty.globalNoPassesDescription
+                      : "The function is available, but no associated Pass was reported for this run."
+                  }
                   tone="empty"
                   compact
                 />

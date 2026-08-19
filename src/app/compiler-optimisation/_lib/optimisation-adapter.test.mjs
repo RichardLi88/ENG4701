@@ -105,6 +105,34 @@ test("function Pass lists do not mix functions or include module Passes", () => 
     model.passes[0].position.withinFunction.reason,
     "not-applicable",
   );
+  assert.deepEqual(
+    model.globalPasses.map((pass) => pass.id),
+    ["pass:000000:dmVyaWZ5"],
+  );
+});
+
+test("global Passes include module and unknown scopes without a function", () => {
+  const input = readFixture("multi-function.json");
+  const unassignedPass = structuredClone(input.passes[4]);
+  unassignedPass.id = "pass:000005:dW5hc3NpZ25lZA";
+  unassignedPass.order = 5;
+  unassignedPass.name = "unassigned";
+  unassignedPass.scope = { level: "unknown" };
+  input.passes.push(unassignedPass);
+  input.meta.totalPasses = input.passes.length;
+
+  const model = expectSuccess(parseOptimisationResult(input));
+
+  assert.deepEqual(
+    model.globalPasses.map((pass) => pass.id),
+    ["pass:000000:dmVyaWZ5", "pass:000005:dW5hc3NpZ25lZA"],
+  );
+  assert.equal(
+    model.functions.some((fn) =>
+      fn.passes.some((pass) => pass.id === unassignedPass.id),
+    ),
+    false,
+  );
 });
 
 test("missing optional data remains explicitly unavailable", () => {

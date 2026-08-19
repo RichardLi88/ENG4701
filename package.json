@@ -18,6 +18,12 @@
     "lint:fix": "next lint --fix",
     "preview": "next build && next start",
     "start": "next start",
+    "test": "npm run test:unit && npm run test:components",
+    "test:components": "vitest run",
+    "test:e2e:llvm": "npm run test:e2e:llvm:success && npm run test:e2e:llvm:failure",
+    "test:e2e:llvm:failure": "node --experimental-strip-types scripts/run-llvm-failure-cases.mjs",
+    "test:e2e:llvm:success": "node --experimental-strip-types scripts/run-llvm-real-cases.mjs",
+    "test:unit": "node --test src/app/compiler-optimisation/_lib/*.test.mjs src/server/api/llvm-service-client.test.mjs llvm-service/optimisation-payload.test.js",
     "test:program-reduction": "node --experimental-strip-types --test src/app/program-reduction/_lib/reduction-trace-adapter.test.mjs",
     "typecheck": "tsc --noEmit"
   },
@@ -38,18 +44,24 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@tailwindcss/postcss": "^4.0.15",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.5",
     "@types/node": "^20.14.10",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.0.5",
     "eslint": "^9.23.0",
     "eslint-config-next": "^15.2.3",
+    "jsdom": "^30.0.1",
     "postcss": "^8.5.3",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "prisma": "^6.6.0",
     "tailwindcss": "^4.0.15",
     "typescript": "^5.8.2",
-    "typescript-eslint": "^8.27.0"
+    "typescript-eslint": "^8.27.0",
+    "vitest": "^4.1.6"
   },
   "ct3aMetadata": {
     "initVersion": "7.40.0"

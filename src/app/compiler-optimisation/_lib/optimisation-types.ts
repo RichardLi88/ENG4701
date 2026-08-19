@@ -198,6 +198,8 @@ export type OptimisationViewModel = Readonly<{
   summary: OptimisationSummaryViewModel;
   /** Complete Pass stream, sorted by global position. */
   passes: ReadonlyArray<OptimisationPassViewModel>;
+  /** Module Passes and unknown-scope Passes without a function owner. */
+  globalPasses: ReadonlyArray<OptimisationPassViewModel>;
   /** Functions retain payload order; each nested Pass list is globally ordered. */
   functions: ReadonlyArray<OptimisationFunctionViewModel>;
   /** Index objects must be created without a prototype by the adapter. */

@@ -56,3 +56,45 @@ export const compilerWorkflowContent = {
       "The optimisation response does not match the supported data protocol.",
   },
 } as const;
+
+export const compilerWorkspaceContent = {
+  scopes: {
+    heading: "Pass scopes",
+    globalName: "Global Passes",
+    globalDescription: "Module and unassigned Passes",
+  },
+  empty: {
+    noScopesTitle: "There are no Passes to inspect",
+    noScopesDescription:
+      "This optimisation result did not include function, module, or unassigned Pass entries.",
+    globalNoPassesTitle: "There are no global Passes",
+    globalNoPassesDescription:
+      "No module-level or unassigned Pass was reported for this run.",
+  },
+} as const;
+
+export const cfgContent = {
+  heading: "Control flow graph",
+  description:
+    "Directed basic-block flow before and after this Pass. Scroll the canvas to pan.",
+  unavailable: "CFG data was not provided for this Pass.",
+  empty: "This CFG snapshot contains no basic blocks.",
+  fallback: {
+    title: "Diagram unavailable",
+    duplicateNode:
+      "The graph contains duplicate node IDs, so it is shown as a readable list.",
+    danglingEdge:
+      "The graph contains an edge whose endpoint is missing, so it is shown as a readable list.",
+  },
+  controls: {
+    zoomOut: "Zoom out",
+    zoomIn: "Zoom in",
+    reset: "Reset zoom",
+  },
+  legend: {
+    added: "Added",
+    removed: "Removed",
+    changed: "Changed",
+    unchanged: "Unchanged",
+  },
+} as const;

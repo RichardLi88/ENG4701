@@ -13,6 +13,7 @@ import {
   resetWorkspaceState,
   selectAdjacentWorkspacePass,
   selectWorkspaceFunction,
+  selectWorkspaceGlobalPasses,
   selectWorkspacePass,
   setWorkspacePassChangeFilter,
   setWorkspacePassTypeFilter,
@@ -31,11 +32,12 @@ function parseModel(input) {
   return result.data;
 }
 
+function readFixture(name) {
+  return JSON.parse(readFileSync(new URL(name, fixtureDirectory), "utf8"));
+}
+
 function readModel(name) {
-  const input = JSON.parse(
-    readFileSync(new URL(name, fixtureDirectory), "utf8"),
-  );
-  return parseModel(input);
+  return parseModel(readFixture(name));
 }
 
 test("initial state selects the first function and its first Pass by ID", () => {
@@ -65,6 +67,46 @@ test("a single-function result selects its only function and Pass", () => {
   assert.equal(selection.selectedFunction?.id, "fn:bWFpbg");
   assert.equal(selection.selectedPass?.id, "pass:000000:aW5zdGNvbWJpbmU");
   assert.equal(selection.visiblePasses.length, 1);
+});
+
+test("module and unassigned Passes can be selected as a global timeline", () => {
+  const input = readFixture("multi-function.json");
+  const unassignedPass = structuredClone(input.passes[4]);
+  unassignedPass.id = "pass:000005:dW5hc3NpZ25lZA";
+  unassignedPass.order = 5;
+  unassignedPass.name = "unassigned";
+  unassignedPass.scope = { level: "unknown" };
+  input.passes.push(unassignedPass);
+  input.meta.totalPasses = input.passes.length;
+  const model = parseModel(input);
+
+  const globalState = selectWorkspaceGlobalPasses(
+    model,
+    createInitialWorkspaceState(model),
+  );
+  const selection = deriveWorkspaceSelection(model, globalState);
+
+  assert.equal(globalState.selectedFunctionId, undefined);
+  assert.equal(selection.selectedFunction, undefined);
+  assert.deepEqual(
+    selection.visiblePasses.map((pass) => pass.id),
+    ["pass:000000:dmVyaWZ5", "pass:000005:dW5hc3NpZ25lZA"],
+  );
+  assert.equal(selection.selectedPass?.id, "pass:000000:dmVyaWZ5");
+});
+
+test("a global-only result selects its first Pass initially", () => {
+  const input = readFixture("minimal.json");
+  input.functions = [];
+  input.passes[0].scope = { level: "module" };
+  const model = parseModel(input);
+  const state = createInitialWorkspaceState(model);
+  const selection = deriveWorkspaceSelection(model, state);
+
+  assert.equal(state.selectedFunctionId, undefined);
+  assert.equal(selection.selectedFunction, undefined);
+  assert.equal(selection.selectedPass?.id, input.passes[0].id);
+  assert.deepEqual(selection.visiblePasses, model.globalPasses);
 });
 
 test("switching functions atomically selects the new function's first Pass", () => {
