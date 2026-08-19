@@ -18,12 +18,14 @@
     "lint:fix": "next lint --fix",
     "preview": "next build && next start",
     "start": "next start",
+    "test:program-reduction": "vitest run src/app/program-reduction",
     "test:optimisation-schema": "node --experimental-strip-types --test src/app/compiler-optimisation/_lib/optimisation-schema.test.mjs",
     "test:optimisation-adapter": "node --experimental-strip-types --test src/app/compiler-optimisation/_lib/optimisation-adapter.test.mjs",
     "test:optimisation-diff": "node --experimental-strip-types --test src/app/compiler-optimisation/_lib/optimisation-diff.test.mjs",
     "test:pass-detail-display": "node --experimental-strip-types --test src/app/compiler-optimisation/_lib/pass-detail-display.test.mjs",
     "test:real-backend-payload": "node --experimental-strip-types --test src/app/compiler-optimisation/_lib/real-backend-payload.test.mjs",
     "test:workspace-state": "node --experimental-strip-types --test src/app/compiler-optimisation/_lib/workspace-state.test.mjs",
+    "test": "vitest run src/app/program-reduction",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -33,6 +35,7 @@
     "@trpc/client": "^11.0.0",
     "@trpc/react-query": "^11.0.0",
     "@trpc/server": "^11.0.0",
+    "diff": "^9.0.0",
     "next": "^15.2.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -43,18 +46,25 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@tailwindcss/postcss": "^4.0.15",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.5",
     "@types/node": "^20.14.10",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.7.0",
     "eslint": "^9.23.0",
     "eslint-config-next": "^15.2.3",
+    "jsdom": "^26.1.0",
     "postcss": "^8.5.3",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "prisma": "^6.6.0",
     "tailwindcss": "^4.0.15",
     "typescript": "^5.8.2",
-    "typescript-eslint": "^8.27.0"
+    "typescript-eslint": "^8.27.0",
+    "vite": "^6.4.3",
+    "vitest": "^3.2.7"
   },
   "ct3aMetadata": {
     "initVersion": "7.40.0"
