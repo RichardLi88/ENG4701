@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 
-import { createIrDiff, type IrDiffLine } from "../_lib/optimisation-diff";
+import { createIrDiff, type IrDiffLine } from "~/app/_helpers/text-diff";
 
 export type IrDiffViewerProps = Readonly<{
   before?: string | null;

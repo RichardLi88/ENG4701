@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { createIrDiff } from "./optimisation-diff.ts";
+import { createIrDiff } from "./text-diff.ts";
 
 const compact = (result) =>
   result.lines.map((line) => [
