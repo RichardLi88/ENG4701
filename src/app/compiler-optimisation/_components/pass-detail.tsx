@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 import type { OptimisationPassViewProps } from "../_lib/optimisation-types";
 import {
   describePassScope,
@@ -10,7 +12,9 @@ import { IrDiffViewer } from "./ir-diff-viewer";
 
 const NOT_AVAILABLE = "Not available";
 
-export function PassDetail({ pass }: OptimisationPassViewProps) {
+export const PassDetail = memo(function PassDetail({
+  pass,
+}: OptimisationPassViewProps) {
   const scope = describePassScope(pass);
   const localPosition =
     pass.position.withinFunction.status === "available"
@@ -260,4 +264,4 @@ export function PassDetail({ pass }: OptimisationPassViewProps) {
       <IrDiffViewer before={pass.ir.before} after={pass.ir.after} />
     </article>
   );
-}
+});

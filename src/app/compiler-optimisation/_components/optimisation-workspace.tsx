@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 
 import type { OptimisationWorkspaceProps } from "../_lib/optimisation-types";
 import {
@@ -49,59 +49,82 @@ function OptimisationWorkspaceSession({
   const [workspaceState, setWorkspaceState] = useState(() =>
     createInitialWorkspaceState(model),
   );
-  const { selectedFunction, selectedPass, visiblePasses } =
-    deriveWorkspaceSelection(model, workspaceState);
-  const filterCounts = calculatePassFilterCounts(
-    selectedFunction?.passes ?? [],
-    workspaceState.passFilters,
+  const { selectedFunction, selectedPass, visiblePasses } = useMemo(
+    () => deriveWorkspaceSelection(model, workspaceState),
+    [model, workspaceState],
+  );
+  const selectedFunctionPasses = selectedFunction?.passes;
+  const filterCounts = useMemo(
+    () =>
+      calculatePassFilterCounts(
+        selectedFunctionPasses ?? [],
+        workspaceState.passFilters,
+      ),
+    [selectedFunctionPasses, workspaceState.passFilters],
   );
   const hasActiveFilters =
     workspaceState.passFilters.type !== "all" ||
     workspaceState.passFilters.change !== "all";
-  const selectedPassIndex = selectedPass
-    ? visiblePasses.findIndex((pass) => pass.id === selectedPass.id)
-    : -1;
+  const selectedPassIndex = useMemo(
+    () =>
+      selectedPass
+        ? visiblePasses.findIndex((pass) => pass.id === selectedPass.id)
+        : -1,
+    [selectedPass, visiblePasses],
+  );
   const canSelectPreviousPass = selectedPassIndex > 0;
   const canSelectNextPass =
     selectedPassIndex >= 0 && selectedPassIndex < visiblePasses.length - 1;
 
-  function selectFunction(functionId: string) {
-    setWorkspaceState((state) =>
-      selectWorkspaceFunction(model, state, functionId),
-    );
-  }
+  const selectFunction = useCallback(
+    (functionId: string) => {
+      setWorkspaceState((state) =>
+        selectWorkspaceFunction(model, state, functionId),
+      );
+    },
+    [model],
+  );
 
-  function selectPass(passId: string) {
-    setWorkspaceState((state) => selectWorkspacePass(model, state, passId));
-  }
+  const selectPass = useCallback(
+    (passId: string) => {
+      setWorkspaceState((state) => selectWorkspacePass(model, state, passId));
+    },
+    [model],
+  );
 
-  function selectPreviousPass() {
+  const selectPreviousPass = useCallback(() => {
     setWorkspaceState((state) =>
       selectAdjacentWorkspacePass(model, state, "previous"),
     );
-  }
+  }, [model]);
 
-  function selectNextPass() {
+  const selectNextPass = useCallback(() => {
     setWorkspaceState((state) =>
       selectAdjacentWorkspacePass(model, state, "next"),
     );
-  }
+  }, [model]);
 
-  function setTypeFilter(filter: PassTypeFilter) {
-    setWorkspaceState((state) =>
-      setWorkspacePassTypeFilter(model, state, filter),
-    );
-  }
+  const setTypeFilter = useCallback(
+    (filter: PassTypeFilter) => {
+      setWorkspaceState((state) =>
+        setWorkspacePassTypeFilter(model, state, filter),
+      );
+    },
+    [model],
+  );
 
-  function setChangeFilter(filter: PassChangeFilter) {
-    setWorkspaceState((state) =>
-      setWorkspacePassChangeFilter(model, state, filter),
-    );
-  }
+  const setChangeFilter = useCallback(
+    (filter: PassChangeFilter) => {
+      setWorkspaceState((state) =>
+        setWorkspacePassChangeFilter(model, state, filter),
+      );
+    },
+    [model],
+  );
 
-  function clearFilters() {
+  const clearFilters = useCallback(() => {
     setWorkspaceState((state) => clearWorkspacePassFilters(model, state));
-  }
+  }, [model]);
 
   return (
     <div className="text-slate-100">

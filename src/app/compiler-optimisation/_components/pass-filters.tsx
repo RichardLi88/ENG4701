@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 import type {
   PassChangeFilter,
   PassFilterCounts,
@@ -31,7 +33,7 @@ const filterButtonClass = (selected: boolean) =>
       : "border-slate-800 bg-slate-900/60 text-slate-400 hover:border-slate-600 hover:text-slate-200"
   }`;
 
-export function PassFiltersControl({
+export const PassFiltersControl = memo(function PassFiltersControl({
   filters,
   counts,
   onTypeChange,
@@ -90,4 +92,4 @@ export function PassFiltersControl({
       </fieldset>
     </div>
   );
-}
+});
