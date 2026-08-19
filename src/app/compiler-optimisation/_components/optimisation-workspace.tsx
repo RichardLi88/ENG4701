@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useMemo, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 
 import type { OptimisationWorkspaceProps } from "../_lib/optimisation-types";
 import { compilerWorkspaceContent } from "../content";
@@ -13,32 +19,45 @@ import {
   selectWorkspaceGlobalPasses,
   selectWorkspaceFunction,
   selectWorkspacePass,
+  setWorkspaceDiffMode,
   setWorkspacePassChangeFilter,
   setWorkspacePassTypeFilter,
   type PassChangeFilter,
+  type DiffMode,
   type PassTypeFilter,
+  type WorkspaceState,
 } from "../_lib/workspace-state";
+import {
+  createWorkspaceUrlSearchParams,
+  parseWorkspaceUrlState,
+} from "../_lib/workspace-url-state";
 import { FunctionSelector } from "./function-selector";
 import { OptimisationSummary } from "./optimisation-summary";
 import { PassDetail } from "./pass-detail";
 import { PassFiltersControl } from "./pass-filters";
-import { PassList } from "./pass-list";
+import { PASS_VIRTUALISATION_THRESHOLD, PassList } from "./pass-list";
 import { StatusPanel } from "./status-panel";
 
 type InteractiveOptimisationWorkspaceProps = OptimisationWorkspaceProps &
   Readonly<{
     /** Stable identity for one loaded result; changing it resets navigation. */
     resultKey: string;
+    initialWorkspaceState?: WorkspaceState;
     children?: ReactNode;
   }>;
 
 export function OptimisationWorkspace({
   model,
   resultKey,
+  initialWorkspaceState,
   children,
 }: InteractiveOptimisationWorkspaceProps) {
   return (
-    <OptimisationWorkspaceSession key={resultKey} model={model}>
+    <OptimisationWorkspaceSession
+      key={resultKey}
+      model={model}
+      initialWorkspaceState={initialWorkspaceState}
+    >
       {children}
     </OptimisationWorkspaceSession>
   );
@@ -46,11 +65,42 @@ export function OptimisationWorkspace({
 
 function OptimisationWorkspaceSession({
   model,
+  initialWorkspaceState,
   children,
-}: OptimisationWorkspaceProps & Readonly<{ children?: ReactNode }>) {
-  const [workspaceState, setWorkspaceState] = useState(() =>
-    createInitialWorkspaceState(model),
+}: OptimisationWorkspaceProps &
+  Readonly<{
+    initialWorkspaceState?: WorkspaceState;
+    children?: ReactNode;
+  }>) {
+  const [workspaceState, setWorkspaceState] = useState(
+    () => initialWorkspaceState ?? createInitialWorkspaceState(model),
   );
+
+  useEffect(() => {
+    function restoreUrlState() {
+      setWorkspaceState(
+        parseWorkspaceUrlState(model, new URLSearchParams(location.search)),
+      );
+    }
+
+    window.addEventListener("popstate", restoreUrlState);
+    return () => window.removeEventListener("popstate", restoreUrlState);
+  }, [model]);
+
+  useEffect(() => {
+    const nextSearchParams = createWorkspaceUrlSearchParams(
+      model,
+      workspaceState,
+      new URLSearchParams(location.search),
+    );
+    const query = nextSearchParams.toString();
+    const nextUrl = `${location.pathname}${query.length > 0 ? `?${query}` : ""}${location.hash}`;
+    const currentUrl = `${location.pathname}${location.search}${location.hash}`;
+
+    if (nextUrl !== currentUrl) {
+      window.history.replaceState(null, "", nextUrl);
+    }
+  }, [model, workspaceState]);
   const { selectedFunction, selectedPass, visiblePasses } = useMemo(
     () => deriveWorkspaceSelection(model, workspaceState),
     [model, workspaceState],
@@ -143,6 +193,10 @@ function OptimisationWorkspaceSession({
     setWorkspaceState((state) => clearWorkspacePassFilters(model, state));
   }, [model]);
 
+  const setDiffMode = useCallback((diffMode: DiffMode) => {
+    setWorkspaceState((state) => setWorkspaceDiffMode(state, diffMode));
+  }, []);
+
   return (
     <div className="text-slate-100">
       <div className="mx-auto w-full max-w-[112rem] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
@@ -200,7 +254,13 @@ function OptimisationWorkspaceSession({
           </div>
         ) : (
           <div className="mt-6 grid min-w-0 gap-6 lg:grid-cols-[18rem_minmax(0,1fr)] xl:grid-cols-[20rem_minmax(0,1fr)]">
-            <aside className="min-w-0 space-y-7 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-2">
+            <aside
+              className={`min-w-0 space-y-7 lg:sticky lg:top-6 lg:pr-2 ${
+                visiblePasses.length > PASS_VIRTUALISATION_THRESHOLD
+                  ? ""
+                  : "lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto"
+              }`}
+            >
               <FunctionSelector
                 functions={model.functions}
                 globalPassCount={model.globalPasses.length}
@@ -269,7 +329,11 @@ function OptimisationWorkspaceSession({
                   compact
                 />
               ) : (
-                <PassDetail pass={selectedPass} />
+                <PassDetail
+                  pass={selectedPass}
+                  diffMode={workspaceState.diffMode}
+                  onDiffModeChange={setDiffMode}
+                />
               )}
             </section>
           </div>

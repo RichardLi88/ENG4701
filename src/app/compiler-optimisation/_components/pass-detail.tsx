@@ -1,6 +1,7 @@
 import { memo } from "react";
 
 import type { OptimisationPassViewProps } from "../_lib/optimisation-types";
+import type { DiffMode } from "../_lib/workspace-state";
 import {
   describePassScope,
   formatMetricDelta,
@@ -8,14 +9,23 @@ import {
   getPassMetric,
   PASS_METRIC_DEFINITIONS,
 } from "../_lib/pass-detail-display";
-import { CfgView } from "./cfg-view";
+import { DeferredCfgView } from "./deferred-cfg-view";
 import { IrDiffViewer } from "./ir-diff-viewer";
 
 const NOT_AVAILABLE = "Not available";
+const ignoreDiffModeChange = () => undefined;
+
+type PassDetailProps = OptimisationPassViewProps &
+  Readonly<{
+    diffMode?: DiffMode;
+    onDiffModeChange?: (diffMode: DiffMode) => void;
+  }>;
 
 export const PassDetail = memo(function PassDetail({
   pass,
-}: OptimisationPassViewProps) {
+  diffMode = "side-by-side",
+  onDiffModeChange = ignoreDiffModeChange,
+}: PassDetailProps) {
   const scope = describePassScope(pass);
   const localPosition =
     pass.position.withinFunction.status === "available"
@@ -262,8 +272,13 @@ export const PassDetail = memo(function PassDetail({
         </section>
       </div>
 
-      <IrDiffViewer before={pass.ir.before} after={pass.ir.after} />
-      <CfgView key={pass.id} cfg={pass.cfg} />
+      <IrDiffViewer
+        before={pass.ir.before}
+        after={pass.ir.after}
+        mode={diffMode}
+        onModeChange={onDiffModeChange}
+      />
+      <DeferredCfgView key={pass.id} cfg={pass.cfg} />
     </article>
   );
 });

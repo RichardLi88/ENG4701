@@ -73,12 +73,41 @@ export const compilerWorkspaceContent = {
   },
 } as const;
 
+export const routeErrorContent = {
+  eyebrow: "Route error",
+  title: "The optimisation workspace could not be loaded",
+  description:
+    "An unexpected error interrupted this page. Try loading the workspace again, or return home and start a new run.",
+  referenceLabel: "Error reference",
+  actions: {
+    retry: "Try again",
+    home: "Return home",
+  },
+} as const;
+
+export const irDiffContent = {
+  viewLabel: "Diff view",
+  modes: {
+    sideBySide: "Side by side",
+    unified: "Unified",
+  },
+  descriptions: {
+    sideBySide: "Line-level comparison · panes scroll independently",
+    unified: "Single-stream comparison · before and after line numbers",
+  },
+} as const;
+
 export const cfgContent = {
   heading: "Control flow graph",
   description:
     "Directed basic-block flow before and after this Pass. Scroll the canvas to pan.",
   unavailable: "CFG data was not provided for this Pass.",
   empty: "This CFG snapshot contains no basic blocks.",
+  lazy: {
+    waiting:
+      "CFG loading is deferred until this section approaches the viewport.",
+    loading: "Loading control flow graph…",
+  },
   fallback: {
     title: "Diagram unavailable",
     duplicateNode:

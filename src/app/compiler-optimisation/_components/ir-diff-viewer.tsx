@@ -2,12 +2,16 @@
 
 import { useMemo } from "react";
 
+import { irDiffContent } from "../content";
 import { createIrDiff, type IrDiffLine } from "~/app/_helpers/text-diff";
+import type { DiffMode } from "../_lib/workspace-state";
 
 export type IrDiffViewerProps = Readonly<{
   before?: string | null;
   after?: string | null;
   structuredDiff?: ReadonlyArray<IrDiffLine> | null;
+  mode?: DiffMode;
+  onModeChange?: (mode: DiffMode) => void;
 }>;
 
 type DiffRow = Readonly<{
@@ -163,10 +167,112 @@ function DiffPane({ side, rows }: DiffPaneProps) {
   );
 }
 
+type UnifiedDiffProps = Readonly<{
+  lines: ReadonlyArray<IrDiffLine>;
+}>;
+
+function UnifiedDiff({ lines }: UnifiedDiffProps) {
+  return (
+    <section
+      className="min-h-80 min-w-0 overflow-hidden rounded-xl border border-slate-800 bg-[#070b12] xl:min-h-[30rem]"
+      aria-label="Unified optimisation IR"
+    >
+      <header className="flex items-center justify-between gap-4 border-b border-slate-800 bg-slate-900/90 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <span
+            className="size-2 rounded-full bg-cyan-300"
+            aria-hidden="true"
+          />
+          <h4 className="font-mono text-xs font-semibold tracking-[0.14em] text-slate-200 uppercase">
+            Unified
+          </h4>
+        </div>
+        <span className="font-mono text-[0.65rem] tracking-wider text-slate-500 uppercase">
+          Before / After
+        </span>
+      </header>
+
+      <div
+        className="max-h-[42rem] overflow-auto overscroll-contain focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:outline-none focus-visible:ring-inset"
+        tabIndex={0}
+        role="region"
+        aria-label="Unified IR Diff, read only"
+      >
+        <div className="w-max min-w-full py-2 font-mono text-[0.78rem] leading-6">
+          {lines.map((line, index) => {
+            const changed = line.kind !== "unchanged";
+            const symbol =
+              line.kind === "removed" ? "-" : line.kind === "added" ? "+" : " ";
+            const rowTone =
+              line.kind === "removed"
+                ? "bg-rose-950/35 text-rose-100"
+                : line.kind === "added"
+                  ? "bg-emerald-950/30 text-emerald-100"
+                  : "text-slate-300";
+            const symbolTone =
+              line.kind === "removed"
+                ? "bg-rose-400/15 text-rose-300"
+                : "bg-emerald-400/15 text-emerald-300";
+
+            return (
+              <div
+                key={`unified-${index}-${line.beforeLineNumber ?? "none"}-${line.afterLineNumber ?? "none"}`}
+                className={`grid min-h-6 grid-cols-[2rem_3.5rem_3.5rem_minmax(0,1fr)] ${rowTone}`}
+              >
+                <span
+                  className={`text-center font-bold select-none ${changed ? symbolTone : "text-slate-700"}`}
+                  aria-label={
+                    line.kind === "removed"
+                      ? "Removed line"
+                      : line.kind === "added"
+                        ? "Added line"
+                        : "Unchanged line"
+                  }
+                >
+                  {symbol}
+                </span>
+                <span
+                  className="border-r border-slate-800/70 pr-3 text-right text-slate-600 select-none"
+                  aria-label={
+                    line.beforeLineNumber === null
+                      ? undefined
+                      : `Before line ${line.beforeLineNumber}`
+                  }
+                  aria-hidden={line.beforeLineNumber === null}
+                >
+                  {line.beforeLineNumber}
+                </span>
+                <span
+                  className="border-r border-slate-800/70 pr-3 text-right text-slate-600 select-none"
+                  aria-label={
+                    line.afterLineNumber === null
+                      ? undefined
+                      : `After line ${line.afterLineNumber}`
+                  }
+                  aria-hidden={line.afterLineNumber === null}
+                >
+                  {line.afterLineNumber}
+                </span>
+                <code className="px-4 whitespace-pre">
+                  {line.content || " "}
+                </code>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const ignoreModeChange = () => undefined;
+
 export function IrDiffViewer({
   before,
   after,
   structuredDiff,
+  mode = "side-by-side",
+  onModeChange = ignoreModeChange,
 }: IrDiffViewerProps) {
   const { diff, rows } = useMemo(() => {
     const currentDiff = createIrDiff({ before, after, structuredDiff });
@@ -214,16 +320,46 @@ export function IrDiffViewer({
             Intermediate representation
           </h3>
           <p className="mt-1 text-xs text-slate-600">
-            Line-level comparison · panes scroll independently
+            {mode === "side-by-side"
+              ? irDiffContent.descriptions.sideBySide
+              : irDiffContent.descriptions.unified}
           </p>
         </div>
-        <div className="flex items-center gap-3 font-mono text-[0.68rem] tracking-wide text-slate-500 uppercase">
-          <span>
-            <strong className="mr-1 text-rose-300">-</strong> Removed
-          </span>
-          <span>
-            <strong className="mr-1 text-emerald-300">+</strong> Added
-          </span>
+        <div className="flex flex-wrap items-center justify-end gap-3">
+          <div
+            className="inline-flex rounded-lg border border-slate-700 bg-slate-950 p-1"
+            role="group"
+            aria-label={irDiffContent.viewLabel}
+          >
+            {(
+              [
+                ["side-by-side", irDiffContent.modes.sideBySide],
+                ["unified", irDiffContent.modes.unified],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => onModeChange(value)}
+                aria-pressed={mode === value}
+                className={`rounded-md px-3 py-1.5 text-xs font-semibold transition focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:outline-none ${
+                  mode === value
+                    ? "bg-cyan-400/15 text-cyan-100"
+                    : "text-slate-500 hover:text-slate-200"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-3 font-mono text-[0.68rem] tracking-wide text-slate-500 uppercase">
+            <span>
+              <strong className="mr-1 text-rose-300">-</strong> Removed
+            </span>
+            <span>
+              <strong className="mr-1 text-emerald-300">+</strong> Added
+            </span>
+          </div>
         </div>
       </div>
 
@@ -246,10 +382,14 @@ export function IrDiffViewer({
         </div>
       ) : null}
 
-      <div className="grid min-w-0 overflow-hidden rounded-xl border border-slate-800 xl:grid-cols-2">
-        <DiffPane side="before" rows={rows} />
-        <DiffPane side="after" rows={rows} />
-      </div>
+      {mode === "side-by-side" ? (
+        <div className="grid min-w-0 overflow-hidden rounded-xl border border-slate-800 xl:grid-cols-2">
+          <DiffPane side="before" rows={rows} />
+          <DiffPane side="after" rows={rows} />
+        </div>
+      ) : (
+        <UnifiedDiff lines={diff.lines} />
+      )}
     </section>
   );
 }

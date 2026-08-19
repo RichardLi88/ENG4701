@@ -69,6 +69,22 @@ function assertPayloadInvariants(payload, payloadText, testCase) {
   );
   assert.ok(payload.passes.some((pass) => pass.changed));
   assert.ok(payload.passes.some((pass) => !pass.changed));
+  assert.ok(payload.passes.some((pass) => pass.metrics !== undefined));
+  assert.ok(
+    payload.passes.some(
+      (pass) => pass.cfg !== undefined && pass.cfg.before.nodes.length > 0,
+    ),
+  );
+  assert.ok(payload.passes.some((pass) => pass.transformation !== undefined));
+  assert.ok(
+    payload.passes.every((pass) =>
+      pass.metrics === undefined
+        ? true
+        : Object.values(pass.metrics).every(
+            (metric) => metric.estimated === true,
+          ),
+    ),
+  );
   assert.ok(
     payload.passes.every(
       (pass) => pass.changed === (pass.ir.before !== pass.ir.after),

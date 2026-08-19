@@ -16,6 +16,7 @@ import {
   selectWorkspaceGlobalPasses,
   selectWorkspacePass,
   setWorkspacePassChangeFilter,
+  setWorkspaceDiffMode,
   setWorkspacePassTypeFilter,
 } from "./workspace-state.ts";
 
@@ -48,6 +49,7 @@ test("initial state selects the first function and its first Pass by ID", () => 
     selectedFunctionId: "fn:bWFpbg",
     selectedPassId: "pass:000001:aW5zdGNvbWJpbmU",
     passFilters: ALL_FILTERS,
+    diffMode: "side-by-side",
   });
   assert.equal(
     deriveWorkspaceSelection(model, state).selectedFunction?.name,
@@ -118,6 +120,7 @@ test("switching functions atomically selects the new function's first Pass", () 
     selectedFunctionId: "fn:aGVscGVy",
     selectedPassId: "pass:000002:c2ltcGxpZnljZmc",
     passFilters: ALL_FILTERS,
+    diffMode: "side-by-side",
   });
   assert.equal(
     deriveWorkspaceSelection(model, next).selectedPass?.scope.functionId,
@@ -153,6 +156,7 @@ test("empty functions and functions without Passes create no invalid IDs", () =>
       selectedFunctionId: undefined,
       selectedPassId: undefined,
       passFilters: ALL_FILTERS,
+      diffMode: "side-by-side",
     },
   );
 
@@ -166,6 +170,19 @@ test("empty functions and functions without Passes create no invalid IDs", () =>
       .visiblePasses,
     [],
   );
+});
+
+test("Diff mode is preserved while navigating between Pass scopes", () => {
+  const model = readModel("multi-function.json");
+  const unified = setWorkspaceDiffMode(
+    createInitialWorkspaceState(model),
+    "unified",
+  );
+  const helper = selectWorkspaceFunction(model, unified, "fn:aGVscGVy");
+  const global = selectWorkspaceGlobalPasses(model, helper);
+
+  assert.equal(helper.diffMode, "unified");
+  assert.equal(global.diffMode, "unified");
 });
 
 test("loading a second result resets both selections from the new model", () => {
