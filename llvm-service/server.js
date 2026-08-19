@@ -4,6 +4,7 @@ const { writeFile, readFile, unlink } = require("fs/promises");
 const { tmpdir } = require("os");
 const { join } = require("path");
 const { promisify } = require("util");
+const { measureIrDumpData } = require("./measured-metrics");
 const { createOptimisationPayload } = require("./optimisation-payload");
 
 const execAsync = promisify(exec);
@@ -114,9 +115,17 @@ app.post("/optimise-structured", async (req, res) => {
 
   try {
     const result = await optimiseIr(ir);
+    const {
+      analysesByDump,
+      cfgByDump: measuredCfgByDump,
+      metricsByDump: measuredMetricsByDump,
+    } = await measureIrDumpData(result.beforeAfterLog, ir);
     res.json(
       createOptimisationPayload({
         beforeAfterLog: result.beforeAfterLog,
+        analysesByDump,
+        measuredCfgByDump,
+        measuredMetricsByDump,
         sourceFile: filename,
         unoptimisedIr: ir,
       }),

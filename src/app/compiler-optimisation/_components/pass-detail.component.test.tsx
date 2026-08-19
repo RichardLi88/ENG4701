@@ -82,6 +82,59 @@ function firstPartialPass(): OptimisationPassViewModel {
   return pass;
 }
 
+describe("PassDetail metadata", () => {
+  test("shows unique metadata once without the repeated details panel", () => {
+    render(<PassDetail pass={firstPassWithCfg()} />);
+
+    const header = screen
+      .getByRole("heading", { name: "instcombine" })
+      .closest("header");
+    if (header === null) throw new Error("Expected Pass detail header");
+
+    expect(within(header).getByText("InstCombinePass")).toBeInTheDocument();
+    expect(within(header).getByText("Global")).toBeInTheDocument();
+    expect(within(header).getByText("2")).toBeInTheDocument();
+    expect(within(header).getByText("Function")).toBeInTheDocument();
+    expect(within(header).getByText("1")).toBeInTheDocument();
+    expect(screen.queryByText("Pass details")).toBeNull();
+    expect(screen.queryByText("Global order")).toBeNull();
+  });
+
+  test("shows runtime analysis context without the transformation card", () => {
+    const basePass = firstPassWithCfg();
+    const previousPass = { ...basePass, id: "previous", name: "simplify-cfg" };
+    const nextPass = { ...basePass, id: "next", name: "sroa" };
+    const pass: OptimisationPassViewModel = {
+      ...basePass,
+      analysisActivity: {
+        status: "available",
+        data: {
+          computed: ["DominatorTreeAnalysis", "LoopAnalysis"],
+          preservation: "not-all",
+        },
+      },
+    };
+
+    render(
+      <PassDetail
+        pass={pass}
+        previousPass={previousPass}
+        nextPass={nextPass}
+      />,
+    );
+
+    expect(screen.queryByText("Transformation result")).toBeNull();
+    expect(
+      screen.getByText("May invalidate cached analyses"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("DominatorTreeAnalysis")).toBeInTheDocument();
+    expect(screen.getByText("LoopAnalysis")).toBeInTheDocument();
+    expect(screen.getByText("simplify-cfg")).toBeInTheDocument();
+    expect(screen.getByText("sroa")).toBeInTheDocument();
+    expect(screen.queryByText("Dependencies and relations")).toBeNull();
+  });
+});
+
 describe("PassDetail CFG", () => {
   beforeEach(() => {
     vi.stubGlobal("IntersectionObserver", MockIntersectionObserver);
@@ -131,23 +184,58 @@ describe("PassDetail CFG", () => {
     expect(within(beforeGraph).getByText("exit · changed")).toBeInTheDocument();
   });
 
-  test("zooms a graph and resets zoom independently", async () => {
+  test("links graph zoom by default and resets the shared scale", async () => {
     const user = userEvent.setup();
     render(<PassDetail pass={firstPassWithCfg()} />);
     await revealCfg();
 
-    const reset = await screen.findByRole("button", {
-      name: "Reset zoom Before CFG",
-    });
+    const reset = await screen.findByRole("button", { name: "Reset zoom" });
     expect(reset).toHaveTextContent("100%");
+    expect(
+      screen.getByRole("button", { name: "Unlink views" }),
+    ).toHaveAttribute("aria-pressed", "true");
 
-    await user.click(
-      screen.getByRole("button", { name: "Zoom in Before CFG" }),
-    );
-    expect(reset).toHaveTextContent("125%");
+    await user.click(screen.getByRole("button", { name: "Zoom in" }));
+    expect(reset).toHaveTextContent("115%");
 
     await user.click(reset);
     expect(reset).toHaveTextContent("100%");
+  });
+
+  test("opens the investigation workspace and exits it with Escape", async () => {
+    const user = userEvent.setup();
+    render(<PassDetail pass={firstPassWithCfg()} />);
+    await revealCfg();
+
+    await user.click(
+      screen.getByRole("button", { name: "Open fullscreen workspace" }),
+    );
+    expect(
+      screen.getByRole("button", { name: "Exit fullscreen workspace" }),
+    ).toBeInTheDocument();
+
+    await user.keyboard("{Escape}");
+    expect(
+      screen.getByRole("button", { name: "Open fullscreen workspace" }),
+    ).toBeInTheDocument();
+  });
+
+  test("inspects one stable block across Before and After", async () => {
+    const user = userEvent.setup();
+    render(<PassDetail pass={firstPassWithCfg()} />);
+    await revealCfg();
+
+    const entryNodes = await screen.findAllByRole("button", {
+      name: "entry, entry, unchanged",
+    });
+    await user.click(entryNodes[0]!);
+
+    const inspector = screen.getByRole("complementary", {
+      name: "Selected block",
+    });
+    expect(inspector).toHaveTextContent("Stable ID: main:entry");
+    expect(within(inspector).getByText("Before IR")).toBeInTheDocument();
+    expect(within(inspector).getByText("After IR")).toBeInTheDocument();
   });
 
   test("keeps IR visible when CFG data is unavailable", async () => {

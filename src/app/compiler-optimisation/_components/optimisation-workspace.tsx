@@ -117,6 +117,17 @@ function OptimisationWorkspaceSession({
       workspaceState.selectedFunctionId,
     ],
   );
+  const adjacentPasses = useMemo(() => {
+    if (selectedPass === undefined) return {};
+    const selectedIndex = selectedScopePasses.findIndex(
+      (pass) => pass.id === selectedPass.id,
+    );
+    if (selectedIndex === -1) return {};
+    return {
+      previousPass: selectedScopePasses[selectedIndex - 1],
+      nextPass: selectedScopePasses[selectedIndex + 1],
+    };
+  }, [selectedPass, selectedScopePasses]);
   const filterCounts = useMemo(
     () =>
       calculatePassFilterCounts(
@@ -331,6 +342,8 @@ function OptimisationWorkspaceSession({
               ) : (
                 <PassDetail
                   pass={selectedPass}
+                  previousPass={adjacentPasses.previousPass}
+                  nextPass={adjacentPasses.nextPass}
                   diffMode={workspaceState.diffMode}
                   onDiffModeChange={setDiffMode}
                 />

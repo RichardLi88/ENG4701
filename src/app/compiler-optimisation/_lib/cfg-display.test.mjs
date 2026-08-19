@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { createCfgDisplayModel } from "./cfg-display.ts";
+import {
+  createCfgComparisonDisplayModels,
+  createCfgDisplayModel,
+} from "./cfg-display.ts";
 
 const unavailableLabel = { status: "unavailable", reason: "not-provided" };
 
@@ -112,4 +115,69 @@ test("does not mutate CFG snapshots", () => {
   createCfgDisplayModel(graph, graph, "before");
 
   assert.deepEqual(graph, before);
+});
+
+test("keeps shared nodes at identical coordinates across snapshots", () => {
+  const before = snapshot(
+    [
+      { id: "entry", label: "entry" },
+      { id: "work", label: "old work" },
+      { id: "removed", label: "removed" },
+      { id: "exit", label: "exit" },
+    ],
+    [
+      { source: "entry", target: "work", label: unavailableLabel },
+      { source: "work", target: "removed", label: unavailableLabel },
+      { source: "removed", target: "exit", label: unavailableLabel },
+    ],
+  );
+  const after = snapshot(
+    [
+      { id: "entry", label: "entry" },
+      { id: "work", label: "new work" },
+      { id: "exit", label: "exit" },
+    ],
+    [
+      { source: "entry", target: "work", label: unavailableLabel },
+      { source: "work", target: "exit", label: unavailableLabel },
+    ],
+  );
+
+  const models = createCfgComparisonDisplayModels(before, after);
+  assert.equal(models.before.status, "diagram");
+  assert.equal(models.after.status, "diagram");
+  for (const nodeId of ["entry", "work", "exit"]) {
+    const beforeNode = models.before.nodes.find((node) => node.id === nodeId);
+    const afterNode = models.after.nodes.find((node) => node.id === nodeId);
+    assert.deepEqual(
+      { x: beforeNode?.x, y: beforeNode?.y, rank: beforeNode?.rank },
+      { x: afterNode?.x, y: afterNode?.y, rank: afterNode?.rank },
+    );
+  }
+  assert.ok(models.before.nodes[0].rank < models.before.nodes[1].rank);
+});
+
+test("routes loop-back edges through a side lane", () => {
+  const graph = snapshot(
+    [
+      { id: "entry", label: "entry" },
+      { id: "header", label: "header" },
+      { id: "body", label: "body" },
+      { id: "exit", label: "exit" },
+    ],
+    [
+      { source: "entry", target: "header", label: unavailableLabel },
+      { source: "header", target: "body", label: unavailableLabel },
+      { source: "body", target: "header", label: unavailableLabel },
+      { source: "header", target: "exit", label: unavailableLabel },
+    ],
+  );
+
+  const model = createCfgDisplayModel(graph, graph, "after");
+  assert.equal(model.status, "diagram");
+  const backEdge = model.edges.find(
+    (edge) => edge.source === "body" && edge.target === "header",
+  );
+  assert.equal(backEdge?.route, "back");
+  assert.match(backEdge?.path ?? "", /^M .* C /);
 });
