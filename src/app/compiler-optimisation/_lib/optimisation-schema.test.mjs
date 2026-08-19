@@ -18,6 +18,7 @@ const validFixtureNames = [
   "empty-functions.json",
   "long-content.json",
   "real-backend.json",
+  "day2-real-backend.json",
 ];
 
 function readFixture(name) {
