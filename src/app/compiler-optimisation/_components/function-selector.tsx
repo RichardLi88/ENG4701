@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 import type { OptimisationFunctionViewModel } from "../_lib/optimisation-types";
 
 type FunctionSelectorProps = Readonly<{
@@ -6,7 +8,7 @@ type FunctionSelectorProps = Readonly<{
   onSelect: (functionId: string) => void;
 }>;
 
-export function FunctionSelector({
+export const FunctionSelector = memo(function FunctionSelector({
   functions,
   selectedFunctionId,
   onSelect,
@@ -78,4 +80,4 @@ export function FunctionSelector({
       </ul>
     </section>
   );
-}
+});

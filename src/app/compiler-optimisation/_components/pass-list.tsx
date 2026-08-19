@@ -1,3 +1,5 @@
+import { memo, useRef, type KeyboardEvent } from "react";
+
 import type { OptimisationPassViewModel } from "../_lib/optimisation-types";
 
 type PassListProps = Readonly<{
@@ -13,7 +15,7 @@ type PassListProps = Readonly<{
   onClearFilters: () => void;
 }>;
 
-export function PassList({
+export const PassList = memo(function PassList({
   passes,
   selectedPassId,
   selectedPassIndex,
@@ -25,8 +27,41 @@ export function PassList({
   hasActiveFilters,
   onClearFilters,
 }: PassListProps) {
+  const passButtonRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const navigationButtonClass =
     "rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-2 text-xs font-semibold text-slate-300 transition hover:border-slate-500 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-slate-700 disabled:hover:text-slate-300";
+
+  function handlePassKeyDown(
+    event: KeyboardEvent<HTMLButtonElement>,
+    passIndex: number,
+  ) {
+    const targetIndex =
+      event.key === "ArrowUp"
+        ? passIndex - 1
+        : event.key === "ArrowDown"
+          ? passIndex + 1
+          : event.key === "Home"
+            ? 0
+            : event.key === "End"
+              ? passes.length - 1
+              : undefined;
+
+    if (
+      targetIndex === undefined ||
+      targetIndex < 0 ||
+      targetIndex >= passes.length
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    const targetPass = passes[targetIndex];
+
+    if (targetPass !== undefined) {
+      onSelect(targetPass.id);
+      passButtonRefs.current[targetIndex]?.focus();
+    }
+  }
 
   return (
     <section aria-labelledby="passes-heading" className="min-w-0">
@@ -92,7 +127,7 @@ export function PassList({
         </div>
       ) : (
         <ol className="space-y-1.5">
-          {passes.map((pass) => {
+          {passes.map((pass, passIndex) => {
             const selected = pass.id === selectedPassId;
             const scopeLevel =
               pass.scope.level === "unknown"
@@ -102,8 +137,12 @@ export function PassList({
             return (
               <li key={pass.id}>
                 <button
+                  ref={(element) => {
+                    passButtonRefs.current[passIndex] = element;
+                  }}
                   type="button"
                   onClick={() => onSelect(pass.id)}
+                  onKeyDown={(event) => handlePassKeyDown(event, passIndex)}
                   className={`grid w-full min-w-0 grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2 rounded-lg border px-2 py-2.5 text-left transition focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 focus-visible:outline-none ${
                     selected
                       ? "border-cyan-400/60 bg-cyan-400/10"
@@ -111,6 +150,7 @@ export function PassList({
                   }`}
                   aria-current={selected ? "step" : undefined}
                   aria-pressed={selected}
+                  aria-keyshortcuts="ArrowUp ArrowDown Home End"
                   aria-label={`Pass ${pass.position.global + 1}, ${pass.name}, ${pass.type}, ${scopeLevel}, ${pass.changed ? "changed" : "unchanged"}${selected ? ", current" : ""}`}
                 >
                   <span className="font-mono text-xs text-slate-500 tabular-nums">
@@ -148,4 +188,4 @@ export function PassList({
       )}
     </section>
   );
-}
+});
