@@ -1,9 +1,38 @@
 import { render, screen, within } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, test, vi } from "vitest";
 
 import { IrDiffViewer } from "./ir-diff-viewer";
 
 describe("IrDiffViewer", () => {
+  test("renders a unified edit stream and exposes a controlled mode toggle", async () => {
+    const user = userEvent.setup();
+    const onModeChange = vi.fn();
+    render(
+      <IrDiffViewer
+        before={"define @main {\n  ret i32 0\n}"}
+        after={"define @main {\n  ret i32 1\n}"}
+        mode="unified"
+        onModeChange={onModeChange}
+      />,
+    );
+
+    const unified = screen.getByRole("region", {
+      name: "Unified optimisation IR",
+    });
+    expect(within(unified).getByText("ret i32 0")).toBeInTheDocument();
+    expect(within(unified).getByText("ret i32 1")).toBeInTheDocument();
+    expect(within(unified).getByLabelText("Removed line")).toBeInTheDocument();
+    expect(within(unified).getByLabelText("Added line")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Unified" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+
+    await user.click(screen.getByRole("button", { name: "Side by side" }));
+    expect(onModeChange).toHaveBeenCalledWith("side-by-side");
+  });
+
   test("keeps before and after sides ordered and labels line changes", () => {
     render(
       <IrDiffViewer

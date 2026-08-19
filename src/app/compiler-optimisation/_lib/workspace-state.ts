@@ -12,11 +12,13 @@ export type WorkspaceState = Readonly<{
   selectedFunctionId: string | undefined;
   selectedPassId: string | undefined;
   passFilters: PassFilters;
+  diffMode: DiffMode;
 }>;
 
 export type PassTypeFilter = "all" | "transform" | "analysis";
 export type PassChangeFilter = "all" | "changed" | "unchanged";
 export type PassNavigationDirection = "previous" | "next";
+export type DiffMode = "side-by-side" | "unified";
 
 export type PassFilters = Readonly<{
   type: PassTypeFilter;
@@ -144,6 +146,7 @@ export function createInitialWorkspaceState(
       selectedFunction?.passes[0]?.id ??
       (selectedFunction === undefined ? model.globalPasses[0]?.id : undefined),
     passFilters: DEFAULT_PASS_FILTERS,
+    diffMode: "side-by-side",
   };
 }
 
@@ -171,6 +174,7 @@ export function selectWorkspaceFunction(
     selectedFunctionId: selectedFunction.id,
     selectedPassId: selectedFunction.passes[0]?.id,
     passFilters: DEFAULT_PASS_FILTERS,
+    diffMode: state.diffMode,
   };
 }
 
@@ -185,6 +189,7 @@ export function selectWorkspaceGlobalPasses(
     selectedFunctionId: undefined,
     selectedPassId: model.globalPasses[0]?.id,
     passFilters: DEFAULT_PASS_FILTERS,
+    diffMode: state.diffMode,
   };
 }
 
@@ -260,6 +265,13 @@ export function clearWorkspacePassFilters(
     ...state,
     passFilters: DEFAULT_PASS_FILTERS,
   });
+}
+
+export function setWorkspaceDiffMode(
+  state: WorkspaceState,
+  diffMode: DiffMode,
+): WorkspaceState {
+  return state.diffMode === diffMode ? state : { ...state, diffMode };
 }
 
 /** Resolve state IDs against the current result without storing derived data. */

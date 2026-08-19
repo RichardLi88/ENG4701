@@ -12,6 +12,7 @@ import { api } from "~/trpc/server";
 import { CompilerOptimisationExplorer } from "./_components/compiler-optimisation-explorer";
 import { parseOptimisationResult } from "./_lib/optimisation-adapter";
 import type { OptimisationViewModel } from "./_lib/optimisation-types";
+import { parseWorkspaceUrlState } from "./_lib/workspace-url-state";
 
 export const metadata: Metadata = {
   title: "Compiler optimisation workspace",
@@ -48,7 +49,8 @@ type CompilerOptimisationPageProps = Readonly<{
 export default async function CompilerOptimisationPage({
   searchParams,
 }: CompilerOptimisationPageProps) {
-  const requestedFixture = (await searchParams).fixture;
+  const resolvedSearchParams = await searchParams;
+  const requestedFixture = resolvedSearchParams.fixture;
   const fixtureCandidate =
     typeof requestedFixture === "string" ? requestedFixture : undefined;
   const fixtureKey: FixtureKey = isFixtureKey(fixtureCandidate)
@@ -78,6 +80,12 @@ export default async function CompilerOptimisationPage({
     <CompilerOptimisationExplorer
       fixtureKey={fixtureKey}
       initialModel={toClientViewModel(result.data)}
+      initialWorkspaceState={parseWorkspaceUrlState(result.data, {
+        get(name) {
+          const value = resolvedSearchParams[name];
+          return typeof value === "string" ? value : null;
+        },
+      })}
     />
   );
 }
