@@ -8,6 +8,7 @@ import {
   getPassMetric,
   PASS_METRIC_DEFINITIONS,
 } from "../_lib/pass-detail-display";
+import { CfgView } from "./cfg-view";
 import { IrDiffViewer } from "./ir-diff-viewer";
 
 const NOT_AVAILABLE = "Not available";
@@ -262,6 +263,7 @@ export const PassDetail = memo(function PassDetail({
       </div>
 
       <IrDiffViewer before={pass.ir.before} after={pass.ir.after} />
+      <CfgView key={pass.id} cfg={pass.cfg} />
     </article>
   );
 });

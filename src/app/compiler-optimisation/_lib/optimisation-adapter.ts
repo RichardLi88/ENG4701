@@ -268,6 +268,12 @@ function adaptValidatedResult(
       passes: passesByFunctionId.get(fn.id) ?? [],
     }),
   );
+  const globalPasses = passes.filter(
+    (pass) =>
+      pass.scope.level === "module" ||
+      (pass.scope.level === "unknown" &&
+        pass.scope.function.status === "unavailable"),
+  );
   const changedPassCount = passes.filter((pass) => pass.changed).length;
 
   return {
@@ -289,6 +295,7 @@ function adaptValidatedResult(
           .length,
       },
       passes,
+      globalPasses,
       functions,
       functionsById: createIndex(functions),
       passesById: createIndex(passes),

@@ -39,6 +39,15 @@ const EMPTY_PASSES: ReadonlyArray<OptimisationPassViewModel> = Object.freeze(
   [],
 );
 
+function getSelectedScopePasses(
+  model: OptimisationViewModel,
+  selectedFunctionId: string | undefined,
+): ReadonlyArray<OptimisationPassViewModel> {
+  return selectedFunctionId === undefined
+    ? model.globalPasses
+    : (model.functionsById[selectedFunctionId]?.passes ?? EMPTY_PASSES);
+}
+
 export const DEFAULT_PASS_FILTERS: PassFilters = Object.freeze({
   type: "all",
   change: "all",
@@ -107,12 +116,8 @@ function normaliseWorkspacePassSelection(
   model: OptimisationViewModel,
   state: WorkspaceState,
 ): WorkspaceState {
-  const selectedFunction =
-    state.selectedFunctionId === undefined
-      ? undefined
-      : model.functionsById[state.selectedFunctionId];
   const visiblePasses = filterPasses(
-    selectedFunction?.passes ?? EMPTY_PASSES,
+    getSelectedScopePasses(model, state.selectedFunctionId),
     state.passFilters,
   );
   const selectedPassIsVisible = visiblePasses.some(
@@ -135,7 +140,9 @@ export function createInitialWorkspaceState(
 
   return {
     selectedFunctionId: selectedFunction?.id,
-    selectedPassId: selectedFunction?.passes[0]?.id,
+    selectedPassId:
+      selectedFunction?.passes[0]?.id ??
+      (selectedFunction === undefined ? model.globalPasses[0]?.id : undefined),
     passFilters: DEFAULT_PASS_FILTERS,
   };
 }
@@ -167,20 +174,29 @@ export function selectWorkspaceFunction(
   };
 }
 
-/** Select a Pass only when it belongs to the currently selected function. */
+/** Select module-level and otherwise unowned Passes as one global timeline. */
+export function selectWorkspaceGlobalPasses(
+  model: OptimisationViewModel,
+  state: WorkspaceState,
+): WorkspaceState {
+  if (model.globalPasses.length === 0) return state;
+
+  return {
+    selectedFunctionId: undefined,
+    selectedPassId: model.globalPasses[0]?.id,
+    passFilters: DEFAULT_PASS_FILTERS,
+  };
+}
+
+/** Select a Pass only when it belongs to the currently selected scope. */
 export function selectWorkspacePass(
   model: OptimisationViewModel,
   state: WorkspaceState,
   passId: string,
 ): WorkspaceState {
-  const selectedFunction =
-    state.selectedFunctionId === undefined
-      ? undefined
-      : model.functionsById[state.selectedFunctionId];
-
   if (
     !filterPasses(
-      selectedFunction?.passes ?? EMPTY_PASSES,
+      getSelectedScopePasses(model, state.selectedFunctionId),
       state.passFilters,
     ).some((pass) => pass.id === passId)
   ) {
@@ -256,7 +272,7 @@ export function deriveWorkspaceSelection(
       ? undefined
       : model.functionsById[state.selectedFunctionId];
   const visiblePasses = filterPasses(
-    selectedFunction?.passes ?? EMPTY_PASSES,
+    getSelectedScopePasses(model, state.selectedFunctionId),
     state.passFilters,
   );
   const selectedPass = visiblePasses.find(

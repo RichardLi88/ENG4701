@@ -4,6 +4,7 @@ import type { OptimisationPassViewModel } from "../_lib/optimisation-types";
 
 type PassListProps = Readonly<{
   passes: ReadonlyArray<OptimisationPassViewModel>;
+  scopeName: string;
   selectedPassId?: string;
   selectedPassIndex: number;
   onSelect: (passId: string) => void;
@@ -17,6 +18,7 @@ type PassListProps = Readonly<{
 
 export const PassList = memo(function PassList({
   passes,
+  scopeName,
   selectedPassId,
   selectedPassIndex,
   onSelect,
@@ -112,8 +114,8 @@ export const PassList = memo(function PassList({
           </p>
           <p className="mt-1 text-xs leading-5 text-slate-500">
             {hasActiveFilters
-              ? "Clear the filters to restore this function's full timeline."
-              : "This function has no timeline entries for this run."}
+              ? `Clear the filters to restore the ${scopeName} timeline.`
+              : `The ${scopeName} scope has no timeline entries for this run.`}
           </p>
           {hasActiveFilters ? (
             <button
