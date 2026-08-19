@@ -77,7 +77,7 @@ function DiffPane({ side, rows }: DiffPaneProps) {
 
   return (
     <section
-      className="flex min-h-80 min-w-0 flex-col overflow-hidden border-slate-800 bg-[#070b12] first:border-b xl:min-h-[30rem] xl:first:border-r xl:first:border-b-0"
+      className="flex min-h-80 min-w-0 flex-col overflow-hidden border-slate-800 bg-[var(--compiler-code-bg)] first:border-b xl:min-h-[30rem] xl:first:border-r xl:first:border-b-0"
       aria-label={`${label} optimisation IR`}
     >
       <header className="flex items-center justify-between gap-4 border-b border-slate-800 bg-slate-900/90 px-4 py-3">
@@ -174,7 +174,7 @@ type UnifiedDiffProps = Readonly<{
 function UnifiedDiff({ lines }: UnifiedDiffProps) {
   return (
     <section
-      className="min-h-80 min-w-0 overflow-hidden rounded-xl border border-slate-800 bg-[#070b12] xl:min-h-[30rem]"
+      className="min-h-80 min-w-0 overflow-hidden rounded-xl border border-slate-800 bg-[var(--compiler-code-bg)] xl:min-h-[30rem]"
       aria-label="Unified optimisation IR"
     >
       <header className="flex items-center justify-between gap-4 border-b border-slate-800 bg-slate-900/90 px-4 py-3">
@@ -310,7 +310,7 @@ export function IrDiffViewer({
   }
 
   return (
-    <section aria-labelledby="ir-diff-heading">
+    <section aria-labelledby="ir-diff-heading" data-diff-source={diff.source}>
       <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h3

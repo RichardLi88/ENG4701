@@ -184,6 +184,10 @@ function adaptPass(
     ir: {
       before: pass.ir.before,
       after: pass.ir.after,
+      diff:
+        pass.ir.diff === undefined
+          ? notProvided()
+          : available(pass.ir.diff.map((line) => ({ ...line }))),
     },
     metrics:
       pass.metrics === undefined

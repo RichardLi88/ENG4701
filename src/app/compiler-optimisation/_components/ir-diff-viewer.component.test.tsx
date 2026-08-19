@@ -73,4 +73,33 @@ describe("IrDiffViewer", () => {
       screen.getByText("The IR snapshot before this Pass was not provided."),
     ).toBeInTheDocument();
   });
+
+  test("prefers a valid backend structured Diff", () => {
+    render(
+      <IrDiffViewer
+        before="old"
+        after="new"
+        structuredDiff={[
+          {
+            kind: "removed",
+            content: "old",
+            beforeLineNumber: 1,
+            afterLineNumber: null,
+            endsWithNewline: false,
+          },
+          {
+            kind: "added",
+            content: "new",
+            beforeLineNumber: null,
+            afterLineNumber: 1,
+            endsWithNewline: false,
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByRole("region", { name: "Intermediate representation" }),
+    ).toHaveAttribute("data-diff-source", "structured");
+  });
 });

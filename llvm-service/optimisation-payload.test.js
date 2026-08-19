@@ -24,7 +24,7 @@ define i32 @main() {
 }`,
   });
 
-  assert.equal(payload.schemaVersion, "1.0.0");
+  assert.equal(payload.schemaVersion, "1.1.0");
   assert.deepEqual(payload.functions, [{ id: "fn:main", name: "main" }]);
   assert.equal(payload.meta.totalPasses, 1);
   assert.equal(payload.passes[0].name, "simplify-cfg");
@@ -33,6 +33,43 @@ define i32 @main() {
     level: "function",
     functionId: "fn:main",
   });
+  assert.deepEqual(payload.passes[0].ir.diff, [
+    {
+      kind: "unchanged",
+      content: "define i32 @main() {",
+      beforeLineNumber: 1,
+      afterLineNumber: 1,
+      endsWithNewline: true,
+    },
+    {
+      kind: "removed",
+      content: "  br label %1",
+      beforeLineNumber: 2,
+      afterLineNumber: null,
+      endsWithNewline: true,
+    },
+    {
+      kind: "removed",
+      content: "1:",
+      beforeLineNumber: 3,
+      afterLineNumber: null,
+      endsWithNewline: true,
+    },
+    {
+      kind: "unchanged",
+      content: "  ret i32 0",
+      beforeLineNumber: 4,
+      afterLineNumber: 2,
+      endsWithNewline: true,
+    },
+    {
+      kind: "unchanged",
+      content: "}",
+      beforeLineNumber: 5,
+      afterLineNumber: 3,
+      endsWithNewline: false,
+    },
+  ]);
   assert.deepEqual(payload.passes[0].metrics, {
     instructions: { before: 2, after: 1, delta: -1, estimated: true },
     memoryOperations: { before: 0, after: 0, delta: 0, estimated: true },
@@ -80,6 +117,7 @@ ${dump}`,
 
   assert.equal(payload.passes[0].type, "analysis");
   assert.equal(payload.passes[0].changed, false);
+  assert.equal(payload.passes[0].ir.diff, undefined);
   assert.equal(payload.passes[0].ir.before.includes("/tmp/"), false);
   assert.equal(payload.passes[0].ir.before.includes("safe.c"), true);
   assert.equal(payload.passes[0].cfg, undefined);

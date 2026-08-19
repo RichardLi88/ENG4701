@@ -59,7 +59,7 @@ describe("OptimisationWorkspace", () => {
     window.history.replaceState(
       null,
       "",
-      "/compiler-optimisation?fixture=multi",
+      "/compiler-optimisation?campaign=demo",
     );
     renderWorkspace();
 
@@ -69,7 +69,7 @@ describe("OptimisationWorkspace", () => {
     await user.click(screen.getByRole("button", { name: "Unified" }));
 
     const params = new URLSearchParams(window.location.search);
-    expect(params.get("fixture")).toBe("multi");
+    expect(params.get("campaign")).toBe("demo");
     expect(params.get("function")).toBe("fn:aGVscGVy");
     expect(params.get("pass")).toBe("pass:000004:ZnV0dXJlLXBhc3M");
     expect(params.get("change")).toBe("unchanged");

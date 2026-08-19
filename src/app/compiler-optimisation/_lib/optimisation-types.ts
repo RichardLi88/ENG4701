@@ -5,6 +5,8 @@ import type {
   controlFlowGraphEdgeSchema,
   controlFlowGraphNodeSchema,
   controlFlowGraphSnapshotSchema,
+  irDiffLineKindSchema,
+  irDiffLineSchema,
   optimisationMetadataSchema,
   optimisationPassSchema,
   optimisationPassScopeSchema,
@@ -36,6 +38,8 @@ export type OptimisationPass = z.infer<typeof optimisationPassSchema>;
 export type OptimisationPassType = z.infer<typeof optimisationPassTypeSchema>;
 export type OptimisationPassScope = z.infer<typeof optimisationPassScopeSchema>;
 export type PassIr = z.infer<typeof passIrSchema>;
+export type IrDiffLineKind = z.infer<typeof irDiffLineKindSchema>;
+export type StructuredIrDiffLine = z.infer<typeof irDiffLineSchema>;
 export type PassMetrics = z.infer<typeof passMetricsSchema>;
 export type BeforeAfterMetric = z.infer<typeof beforeAfterMetricSchema>;
 export type PassControlFlowGraph = z.infer<typeof passControlFlowGraphSchema>;
@@ -155,6 +159,7 @@ export type PassPositionViewModel = Readonly<{
 export type PassIrViewModel = Readonly<{
   before: string;
   after: string;
+  diff: DataAvailability<ReadonlyArray<StructuredIrDiffLine>>;
 }>;
 
 export type OptimisationPassViewModel = Readonly<{

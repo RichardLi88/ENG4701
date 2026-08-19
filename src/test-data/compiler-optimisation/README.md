@@ -33,3 +33,7 @@ cases, UI View Model conversion, navigation, filtering, IR Diff, CFG rendering,
 and missing optional data states. With the local LLVM service running, use
 `npm run test:e2e:llvm` to repeat the real C/C++ success and failure cases. The
 HTTP client suite also covers timeout and unavailable-service classification.
+
+Schema `1.1.x` adds `passes[].ir.diff`, a structured line-level edit script
+required for changed Passes. Legacy `1.0.x` fixtures remain supported and use
+the frontend Diff fallback when that optional field is absent.

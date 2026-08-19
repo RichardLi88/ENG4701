@@ -71,6 +71,11 @@ function assertPayloadInvariants(payload, payloadText, testCase) {
   assert.ok(payload.passes.some((pass) => !pass.changed));
   assert.ok(payload.passes.some((pass) => pass.metrics !== undefined));
   assert.ok(
+    payload.passes
+      .filter((pass) => pass.changed)
+      .every((pass) => Array.isArray(pass.ir.diff)),
+  );
+  assert.ok(
     payload.passes.some(
       (pass) => pass.cfg !== undefined && pass.cfg.before.nodes.length > 0,
     ),
