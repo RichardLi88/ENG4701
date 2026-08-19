@@ -13,6 +13,10 @@ const day2FixtureUrl = new URL(
   "../../../test-data/compiler-optimisation/day2-real-backend.json",
   import.meta.url,
 );
+const day3FixtureUrl = new URL(
+  "../../../test-data/compiler-optimisation/day3-special-name-backend.json",
+  import.meta.url,
+);
 
 function readFixtureText() {
   return readFileSync(fixtureUrl, "utf8");
@@ -120,4 +124,27 @@ test("Day 2 end-to-end payload is complete, sanitised, and adaptable", () => {
   assert.equal(payload.passes.length, 153);
   assert.equal(fixtureText.includes("/tmp/"), false);
   assert.ok(result.data.summary.changedPassCount > 0);
+});
+
+test("Day 3 boundary payload preserves a quoted special function name and long IR", () => {
+  const fixtureText = readFileSync(day3FixtureUrl, "utf8");
+  const payload = optimisationResultSchema.parse(JSON.parse(fixtureText));
+  const result = parseOptimisationResult(payload);
+
+  assert.equal(result.ok, true, result.ok ? undefined : result.error.message);
+  assert.equal(payload.meta.sourceFile, "day3-special-function.c");
+  assert.equal(payload.functions.length, 3);
+  assert.equal(payload.passes.length, 205);
+  assert.ok(fixtureText.length > 400_000);
+  assert.equal(fixtureText.includes("/tmp/"), false);
+  assert.doesNotMatch(
+    fixtureText,
+    /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i,
+  );
+  assert.equal(
+    result.data.functionsById["fn:special.function-%24case"].name,
+    "special.function-$case",
+  );
+  assert.ok(result.data.summary.changedPassCount > 0);
+  assert.ok(result.data.summary.unchangedPassCount > 0);
 });
