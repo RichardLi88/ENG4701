@@ -18,6 +18,9 @@ export type ReductionFileComparison = Readonly<{
 
 export type ReductionStepView = Readonly<{
   index: number;
+  candidateId: string | null;
+  fromStateId: string;
+  toStateId: string;
   tokensBefore: number;
   tokensAfter: number;
   tokensRemoved: number;
@@ -26,6 +29,7 @@ export type ReductionStepView = Readonly<{
   reducerPass: number | null;
   transformationKind: string | null;
   description: string | null;
+  systemReason: string | null;
   files: ReadonlyArray<ReductionFileComparison>;
   initialFilePath: string | null;
 }>;
@@ -69,6 +73,7 @@ export type ReductionTraceViewModel = Readonly<{
   status: ReductionTrace["meta"]["status"];
   sourceFile: string | null;
   language: string | null;
+  originalStateId: string | null;
   originalTokens: number | null;
   finalTokens: number | null;
   tokensRemoved: number | null;
@@ -354,6 +359,7 @@ function adaptTrace(trace: ReductionTrace): ReductionTraceViewModel {
     status: trace.meta.status,
     sourceFile: trace.meta.sourceFile ?? null,
     language: trace.meta.language ?? null,
+    originalStateId: trace.originalStateId,
     originalTokens,
     finalTokens,
     tokensRemoved,
@@ -378,6 +384,9 @@ function adaptTrace(trace: ReductionTrace): ReductionTraceViewModel {
 
       return {
         index: step.index,
+        candidateId: step.candidateId,
+        fromStateId: step.fromStateId,
+        toStateId: step.toStateId,
         tokensBefore: step.tokensBefore,
         tokensAfter: step.tokensAfter,
         tokensRemoved: step.tokensBefore - step.tokensAfter,
@@ -386,6 +395,7 @@ function adaptTrace(trace: ReductionTrace): ReductionTraceViewModel {
         reducerPass: numberField(step.transformation, "reducerPass"),
         transformationKind: stringField(step.transformation, "kind"),
         description: stringField(step.transformation, "description"),
+        systemReason: stringField(step.transformation, "reason"),
         files,
         initialFilePath,
       };

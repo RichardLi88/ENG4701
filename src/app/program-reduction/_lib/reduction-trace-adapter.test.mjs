@@ -184,6 +184,30 @@ test("supports a valid trace with no accepted steps", () => {
   assert.deepEqual(result.data.steps, []);
 });
 
+test("preserves the reason for a candidate-less system transition", () => {
+  const input = validTrace();
+  input.states[1] = {
+    ...input.states[1],
+    createdByCandidateId: null,
+    kind: "SYSTEM",
+    reason: "Rebuilt parse tree",
+  };
+  input.steps[0] = {
+    ...input.steps[0],
+    candidateId: null,
+    transformation: {
+      kind: "SYSTEM",
+      reason: "Rebuilt parse tree",
+    },
+  };
+
+  const result = parseReductionTrace(input);
+
+  assert.equal(result.ok, true);
+  assert.equal(result.data.steps[0].transformationKind, "SYSTEM");
+  assert.equal(result.data.steps[0].systemReason, "Rebuilt parse tree");
+});
+
 test("groups non-winning candidates by base state in observation order", () => {
   const input = validTrace();
   input.candidates = [
