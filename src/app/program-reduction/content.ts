@@ -2,7 +2,7 @@ export const programReductionContent = {
   eyebrow: "Program Reduction",
   heading: "Reduction trace visualiser",
   description:
-    "Upload a Perses reduction trace and inspect every accepted change side by side.",
+    "Upload a Perses reduction trace and inspect accepted changes or every attempted candidate side by side.",
 } as const;
 
 export const jsonFileUploadContent = {
@@ -37,6 +37,13 @@ export const reductionWorkspaceContent = {
   },
   timeline: {
     heading: "Accepted steps",
+    allAttemptsHeading: "Reduction attempts",
+    modeLabel: "Timeline contents",
+    acceptedOnly: "Accepted only",
+    allAttempts: "All attempts",
+    original: "Original state",
+    otherCandidates: "other candidates",
+    candidate: "Candidate",
     previous: "Previous step",
     next: "Next step",
     step: "Step",
@@ -52,12 +59,16 @@ export const reductionWorkspaceContent = {
     reducerPass: "Reducer pass",
     transformation: "Transformation",
     acceptedSequence: "Accepted sequence",
+    candidateStatus: "Candidate status",
+    testDuration: "Test duration",
+    exitCode: "Exit code",
     unavailable: "Not provided",
     files: "Files",
     comparison: "Line-level comparison",
     diffLegendRemoved: "Removed",
     diffLegendAdded: "Added",
     noFiles: "No files are available for this step.",
+    unavailableComparison: "Candidate comparison unavailable",
   },
   empty: {
     heading: "No accepted reduction steps",
