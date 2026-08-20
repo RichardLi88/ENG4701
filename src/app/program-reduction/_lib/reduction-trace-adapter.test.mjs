@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { parseReductionTrace } from "./reduction-trace-adapter.ts";
+import {
+  buildCandidateComparison,
+  parseReductionTrace,
+} from "./reduction-trace-adapter.ts";
 
 const BEFORE_REF = `p_${"a".repeat(64)}`;
 const AFTER_REF = `p_${"b".repeat(64)}`;
@@ -101,6 +104,51 @@ function validTrace() {
   };
 }
 
+function candidate(overrides = {}) {
+  return {
+    candidateId: "candidate:2",
+    editId: 2,
+    baseStateId: "initial",
+    resultStateId: null,
+    status: "REJECTED",
+    becameBest: false,
+    observedAtSeq: 2,
+    acceptedAtSeq: null,
+    observedAtMs: 100,
+    acceptedAtMs: null,
+    tokensAfter: 8,
+    programRef: null,
+    patches: [
+      {
+        path: "main.c",
+        kind: "MODIFY",
+        diff: [
+          "--- a/main.c",
+          "+++ b/main.c",
+          "@@ -1,3 +1,3 @@",
+          " int main() {",
+          "-  return 1;",
+          "+  return 0;",
+          " }",
+        ].join("\n"),
+      },
+    ],
+    exitCode: 1,
+    elapsedMillis: 20,
+    cancelDurationMillis: null,
+    transformation: {
+      kind: "REPLACE",
+      editClass: "AnyNodeReplacementTreeEdit",
+      description: "Replace a literal",
+      reducer: "token-canonicalizer",
+      reducerPass: 1,
+      actions: [],
+      targets: [],
+    },
+    ...overrides,
+  };
+}
+
 test("adapts a valid multi-file trace into step comparisons", () => {
   const result = parseReductionTrace(validTrace());
   assert.equal(result.ok, true);
@@ -134,4 +182,148 @@ test("supports a valid trace with no accepted steps", () => {
   const result = parseReductionTrace(input);
   assert.equal(result.ok, true);
   assert.deepEqual(result.data.steps, []);
+});
+
+test("groups non-winning candidates by base state in observation order", () => {
+  const input = validTrace();
+  input.candidates = [
+    candidate({ candidateId: "candidate:3", editId: 3, observedAtSeq: 6 }),
+    candidate(),
+    candidate({
+      candidateId: "candidate:1",
+      editId: 1,
+      resultStateId: "state:1",
+      status: "INTERESTING",
+      becameBest: true,
+      observedAtSeq: 5,
+      acceptedAtSeq: 7,
+      acceptedAtMs: 250,
+      tokensAfter: 5,
+      programRef: AFTER_REF,
+      patches: null,
+    }),
+  ];
+
+  const result = parseReductionTrace(input);
+
+  assert.equal(result.ok, true);
+  assert.equal(result.data.candidateCount, 3);
+  assert.deepEqual(
+    result.data.candidatesByState.initial.map((item) => item.candidateId),
+    ["candidate:2", "candidate:3"],
+  );
+  assert.equal(
+    result.data.candidatesByState.initial[0].transformationKind,
+    "REPLACE",
+  );
+});
+
+test("reconstructs modified, added and deleted candidate files", () => {
+  const input = validTrace();
+  input.candidates = [
+    candidate({
+      patches: [
+        ...candidate().patches,
+        {
+          path: "added.h",
+          kind: "ADD",
+          diff: [
+            "--- /dev/null",
+            "+++ b/added.h",
+            "@@ -0,0 +1 @@",
+            "+#pragma once",
+          ].join("\n"),
+        },
+        {
+          path: "unchanged.h",
+          kind: "DELETE",
+          diff: [
+            "--- a/unchanged.h",
+            "+++ /dev/null",
+            "@@ -1 +0,0 @@",
+            "-#define VALUE 1",
+          ].join("\n"),
+        },
+      ],
+    }),
+  ];
+  const parsed = parseReductionTrace(input);
+  assert.equal(parsed.ok, true);
+
+  const comparison = buildCandidateComparison(
+    parsed.data.candidatesByState.initial[0],
+  );
+
+  assert.equal(comparison.ok, true);
+  assert.equal(comparison.files[0].after, "int main() {\n  return 0;\n}\n");
+  assert.equal(comparison.files[1].after, "#pragma once");
+  assert.equal(comparison.files[2].after, "");
+});
+
+test("reconstructs candidate patches containing multiple hunks", () => {
+  const input = validTrace();
+  const before = "one\ntwo\nthree\nfour\nfive\nsix\nseven\n";
+  input.programs[BEFORE_REF].files[0].content = before;
+  input.candidates = [
+    candidate({
+      patches: [
+        {
+          path: "main.c",
+          kind: "MODIFY",
+          diff: [
+            "--- a/main.c",
+            "+++ b/main.c",
+            "@@ -1,3 +1,3 @@",
+            " one",
+            "-two",
+            "+TWO",
+            " three",
+            "@@ -5,3 +5,3 @@",
+            " five",
+            "-six",
+            "+SIX",
+            " seven",
+          ].join("\n"),
+        },
+      ],
+    }),
+  ];
+  const parsed = parseReductionTrace(input);
+  assert.equal(parsed.ok, true);
+
+  const comparison = buildCandidateComparison(
+    parsed.data.candidatesByState.initial[0],
+  );
+
+  assert.equal(comparison.ok, true);
+  assert.equal(
+    comparison.files[0].after,
+    "one\nTWO\nthree\nfour\nfive\nSIX\nseven\n",
+  );
+});
+
+test("keeps malformed candidate patches selectable with an unavailable comparison", () => {
+  const input = validTrace();
+  input.candidates = [
+    candidate({
+      patches: [
+        {
+          path: "main.c",
+          kind: "MODIFY",
+          diff: "not a unified patch",
+        },
+      ],
+    }),
+  ];
+  const parsed = parseReductionTrace(input);
+  assert.equal(parsed.ok, true);
+
+  const comparison = buildCandidateComparison(
+    parsed.data.candidatesByState.initial[0],
+  );
+
+  assert.deepEqual(comparison, {
+    ok: false,
+    message: "Could not reconstruct the candidate change for main.c.",
+  });
 });

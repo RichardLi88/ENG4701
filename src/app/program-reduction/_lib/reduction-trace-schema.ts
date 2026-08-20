@@ -215,6 +215,36 @@ export const reductionTraceSchema = z
       }
     });
 
+    trace.candidates.forEach((candidate, index) => {
+      if (!stateIds.has(candidate.baseStateId)) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["candidates", index, "baseStateId"],
+          message: "Referenced base state does not exist",
+        });
+      }
+      if (
+        candidate.resultStateId !== null &&
+        !stateIds.has(candidate.resultStateId)
+      ) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["candidates", index, "resultStateId"],
+          message: "Referenced result state does not exist",
+        });
+      }
+      if (
+        candidate.programRef !== null &&
+        !programIds.has(candidate.programRef)
+      ) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["candidates", index, "programRef"],
+          message: "Referenced program does not exist",
+        });
+      }
+    });
+
     for (const [field, stateId] of [
       ["originalStateId", trace.originalStateId],
       ["finalStateId", trace.finalStateId],
@@ -232,3 +262,4 @@ export const reductionTraceSchema = z
 export type ReductionTrace = z.infer<typeof reductionTraceSchema>;
 export type ReductionStep = z.infer<typeof reductionStepSchema>;
 export type ReductionProgramFile = z.infer<typeof reductionProgramFileSchema>;
+export type ReductionCandidate = z.infer<typeof candidateSchema>;
