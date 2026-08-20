@@ -197,11 +197,17 @@ function ReductionWorkspaceSession({
                         −{step.tokensRemoved} {units.tokens}
                       </span>
                     </span>
-                    <span className="mt-1 block truncate text-xs opacity-75">
-                      {step.reducer ??
-                        step.transformationKind ??
-                        reductionWorkspaceContent.timeline
-                          .unknownTransformation}
+                    <span className="mt-2 flex min-w-0 items-center gap-2 text-xs">
+                      <span className="shrink-0 rounded bg-black/10 px-1.5 py-0.5 font-mono font-semibold">
+                        {step.transformationKind ??
+                          reductionWorkspaceContent.timeline
+                            .unknownTransformation}
+                      </span>
+                      {step.reducer !== null ? (
+                        <span className="truncate opacity-75">
+                          {step.reducer}
+                        </span>
+                      ) : null}
                     </span>
                   </button>
                 </li>
