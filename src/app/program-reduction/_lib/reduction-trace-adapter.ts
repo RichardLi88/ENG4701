@@ -2,6 +2,7 @@ import type { JsonValue } from "~/app/_helpers/json";
 
 import {
   reductionTraceSchema,
+  type ReductionCandidate,
   type ReductionProgramFile,
   type ReductionTrace,
 } from "./reduction-trace-schema.ts";
@@ -29,6 +30,40 @@ export type ReductionStepView = Readonly<{
   initialFilePath: string | null;
 }>;
 
+export type ReductionCandidatePatchView = Readonly<{
+  path: string;
+  kind: "ADD" | "DELETE" | "MODIFY";
+  diff: string;
+}>;
+
+export type ReductionCandidateView = Readonly<{
+  candidateId: string;
+  editId: number;
+  baseStateId: string;
+  status: ReductionCandidate["status"];
+  observedAtSeq: number | null;
+  tokensBefore: number;
+  tokensAfter: number;
+  tokensRemoved: number;
+  exitCode: number | null;
+  elapsedMillis: number | null;
+  transformationKind: string;
+  description: string;
+  reducer: string | null;
+  reducerPass: number;
+  patches: ReadonlyArray<ReductionCandidatePatchView> | null;
+  baseFiles: ReadonlyArray<ReductionProgramFile>;
+  resultFiles: ReadonlyArray<ReductionProgramFile> | null;
+}>;
+
+export type CandidateComparisonResult =
+  | Readonly<{
+      ok: true;
+      files: ReadonlyArray<ReductionFileComparison>;
+      initialFilePath: string | null;
+    }>
+  | Readonly<{ ok: false; message: string }>;
+
 export type ReductionTraceViewModel = Readonly<{
   schemaVersion: string;
   status: ReductionTrace["meta"]["status"];
@@ -41,6 +76,9 @@ export type ReductionTraceViewModel = Readonly<{
   durationMillis: number | null;
   candidateCount: number;
   steps: ReadonlyArray<ReductionStepView>;
+  candidatesByState: Readonly<
+    Record<string, ReadonlyArray<ReductionCandidateView>>
+  >;
 }>;
 
 export type ParseReductionTraceResult =
@@ -135,6 +173,121 @@ function stateTokens(trace: ReductionTrace, stateId: string | null) {
   );
 }
 
+function splitLines(value: string): Array<string> {
+  if (value.length === 0) {
+    return [];
+  }
+  return value.replace(/\r\n?/g, "\n").split("\n");
+}
+
+function applyUnifiedPatch(base: string, patch: string): string | null {
+  const baseLines = splitLines(base);
+  const patchLines = patch.replace(/\r\n?/g, "\n").split("\n");
+  const result: Array<string> = [];
+  let baseIndex = 0;
+  let patchIndex = 0;
+  let foundHunk = false;
+
+  while (patchIndex < patchLines.length) {
+    const header = /^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/.exec(
+      patchLines[patchIndex]!,
+    );
+    if (header === null) {
+      patchIndex += 1;
+      continue;
+    }
+
+    foundHunk = true;
+    const oldStart = Number(header[1]);
+    const expectedOldCount = Number(header[2] ?? "1");
+    const expectedNewCount = Number(header[4] ?? "1");
+    const hunkBaseIndex = oldStart === 0 ? 0 : oldStart - 1;
+    if (hunkBaseIndex < baseIndex || hunkBaseIndex > baseLines.length) {
+      return null;
+    }
+    result.push(...baseLines.slice(baseIndex, hunkBaseIndex));
+    baseIndex = hunkBaseIndex;
+    patchIndex += 1;
+
+    let oldCount = 0;
+    let newCount = 0;
+    while (
+      patchIndex < patchLines.length &&
+      !patchLines[patchIndex]!.startsWith("@@ ")
+    ) {
+      const line = patchLines[patchIndex]!;
+      const prefix = line[0];
+      const content = line.slice(1);
+
+      if (prefix === " ") {
+        if (baseLines[baseIndex] !== content) {
+          return null;
+        }
+        result.push(content);
+        baseIndex += 1;
+        oldCount += 1;
+        newCount += 1;
+      } else if (prefix === "-") {
+        if (baseLines[baseIndex] !== content) {
+          return null;
+        }
+        baseIndex += 1;
+        oldCount += 1;
+      } else if (prefix === "+") {
+        result.push(content);
+        newCount += 1;
+      } else if (prefix !== "\\" && line.length > 0) {
+        return null;
+      }
+      patchIndex += 1;
+    }
+
+    if (oldCount !== expectedOldCount || newCount !== expectedNewCount) {
+      return null;
+    }
+  }
+
+  if (!foundHunk) {
+    return null;
+  }
+  result.push(...baseLines.slice(baseIndex));
+  return result.join("\n");
+}
+
+export function buildCandidateComparison(
+  candidate: ReductionCandidateView,
+): CandidateComparisonResult {
+  if (candidate.resultFiles !== null) {
+    return {
+      ok: true,
+      ...buildFiles(candidate.baseFiles, candidate.resultFiles, []),
+    };
+  }
+  if (candidate.patches === null) {
+    return { ok: false, message: "Candidate source changes are unavailable." };
+  }
+
+  const baseByPath = filesByPath(candidate.baseFiles);
+  const files: Array<ReductionFileComparison> = [];
+  for (const patch of candidate.patches) {
+    const before = baseByPath.get(patch.path)?.content ?? "";
+    const after = applyUnifiedPatch(before, patch.diff);
+    if (after === null) {
+      return {
+        ok: false,
+        message: `Could not reconstruct the candidate change for ${patch.path}.`,
+      };
+    }
+    files.push({ path: patch.path, kind: patch.kind, before, after });
+  }
+
+  return {
+    ok: true,
+    files,
+    initialFilePath: files[0]?.path ?? null,
+  };
+}
+
 function adaptTrace(trace: ReductionTrace): ReductionTraceViewModel {
   const originalTokens = stateTokens(trace, trace.originalStateId);
   const finalTokens = stateTokens(trace, trace.finalStateId);
@@ -144,6 +297,57 @@ function adaptTrace(trace: ReductionTrace): ReductionTraceViewModel {
       : originalTokens - finalTokens;
   const startedAt = trace.meta.startedAtMillis ?? null;
   const finishedAt = trace.meta.finishedAtMillis ?? null;
+  const statesById = new Map(
+    trace.states.map((state) => [state.stateId, state] as const),
+  );
+  const candidatesByState: Record<string, Array<ReductionCandidateView>> = {};
+
+  for (const candidate of trace.candidates) {
+    if (candidate.becameBest) {
+      continue;
+    }
+    const baseState = statesById.get(candidate.baseStateId);
+    if (baseState === undefined) {
+      continue;
+    }
+    const baseProgram = trace.programs[baseState.programRef];
+    if (baseProgram === undefined) {
+      continue;
+    }
+    const resultProgram =
+      candidate.programRef === null
+        ? null
+        : (trace.programs[candidate.programRef] ?? null);
+    const view: ReductionCandidateView = {
+      candidateId: candidate.candidateId,
+      editId: candidate.editId,
+      baseStateId: candidate.baseStateId,
+      status: candidate.status,
+      observedAtSeq: candidate.observedAtSeq,
+      tokensBefore: baseState.tokens,
+      tokensAfter: candidate.tokensAfter,
+      tokensRemoved: baseState.tokens - candidate.tokensAfter,
+      exitCode: candidate.exitCode,
+      elapsedMillis: candidate.elapsedMillis,
+      transformationKind: candidate.transformation.kind,
+      description: candidate.transformation.description,
+      reducer: candidate.transformation.reducer,
+      reducerPass: candidate.transformation.reducerPass,
+      patches: candidate.patches,
+      baseFiles: baseProgram.files,
+      resultFiles: resultProgram?.files ?? null,
+    };
+    (candidatesByState[candidate.baseStateId] ??= []).push(view);
+  }
+
+  for (const candidates of Object.values(candidatesByState)) {
+    candidates.sort(
+      (left, right) =>
+        (left.observedAtSeq ?? Number.MAX_SAFE_INTEGER) -
+          (right.observedAtSeq ?? Number.MAX_SAFE_INTEGER) ||
+        left.editId - right.editId,
+    );
+  }
 
   return {
     schemaVersion: trace.schemaVersion,
@@ -162,6 +366,7 @@ function adaptTrace(trace: ReductionTrace): ReductionTraceViewModel {
         ? null
         : Math.max(0, finishedAt - startedAt),
     candidateCount: trace.candidates.length,
+    candidatesByState,
     steps: trace.steps.map((step) => {
       const beforeProgram = trace.programs[step.baseProgramRef]!;
       const afterProgram = trace.programs[step.programRef]!;
