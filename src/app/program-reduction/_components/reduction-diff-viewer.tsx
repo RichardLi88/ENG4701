@@ -1,6 +1,12 @@
 "use client";
 
-import { useMemo, useRef, type RefObject, type UIEvent } from "react";
+import {
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  type RefObject,
+  type UIEvent,
+} from "react";
 
 import { createIrDiff, type IrDiffLine } from "~/app/_helpers/text-diff";
 
@@ -45,15 +51,38 @@ function alignRows(lines: ReadonlyArray<IrDiffLine>) {
 type DiffPaneProps = Readonly<{
   side: "before" | "after";
   rows: ReadonlyArray<DiffRow>;
+  firstChangedRowIndex: number;
   paneRef: RefObject<HTMLDivElement | null>;
   onScroll: (event: UIEvent<HTMLDivElement>) => void;
 }>;
 
-function DiffPane({ side, rows, paneRef, onScroll }: DiffPaneProps) {
+const DIFF_ROW_HEIGHT_PX = 24;
+const DIFF_CONTEXT_ROWS = 3;
+
+function DiffPane({
+  side,
+  rows,
+  firstChangedRowIndex,
+  paneRef,
+  onScroll,
+}: DiffPaneProps) {
   const isBefore = side === "before";
   const label = isBefore
     ? reductionWorkspaceContent.detail.before
     : reductionWorkspaceContent.detail.after;
+
+  useLayoutEffect(() => {
+    const pane = paneRef.current;
+    if (pane === null) {
+      return;
+    }
+
+    pane.scrollTop = Math.max(
+      0,
+      (firstChangedRowIndex - DIFF_CONTEXT_ROWS) * DIFF_ROW_HEIGHT_PX,
+    );
+    pane.scrollLeft = 0;
+  }, [firstChangedRowIndex, paneRef, rows]);
 
   return (
     <section
@@ -154,6 +183,14 @@ export function ReductionDiffViewer({
     const diff = createIrDiff({ before, after });
     return diff.status === "unavailable" ? [] : alignRows(diff.lines);
   }, [before, after]);
+  const firstChangedRowIndex = useMemo(() => {
+    const index = rows.findIndex(
+      (row) =>
+        (row.before !== null && row.before.kind !== "unchanged") ||
+        (row.after !== null && row.after.kind !== "unchanged"),
+    );
+    return index < 0 ? 0 : index;
+  }, [rows]);
 
   function synchroniseScroll(
     source: HTMLDivElement,
@@ -187,6 +224,7 @@ export function ReductionDiffViewer({
           <DiffPane
             side="before"
             rows={rows}
+            firstChangedRowIndex={firstChangedRowIndex}
             paneRef={beforeRef}
             onScroll={(event) =>
               synchroniseScroll(event.currentTarget, afterRef.current)
@@ -195,6 +233,7 @@ export function ReductionDiffViewer({
           <DiffPane
             side="after"
             rows={rows}
+            firstChangedRowIndex={firstChangedRowIndex}
             paneRef={afterRef}
             onScroll={(event) =>
               synchroniseScroll(event.currentTarget, beforeRef.current)
