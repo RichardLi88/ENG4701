@@ -1,12 +1,23 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { THEME_STORAGE_KEY } from "../_helpers/theme";
 import { ThemeProvider } from "./theme-provider";
 
 describe("ThemeProvider", () => {
   beforeEach(() => {
+    const values = new Map<string, string>();
+    vi.stubGlobal("localStorage", {
+      clear: () => values.clear(),
+      getItem: (key: string) => values.get(key) ?? null,
+      key: (index: number) => [...values.keys()][index] ?? null,
+      get length() {
+        return values.size;
+      },
+      removeItem: (key: string) => values.delete(key),
+      setItem: (key: string, value: string) => values.set(key, value),
+    } satisfies Storage);
     localStorage.clear();
     document.documentElement.dataset.appTheme = "light";
     document.documentElement.style.colorScheme = "light";
@@ -23,6 +34,9 @@ describe("ThemeProvider", () => {
       name: "Toggle color theme",
     });
 
+    expect(document.querySelector("nav")).toHaveAttribute(
+      "data-workspace-theme",
+    );
     expect(toggle).toHaveAttribute("aria-checked", "false");
 
     await user.click(toggle);

@@ -36,7 +36,10 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
   return (
     <div className="min-h-screen bg-[var(--app-page-bg)] text-[var(--app-text-primary)] transition-colors">
-      <nav className="sticky top-0 z-10 border-b border-[var(--app-border-subtle)] bg-[var(--app-page-bg)]/95 px-6 py-3 backdrop-blur transition-colors">
+      <nav
+        data-workspace-theme
+        className="sticky top-0 z-10 border-b border-[var(--workspace-border-muted)] bg-[var(--workspace-page-bg)]/95 px-6 py-3 backdrop-blur transition-colors"
+      >
         <div className="mx-auto flex w-full max-w-6xl justify-end">
           <ThemeToggle themeMode={themeMode} onToggle={toggleTheme} />
         </div>
