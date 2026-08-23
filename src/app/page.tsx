@@ -1,21 +1,25 @@
 import Link from "next/link";
 
+import { homeContent } from "./content";
+
+const destinationClassName =
+  "flex min-h-[320px] items-center justify-center rounded-2xl border border-[var(--workspace-border-muted)] bg-[var(--workspace-surface)] p-8 text-center text-3xl font-bold text-[var(--workspace-text)] shadow-[var(--workspace-shadow)] shadow-sm transition-colors hover:border-[var(--workspace-accent)] hover:bg-[var(--workspace-accent-soft)] focus-visible:ring-2 focus-visible:ring-[var(--workspace-focus)] focus-visible:outline-none";
+
 export default function Home() {
+  const { programReduction, compilerOptimisation } = homeContent.destinations;
+
   return (
-    <main className="flex min-h-[calc(100vh-65px)] items-center justify-center p-6">
+    <main
+      data-workspace-theme
+      className="flex min-h-[calc(100vh-65px)] items-center justify-center bg-[var(--workspace-page-bg)] p-6 text-[var(--workspace-text)] transition-colors"
+    >
       <section className="grid w-full max-w-6xl grid-cols-2 gap-6">
-        <Link
-          href="/program-reduction"
-          className="flex min-h-[320px] items-center justify-center rounded-lg bg-[var(--app-accent)] p-8 text-center text-3xl font-bold text-[var(--app-accent-text)] transition hover:bg-[var(--app-accent-hover)]"
-        >
-          Program Reduction
+        <Link href={programReduction.href} className={destinationClassName}>
+          {programReduction.label}
         </Link>
 
-        <Link
-          href="/compiler-optimisation"
-          className="flex min-h-[320px] items-center justify-center rounded-lg border border-[var(--app-border)] bg-[var(--app-surface)] p-8 text-center text-3xl font-bold text-[var(--app-text-primary)] shadow-[var(--app-shadow)] shadow-sm transition hover:border-[var(--app-accent)]"
-        >
-          Compiler Optimisation
+        <Link href={compilerOptimisation.href} className={destinationClassName}>
+          {compilerOptimisation.label}
         </Link>
       </section>
     </main>
