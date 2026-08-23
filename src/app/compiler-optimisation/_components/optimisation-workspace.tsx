@@ -36,7 +36,7 @@ import { OptimisationSummary } from "./optimisation-summary";
 import { PassDetail } from "./pass-detail";
 import { PassFiltersControl } from "./pass-filters";
 import { PASS_VIRTUALISATION_THRESHOLD, PassList } from "./pass-list";
-import { StatusPanel } from "./status-panel";
+import { StatusPanel } from "~/app/_components/status-panel";
 
 type InteractiveOptimisationWorkspaceProps = OptimisationWorkspaceProps &
   Readonly<{

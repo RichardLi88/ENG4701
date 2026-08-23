@@ -15,7 +15,7 @@ export default function CompilerOptimisationError({
 }: CompilerOptimisationErrorProps) {
   return (
     <main
-      data-compiler-theme
+      data-workspace-theme
       className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-10 text-slate-100 transition-colors sm:px-6 lg:px-8"
     >
       <section

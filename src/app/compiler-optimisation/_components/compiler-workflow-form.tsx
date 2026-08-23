@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
+import { StatusPanel } from "~/app/_components/status-panel";
 
 import { compilerWorkflowContent } from "../content";
 import { parseOptimisationResult } from "../_lib/optimisation-adapter";
@@ -16,7 +17,6 @@ import {
   type CompilerWorkflowState,
   validateCompilerInput,
 } from "../_lib/compiler-workflow";
-import { StatusPanel } from "./status-panel";
 
 const initialWorkflowState: CompilerWorkflowState = { status: "idle" };
 

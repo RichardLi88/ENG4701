@@ -1,9 +1,9 @@
-import { StatusPanel } from "./_components/status-panel";
+import { StatusPanel } from "~/app/_components/status-panel";
 
 export default function CompilerOptimisationLoading() {
   return (
     <main
-      data-compiler-theme
+      data-workspace-theme
       className="min-h-screen bg-slate-950 px-4 py-8 text-slate-100 transition-colors sm:px-6 lg:px-8"
     >
       <div className="mx-auto max-w-4xl">
