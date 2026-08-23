@@ -15,14 +15,14 @@ export function ThemeToggle({ themeMode, onToggle }: ThemeToggleProps) {
       role="switch"
       aria-checked={isDark}
       aria-label={themeToggleContent.ariaLabel}
-      className="inline-flex h-10 w-36 items-center justify-between rounded-md border border-[var(--app-border)] bg-[var(--app-surface)] p-1 text-sm font-semibold text-[var(--app-text-muted)] transition focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2 focus:ring-offset-[var(--app-page-bg)] focus:outline-none"
+      className="inline-flex h-10 w-36 items-center justify-between rounded-md border border-[var(--workspace-border)] bg-[var(--workspace-surface)] p-1 text-sm font-semibold text-[var(--workspace-text-muted)] transition-colors hover:border-[var(--workspace-accent)] focus:ring-2 focus:ring-[var(--workspace-focus)] focus:ring-offset-2 focus:ring-offset-[var(--workspace-page-bg)] focus:outline-none"
       onClick={onToggle}
     >
       <span
         className={
           isDark
-            ? "rounded px-3 py-1 text-[var(--app-text-muted)]"
-            : "rounded bg-[var(--app-accent)] px-3 py-1 text-[var(--app-accent-text)]"
+            ? "rounded px-3 py-1 text-[var(--workspace-text-muted)]"
+            : "rounded bg-[var(--workspace-accent-soft)] px-3 py-1 text-[var(--workspace-accent)]"
         }
       >
         {themeToggleContent.lightLabel}
@@ -30,8 +30,8 @@ export function ThemeToggle({ themeMode, onToggle }: ThemeToggleProps) {
       <span
         className={
           isDark
-            ? "rounded bg-[var(--app-accent)] px-3 py-1 text-[var(--app-accent-text)]"
-            : "rounded px-3 py-1 text-[var(--app-text-muted)]"
+            ? "rounded bg-[var(--workspace-accent-soft)] px-3 py-1 text-[var(--workspace-accent)]"
+            : "rounded px-3 py-1 text-[var(--workspace-text-muted)]"
         }
       >
         {themeToggleContent.darkLabel}
