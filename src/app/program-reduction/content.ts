@@ -74,4 +74,34 @@ export const reductionWorkspaceContent = {
     heading: "No accepted reduction steps",
     description: "This trace contains no steps to compare.",
   },
+  cumulativeReductionChart: {
+    heading: "Cumulative token reduction",
+    description:
+      "Progress after each accepted candidate, including changes made by intervening system steps.",
+    acceptedCandidates: "Accepted candidates",
+    startingTokens: "Starting token count",
+    latestPlottedTokens: "Latest plotted token count",
+    cumulativeReduction: "Cumulative token reduction",
+    horizontalAxis: "Accepted candidate order",
+    verticalAxis: "Tokens reduced",
+    keyboardHelp:
+      "Use Left and Right Arrow keys to inspect candidates. Use Home and End to jump to the first or last candidate.",
+    point: {
+      acceptedCandidate: "Accepted candidate",
+      candidateId: "Candidate ID",
+      tokensBefore: "Tokens before",
+      tokensAfter: "Tokens after",
+      cumulativeReduction: "Cumulative reduction",
+    },
+    empty: {
+      heading: "No accepted candidates to graph",
+      description:
+        "This trace has no accepted steps linked to a reduction candidate.",
+    },
+    unavailable: {
+      heading: "Cumulative reduction unavailable",
+      description:
+        "The trace does not provide the original token count needed to calculate cumulative progress.",
+    },
+  },
 } as const;

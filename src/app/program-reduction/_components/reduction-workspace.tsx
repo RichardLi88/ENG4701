@@ -10,6 +10,7 @@ import {
   type ReductionStepView,
   type ReductionTraceViewModel,
 } from "../_lib/reduction-trace-adapter";
+import { CumulativeReductionChart } from "./cumulative-reduction-chart";
 import { ReductionDiffViewer } from "./reduction-diff-viewer";
 
 type ReductionWorkspaceProps = Readonly<{
@@ -404,6 +405,11 @@ function ReductionWorkspaceSession({
           value={formatDuration(model.durationMillis)}
         />
       </dl>
+
+      <CumulativeReductionChart
+        originalTokens={model.originalTokens}
+        steps={model.steps}
+      />
 
       <div
         className="inline-flex rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] p-1"
