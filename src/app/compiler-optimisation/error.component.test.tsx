@@ -12,7 +12,13 @@ describe("CompilerOptimisationError", () => {
       digest: "route-error-123",
     });
 
-    render(<CompilerOptimisationError error={error} reset={reset} />);
+    const { container } = render(
+      <CompilerOptimisationError error={error} reset={reset} />,
+    );
+
+    expect(container.querySelector("main")).toHaveAttribute(
+      "data-workspace-theme",
+    );
 
     expect(
       screen.getByRole("heading", {
