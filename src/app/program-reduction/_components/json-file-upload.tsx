@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
+
+import { StatusPanel } from "~/app/_components/status-panel";
 
 import type { JsonValue } from "../../_helpers/json";
-import { jsonFileUploadContent, units } from "../content";
+import { jsonFileUploadContent, programReductionContent } from "../content";
 import { parseReductionTrace } from "../_lib/reduction-trace-adapter";
 import type { ReductionTraceViewModel } from "../_lib/reduction-trace-adapter";
 import type { UploadState } from "../models/json-file-upload.types";
@@ -17,17 +19,15 @@ export function JsonFileUpload({
   hasLoadedTrace,
   onTraceLoaded,
 }: JsonFileUploadProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadState, setUploadState] = useState<UploadState>({
     status: "idle",
   });
 
-  const handleFileSelect = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  async function handleFileSelect(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
+    event.target.value = "";
 
-    if (!file) {
+    if (file === undefined) {
       return;
     }
 
@@ -52,81 +52,106 @@ export function JsonFileUpload({
         return;
       }
 
-      setUploadState({
-        status: "loaded",
-        fileName: file.name,
-        size: file.size,
-      });
+      setUploadState({ status: "idle" });
       onTraceLoaded(result.data, file.name);
     } catch {
       setUploadState({
         status: "error",
         code: "invalidJson",
       });
-    } finally {
-      event.target.value = "";
     }
-  };
+  }
+
+  if (hasLoadedTrace) {
+    return (
+      <section
+        aria-label={jsonFileUploadContent.compactRegionLabel}
+        className="flex justify-end"
+      >
+        <label className="inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-slate-200 transition-colors focus-within:ring-2 focus-within:ring-cyan-300 focus-within:outline-none hover:border-slate-600 hover:bg-slate-800">
+          <UploadIcon />
+          {jsonFileUploadContent.replaceButton}
+          <input
+            type="file"
+            accept="application/json,.json"
+            onChange={handleFileSelect}
+            className="sr-only"
+          />
+        </label>
+      </section>
+    );
+  }
+
+  const errorDescription =
+    uploadState.status === "error" && uploadState.detail !== undefined
+      ? `${jsonFileUploadContent.errors[uploadState.code]} ${uploadState.detail}`
+      : uploadState.status === "error"
+        ? `${jsonFileUploadContent.errors[uploadState.code]} ${jsonFileUploadContent.status.errorDescription}`
+        : null;
 
   return (
-    <div className="rounded-lg border border-[var(--app-border)] bg-[var(--app-surface)] p-6 shadow-[var(--app-shadow)] shadow-sm transition-colors">
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="application/json,.json"
-        className="sr-only"
-        onChange={handleFileSelect}
-      />
-
-      <button
-        type="button"
-        className="rounded-md bg-[var(--app-accent)] px-5 py-3 text-sm font-semibold text-[var(--app-accent-text)] transition hover:bg-[var(--app-accent-hover)] focus:ring-2 focus:ring-[var(--app-focus)] focus:ring-offset-2 focus:ring-offset-[var(--app-surface)] focus:outline-none"
-        onClick={() => fileInputRef.current?.click()}
-      >
-        {hasLoadedTrace
-          ? jsonFileUploadContent.replaceButton
-          : jsonFileUploadContent.uploadButton}
-      </button>
-
-      <div className="mt-5 min-h-16 rounded-md border border-[var(--app-border-subtle)] bg-[var(--app-panel)] p-4 text-sm transition-colors">
-        {uploadState.status === "idle" ? (
-          <p className="text-[var(--app-text-muted)]">
-            {jsonFileUploadContent.idleMessage}
-          </p>
-        ) : null}
-
-        {uploadState.status === "loaded" ? (
-          <dl className="grid gap-2 text-[var(--app-text-secondary)] sm:grid-cols-2">
-            <div>
-              <dt className="font-semibold text-[var(--app-text-primary)]">
-                {jsonFileUploadContent.labels.file}
-              </dt>
-              <dd className="break-all">{uploadState.fileName}</dd>
-            </div>
-            <div>
-              <dt className="font-semibold text-[var(--app-text-primary)]">
-                {jsonFileUploadContent.labels.size}
-              </dt>
-              <dd>
-                {uploadState.size.toLocaleString()} {units.bytes}
-              </dd>
-            </div>
-          </dl>
-        ) : null}
-
-        {uploadState.status === "error" ? (
-          <div role="alert" className="text-[var(--app-error)]">
-            <p className="font-medium">
-              {jsonFileUploadContent.errors[uploadState.code]}
-            </p>
-            {uploadState.detail !== undefined ? (
-              <p className="mt-1 font-mono text-xs break-words">
-                {uploadState.detail}
-              </p>
-            ) : null}
-          </div>
-        ) : null}
+    <section className="mx-auto w-full max-w-3xl rounded-2xl border border-slate-800 bg-slate-900/60 p-6 sm:p-8">
+      <div className="max-w-2xl">
+        <p className="text-xs font-semibold tracking-[0.18em] text-cyan-300 uppercase">
+          {programReductionContent.eyebrow}
+        </p>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+          {programReductionContent.heading}
+        </h1>
+        <p className="mt-3 text-sm leading-6 text-slate-400 sm:text-base">
+          {programReductionContent.description}
+        </p>
       </div>
-    </div>
+
+      <div className="mt-6">
+        <label className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-cyan-400/10 px-5 py-3 text-sm font-semibold text-cyan-100 transition-colors focus-within:ring-2 focus-within:ring-cyan-300 focus-within:ring-offset-2 focus-within:ring-offset-slate-900 focus-within:outline-none hover:bg-cyan-400/20 sm:w-auto">
+          <UploadIcon />
+          {jsonFileUploadContent.uploadButton}
+          <input
+            type="file"
+            accept="application/json,.json"
+            onChange={handleFileSelect}
+            aria-describedby="reduction-upload-help"
+            className="sr-only"
+          />
+        </label>
+        <p
+          id="reduction-upload-help"
+          className="mt-3 text-xs leading-5 text-slate-500"
+        >
+          {jsonFileUploadContent.uploadHelp}
+        </p>
+      </div>
+
+      {errorDescription !== null ? (
+        <div className="mt-6">
+          <StatusPanel
+            eyebrow={jsonFileUploadContent.status.errorEyebrow}
+            title={jsonFileUploadContent.status.errorTitle}
+            description={errorDescription}
+            tone="error"
+            compact
+          />
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+function UploadIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="size-5"
+    >
+      <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5" />
+      <path d="M5 14.5v3A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5v-3" />
+    </svg>
   );
 }

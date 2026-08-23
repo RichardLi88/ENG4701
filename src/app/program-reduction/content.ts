@@ -8,10 +8,12 @@ export const programReductionContent = {
 export const jsonFileUploadContent = {
   uploadButton: "Upload reduction trace",
   replaceButton: "Load another trace",
-  idleMessage: "No file selected.",
-  labels: {
-    file: "File",
-    size: "Size",
+  uploadHelp: "Perses v2 reduction trace JSON files",
+  compactRegionLabel: "Reduction trace file actions",
+  status: {
+    errorEyebrow: "Upload error",
+    errorTitle: "The reduction trace could not be loaded",
+    errorDescription: "Choose another JSON file and try again.",
   },
   errors: {
     invalidFileType: "Select a JSON file.",
@@ -21,7 +23,6 @@ export const jsonFileUploadContent = {
 } as const;
 
 export const units = {
-  bytes: "bytes",
   tokens: "tokens",
 } as const;
 

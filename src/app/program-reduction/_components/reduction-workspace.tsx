@@ -42,11 +42,11 @@ function SummaryCard({
   value,
 }: Readonly<{ label: string; value: string }>) {
   return (
-    <div className="rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-panel)] p-4">
-      <dt className="text-xs font-semibold tracking-wide text-[var(--app-text-muted)] uppercase">
+    <div className="rounded-lg border border-[var(--workspace-border-muted)] bg-[var(--workspace-inset-bg)] p-4">
+      <dt className="text-xs font-semibold tracking-wide text-[var(--workspace-text-muted)] uppercase">
         {label}
       </dt>
-      <dd className="mt-1 font-mono text-sm font-semibold text-[var(--app-text-primary)]">
+      <dd className="mt-1 font-mono text-sm font-semibold text-[var(--workspace-text)]">
         {value}
       </dd>
     </div>
@@ -64,7 +64,7 @@ function FileTabs({
 }>) {
   return (
     <div className="mb-5">
-      <p className="mb-2 text-xs font-semibold tracking-wide text-[var(--app-text-muted)] uppercase">
+      <p className="mb-2 text-xs font-semibold tracking-wide text-[var(--workspace-text-muted)] uppercase">
         {reductionWorkspaceContent.detail.files}
       </p>
       <div className="flex gap-2 overflow-x-auto pb-1" role="tablist">
@@ -75,10 +75,10 @@ function FileTabs({
             role="tab"
             aria-selected={file.path === selectedPath}
             onClick={() => onSelect(file.path)}
-            className={`flex shrink-0 items-center gap-2 rounded-md border px-3 py-2 font-mono text-xs transition focus-visible:ring-2 focus-visible:ring-[var(--app-focus)] focus-visible:outline-none ${
+            className={`flex shrink-0 items-center gap-2 rounded-md border px-3 py-2 font-mono text-xs transition focus-visible:ring-2 focus-visible:ring-[var(--workspace-focus)] focus-visible:outline-none ${
               file.path === selectedPath
-                ? "border-[var(--app-accent)] bg-[var(--app-accent)] text-[var(--app-accent-text)]"
-                : "border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-text-secondary)] hover:border-[var(--app-accent)]"
+                ? "border-[var(--workspace-accent)] bg-[var(--workspace-accent)] text-[var(--workspace-accent-text)]"
+                : "border-[var(--workspace-border)] bg-[var(--workspace-inset-bg)] text-[var(--workspace-text-secondary)] hover:border-[var(--workspace-accent)]"
             }`}
           >
             {file.path}
@@ -118,13 +118,13 @@ function CandidateBlock({
   }
 
   return (
-    <li className="rounded-md border border-dashed border-[var(--app-border)] bg-[var(--app-panel)]">
+    <li className="rounded-md border border-dashed border-[var(--workspace-border)] bg-[var(--workspace-inset-bg)]">
       <button
         type="button"
         aria-expanded={expanded}
         aria-controls={`candidate-block-${stateId}`}
         onClick={onToggle}
-        className="w-full p-3 text-left focus-visible:ring-2 focus-visible:ring-[var(--app-focus)] focus-visible:outline-none"
+        className="w-full p-3 text-left focus-visible:ring-2 focus-visible:ring-[var(--workspace-focus)] focus-visible:outline-none"
       >
         <span className="flex items-center justify-between gap-3 text-xs font-semibold">
           <span>
@@ -133,7 +133,7 @@ function CandidateBlock({
           </span>
           <span aria-hidden="true">{expanded ? "▾" : "▸"}</span>
         </span>
-        <span className="mt-1 block truncate font-mono text-[0.65rem] text-[var(--app-text-muted)]">
+        <span className="mt-1 block truncate font-mono text-[0.65rem] text-[var(--workspace-text-muted)]">
           {[...statusCounts]
             .map(([status, count]) => `${status} ${count}`)
             .join(" · ")}
@@ -142,7 +142,7 @@ function CandidateBlock({
       {expanded ? (
         <ul
           id={`candidate-block-${stateId}`}
-          className="max-h-80 space-y-1 overflow-y-auto border-t border-[var(--app-border-subtle)] p-2"
+          className="max-h-80 space-y-1 overflow-y-auto border-t border-[var(--workspace-border-muted)] p-2"
         >
           {candidates.map((candidate) => (
             <li key={candidate.candidateId}>
@@ -154,10 +154,10 @@ function CandidateBlock({
                     : undefined
                 }
                 onClick={() => onSelect(candidate)}
-                className={`w-full rounded p-2 text-left text-xs transition focus-visible:ring-2 focus-visible:ring-[var(--app-focus)] focus-visible:outline-none ${
+                className={`w-full rounded p-2 text-left text-xs transition focus-visible:ring-2 focus-visible:ring-[var(--workspace-focus)] focus-visible:outline-none ${
                   selectedCandidateId === candidate.candidateId
-                    ? "bg-[var(--app-accent)] text-[var(--app-accent-text)]"
-                    : "hover:bg-[var(--app-surface)]"
+                    ? "bg-[var(--workspace-accent)] text-[var(--workspace-accent-text)]"
+                    : "hover:bg-[var(--workspace-surface)]"
                 }`}
               >
                 <span className="flex items-center justify-between gap-2">
@@ -347,10 +347,10 @@ function ReductionWorkspaceSession({
               ? "step"
               : undefined
           }
-          className={`w-full rounded-md border p-3 text-left transition focus-visible:ring-2 focus-visible:ring-[var(--app-focus)] focus-visible:outline-none ${
+          className={`w-full rounded-md border p-3 text-left transition focus-visible:ring-2 focus-visible:ring-[var(--workspace-focus)] focus-visible:outline-none ${
             selectedCandidate === null && index === selectedStepIndex
-              ? "border-[var(--app-accent)] bg-[var(--app-accent)] text-[var(--app-accent-text)]"
-              : "border-[var(--app-border-subtle)] bg-[var(--app-panel)] hover:border-[var(--app-accent)]"
+              ? "border-[var(--workspace-accent)] bg-[var(--workspace-accent)] text-[var(--workspace-accent-text)]"
+              : "border-[var(--workspace-border-muted)] bg-[var(--workspace-inset-bg)] hover:border-[var(--workspace-accent)]"
           }`}
         >
           <span className="flex justify-between gap-3 text-xs font-semibold">
@@ -412,7 +412,7 @@ function ReductionWorkspaceSession({
       />
 
       <div
-        className="inline-flex rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] p-1"
+        className="inline-flex rounded-lg border border-[var(--workspace-border)] bg-[var(--workspace-inset-bg)] p-1"
         role="group"
         aria-label={reductionWorkspaceContent.timeline.modeLabel}
       >
@@ -427,10 +427,10 @@ function ReductionWorkspaceSession({
             type="button"
             aria-pressed={timelineMode === mode}
             onClick={() => changeTimelineMode(mode)}
-            className={`rounded-md px-3 py-2 text-xs font-semibold transition focus-visible:ring-2 focus-visible:ring-[var(--app-focus)] focus-visible:outline-none ${
+            className={`rounded-md px-3 py-2 text-xs font-semibold transition focus-visible:ring-2 focus-visible:ring-[var(--workspace-focus)] focus-visible:outline-none ${
               timelineMode === mode
-                ? "bg-[var(--app-accent)] text-[var(--app-accent-text)]"
-                : "text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]"
+                ? "bg-[var(--workspace-accent)] text-[var(--workspace-accent-text)]"
+                : "text-[var(--workspace-text-secondary)] hover:text-[var(--workspace-text)]"
             }`}
           >
             {label}
@@ -439,17 +439,17 @@ function ReductionWorkspaceSession({
       </div>
 
       {!hasVisibleTimeline ? (
-        <section className="rounded-xl border border-[var(--app-border)] bg-[var(--app-surface)] p-8 text-center">
+        <section className="rounded-xl border border-[var(--workspace-border)] bg-[var(--workspace-surface)] p-8 text-center">
           <h2 className="text-lg font-semibold">
             {reductionWorkspaceContent.empty.heading}
           </h2>
-          <p className="mt-2 text-sm text-[var(--app-text-muted)]">
+          <p className="mt-2 text-sm text-[var(--workspace-text-muted)]">
             {reductionWorkspaceContent.empty.description}
           </p>
         </section>
       ) : (
         <div className="grid min-w-0 gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
-          <aside className="min-w-0 rounded-xl border border-[var(--app-border)] bg-[var(--app-surface)] p-4 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)]">
+          <aside className="min-w-0 rounded-xl border border-[var(--workspace-border)] bg-[var(--workspace-surface)] p-4 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)]">
             <h2 className="font-semibold">
               {timelineMode === "accepted"
                 ? reductionWorkspaceContent.timeline.heading
@@ -461,7 +461,7 @@ function ReductionWorkspaceSession({
                   type="button"
                   disabled={selectedStepIndex === 0}
                   onClick={() => selectStep(selectedStepIndex - 1)}
-                  className="rounded-md border border-[var(--app-border)] px-3 py-2 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-md border border-[var(--workspace-border)] px-3 py-2 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   ← {reductionWorkspaceContent.timeline.previous}
                 </button>
@@ -469,7 +469,7 @@ function ReductionWorkspaceSession({
                   type="button"
                   disabled={selectedStepIndex === model.steps.length - 1}
                   onClick={() => selectStep(selectedStepIndex + 1)}
-                  className="rounded-md border border-[var(--app-border)] px-3 py-2 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-md border border-[var(--workspace-border)] px-3 py-2 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {reductionWorkspaceContent.timeline.next} →
                 </button>
@@ -477,7 +477,7 @@ function ReductionWorkspaceSession({
             ) : null}
             <ol className="mt-3 max-h-[calc(100vh-12rem)] space-y-2 overflow-y-auto pr-1">
               {timelineMode === "all" ? (
-                <li className="rounded-md border border-[var(--app-border-subtle)] bg-[var(--app-panel)] p-3 text-xs font-semibold">
+                <li className="rounded-md border border-[var(--workspace-border-muted)] bg-[var(--workspace-inset-bg)] p-3 text-xs font-semibold">
                   {reductionWorkspaceContent.timeline.original}
                 </li>
               ) : null}
@@ -525,23 +525,23 @@ function ReductionWorkspaceSession({
             </ol>
           </aside>
 
-          <section className="min-w-0 rounded-xl border border-[var(--app-border)] bg-[var(--app-surface)] p-4 sm:p-6">
+          <section className="min-w-0 rounded-xl border border-[var(--workspace-border)] bg-[var(--workspace-surface)] p-4 sm:p-6">
             {selectedStep === undefined && selectedCandidate === null ? (
-              <div className="p-4 text-sm text-[var(--app-text-muted)]">
+              <div className="p-4 text-sm text-[var(--workspace-text-muted)]">
                 {reductionWorkspaceContent.empty.description}
               </div>
             ) : (
               <>
-                <div className="mb-6 flex flex-col gap-5 border-b border-[var(--app-border-subtle)] pb-5">
+                <div className="mb-6 flex flex-col gap-5 border-b border-[var(--workspace-border-muted)] pb-5">
                   <div>
-                    <p className="text-xs font-semibold tracking-wide text-[var(--app-accent)] uppercase">
+                    <p className="text-xs font-semibold tracking-wide text-[var(--workspace-accent)] uppercase">
                       {selectedCandidate === null
                         ? `${reductionWorkspaceContent.timeline.step} ${selectedStepIndex + 1} / ${model.steps.length}`
                         : `${reductionWorkspaceContent.timeline.candidate} ${selectedCandidate.candidateId}`}
                     </p>
                     <h2 className="mt-1 text-xl font-semibold">{detailKind}</h2>
                     {detailDescription !== null ? (
-                      <p className="mt-2 max-w-4xl text-sm leading-6 text-[var(--app-text-secondary)]">
+                      <p className="mt-2 max-w-4xl text-sm leading-6 text-[var(--workspace-text-secondary)]">
                         {detailDescription}
                       </p>
                     ) : null}
@@ -549,7 +549,7 @@ function ReductionWorkspaceSession({
                   <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                     {detailMetrics.map(([label, value]) => (
                       <div key={label}>
-                        <dt className="text-xs text-[var(--app-text-muted)]">
+                        <dt className="text-xs text-[var(--workspace-text-muted)]">
                           {label}
                         </dt>
                         <dd className="mt-1 font-mono text-sm break-words">
@@ -562,13 +562,13 @@ function ReductionWorkspaceSession({
 
                 {candidateComparison !== null && !candidateComparison.ok ? (
                   <div
-                    className="rounded-lg border border-[var(--app-error)] p-5"
+                    className="rounded-lg border border-[var(--workspace-error)] p-5"
                     role="alert"
                   >
                     <h3 className="font-semibold">
                       {reductionWorkspaceContent.detail.unavailableComparison}
                     </h3>
-                    <p className="mt-1 text-sm text-[var(--app-text-muted)]">
+                    <p className="mt-1 text-sm text-[var(--workspace-text-muted)]">
                       {candidateComparison.message}
                     </p>
                   </div>
@@ -580,7 +580,7 @@ function ReductionWorkspaceSession({
                       onSelect={setSelectedFilePath}
                     />
                     {selectedFile === undefined ? (
-                      <p className="rounded-lg border border-[var(--app-border)] p-5 text-sm text-[var(--app-text-muted)]">
+                      <p className="rounded-lg border border-[var(--workspace-border)] p-5 text-sm text-[var(--workspace-text-muted)]">
                         {reductionWorkspaceContent.detail.noFiles}
                       </p>
                     ) : (
