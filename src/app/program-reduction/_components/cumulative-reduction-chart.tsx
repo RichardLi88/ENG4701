@@ -43,9 +43,11 @@ function EmptyChart({
   description,
 }: Readonly<{ heading: string; description: string }>) {
   return (
-    <section className="rounded-xl border border-[var(--app-border)] bg-[var(--app-surface)] p-6">
+    <section className="rounded-xl border border-[var(--workspace-border)] bg-[var(--workspace-surface)] p-6">
       <h2 className="font-semibold">{heading}</h2>
-      <p className="mt-2 text-sm text-[var(--app-text-muted)]">{description}</p>
+      <p className="mt-2 text-sm text-[var(--workspace-text-muted)]">
+        {description}
+      </p>
     </section>
   );
 }
@@ -183,17 +185,17 @@ export function CumulativeReductionChart({
   return (
     <section
       ref={sectionRef}
-      className="rounded-xl border border-[var(--app-border)] bg-[var(--app-surface)] p-4 sm:p-6"
+      className="rounded-xl border border-[var(--workspace-border)] bg-[var(--workspace-surface)] p-4 sm:p-6"
       aria-labelledby="cumulative-reduction-heading"
     >
       <div>
         <h2 id="cumulative-reduction-heading" className="font-semibold">
           {content.heading}
         </h2>
-        <p className="mt-1 text-sm text-[var(--app-text-muted)]">
+        <p className="mt-1 text-sm text-[var(--workspace-text-muted)]">
           {content.description}
         </p>
-        <p className="mt-3 text-xs text-[var(--app-text-secondary)]">
+        <p className="mt-3 text-xs text-[var(--workspace-text-secondary)]">
           {summary}
         </p>
       </div>
@@ -258,7 +260,7 @@ export function CumulativeReductionChart({
               x2={VIEWBOX_WIDTH - PLOT_RIGHT}
               y1={tick.y}
               y2={tick.y}
-              stroke="var(--app-border-subtle)"
+              stroke="var(--workspace-border-muted)"
               strokeWidth="1"
               vectorEffect="non-scaling-stroke"
             />
@@ -266,7 +268,7 @@ export function CumulativeReductionChart({
               x={PLOT_LEFT - 10}
               y={tick.y + 4}
               textAnchor="end"
-              className="fill-[var(--app-text-muted)] text-[11px]"
+              className="fill-[var(--workspace-text-muted)] text-[11px]"
             >
               {formatNumber(tick.value)}
             </text>
@@ -277,7 +279,7 @@ export function CumulativeReductionChart({
           x2={VIEWBOX_WIDTH - PLOT_RIGHT}
           y1={baselineY}
           y2={baselineY}
-          stroke="var(--app-text-secondary)"
+          stroke="var(--workspace-text-secondary)"
           strokeWidth="1.5"
           vectorEffect="non-scaling-stroke"
         />
@@ -288,7 +290,7 @@ export function CumulativeReductionChart({
               x2={xForOrder(order)}
               y1={PLOT_TOP}
               y2={VIEWBOX_HEIGHT - PLOT_BOTTOM}
-              stroke="var(--app-border-subtle)"
+              stroke="var(--workspace-border-muted)"
               strokeWidth="1"
               vectorEffect="non-scaling-stroke"
             />
@@ -296,7 +298,7 @@ export function CumulativeReductionChart({
               x={xForOrder(order)}
               y={VIEWBOX_HEIGHT - PLOT_BOTTOM + 20}
               textAnchor="middle"
-              className="fill-[var(--app-text-muted)] text-[11px]"
+              className="fill-[var(--workspace-text-muted)] text-[11px]"
             >
               {order.toLocaleString()}
             </text>
@@ -305,7 +307,7 @@ export function CumulativeReductionChart({
         <path
           d={path}
           fill="none"
-          stroke="var(--app-accent)"
+          stroke="var(--workspace-accent)"
           strokeWidth="2.5"
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
@@ -317,8 +319,8 @@ export function CumulativeReductionChart({
               cx={xForOrder(point.order)}
               cy={yForReduction(point.cumulativeReduction)}
               r="4"
-              fill="var(--app-accent)"
-              stroke="var(--app-surface)"
+              fill="var(--workspace-accent)"
+              stroke="var(--workspace-surface)"
               strokeWidth="2"
               vectorEffect="non-scaling-stroke"
             />
@@ -329,8 +331,8 @@ export function CumulativeReductionChart({
             cx={xForOrder(inspectedPoint.order)}
             cy={yForReduction(inspectedPoint.cumulativeReduction)}
             r="7"
-            fill="var(--app-surface)"
-            stroke="var(--app-focus)"
+            fill="var(--workspace-surface)"
+            stroke="var(--workspace-focus)"
             strokeWidth="3"
             vectorEffect="non-scaling-stroke"
           />
@@ -339,14 +341,14 @@ export function CumulativeReductionChart({
           x={PLOT_LEFT + PLOT_WIDTH / 2}
           y={VIEWBOX_HEIGHT - 4}
           textAnchor="middle"
-          className="fill-[var(--app-text-muted)] text-[11px] font-semibold"
+          className="fill-[var(--workspace-text-muted)] text-[11px] font-semibold"
         >
           {content.horizontalAxis}
         </text>
         <text
           x="12"
           y={PLOT_TOP - 8}
-          className="fill-[var(--app-text-muted)] text-[11px] font-semibold"
+          className="fill-[var(--workspace-text-muted)] text-[11px] font-semibold"
         >
           {content.verticalAxis}
         </text>
@@ -355,7 +357,7 @@ export function CumulativeReductionChart({
       <p className="sr-only">{content.keyboardHelp}</p>
       {inspectedPoint !== undefined ? (
         <dl
-          className="mt-3 grid gap-3 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-panel)] p-4 text-xs sm:grid-cols-2 lg:grid-cols-5"
+          className="mt-3 grid gap-3 rounded-lg border border-[var(--workspace-border-muted)] bg-[var(--workspace-inset-bg)] p-4 text-xs sm:grid-cols-2 lg:grid-cols-5"
           aria-live="polite"
         >
           {[
@@ -369,10 +371,10 @@ export function CumulativeReductionChart({
             ],
           ].map(([label, value]) => (
             <div key={label} className="min-w-0">
-              <dt className="font-semibold text-[var(--app-text-muted)]">
+              <dt className="font-semibold text-[var(--workspace-text-muted)]">
                 {label}
               </dt>
-              <dd className="mt-1 truncate font-mono text-[var(--app-text-primary)]">
+              <dd className="mt-1 truncate font-mono text-[var(--workspace-text)]">
                 {value}
               </dd>
             </div>

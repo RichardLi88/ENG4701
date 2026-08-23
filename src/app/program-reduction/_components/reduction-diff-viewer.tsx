@@ -86,7 +86,7 @@ function DiffPane({
 
   return (
     <section
-      className="flex h-[32rem] min-w-0 flex-col overflow-hidden bg-[#070b12] first:border-r first:border-slate-800"
+      className="flex h-[32rem] min-w-0 flex-col overflow-hidden bg-[var(--workspace-code-bg)] first:border-r first:border-slate-800"
       aria-label={label}
     >
       <header className="border-b border-slate-800 bg-slate-900 px-4 py-3 font-mono text-xs font-semibold tracking-wider text-slate-200 uppercase">
@@ -95,7 +95,7 @@ function DiffPane({
       <div
         ref={paneRef}
         onScroll={onScroll}
-        className="min-h-0 flex-1 overflow-auto overscroll-contain focus-visible:ring-2 focus-visible:ring-[var(--app-focus)] focus-visible:outline-none focus-visible:ring-inset"
+        className="min-h-0 flex-1 overflow-auto overscroll-contain focus-visible:ring-2 focus-visible:ring-[var(--workspace-focus)] focus-visible:outline-none focus-visible:ring-inset"
         tabIndex={0}
         role="region"
         aria-label={`${label}, read only`}
@@ -123,9 +123,9 @@ function DiffPane({
               : line.afterLineNumber;
             const tone =
               line.kind === "removed"
-                ? "bg-rose-950/50 text-rose-100"
+                ? "bg-rose-950/35 text-rose-100"
                 : line.kind === "added"
-                  ? "bg-emerald-950/45 text-emerald-100"
+                  ? "bg-emerald-950/30 text-emerald-100"
                   : "";
             const symbol = line.kind === "removed" ? "−" : "+";
 
@@ -208,13 +208,13 @@ export function ReductionDiffViewer({
 
   return (
     <section aria-label={reductionWorkspaceContent.detail.comparison}>
-      <div className="mb-3 flex items-center justify-between gap-4 text-xs text-[var(--app-text-muted)]">
+      <div className="mb-3 flex items-center justify-between gap-4 text-xs text-[var(--workspace-text-muted)]">
         <span>{reductionWorkspaceContent.detail.comparison}</span>
         <span className="flex gap-4 font-mono uppercase">
-          <span className="text-rose-600">
+          <span className="text-[var(--workspace-error)]">
             − {reductionWorkspaceContent.detail.diffLegendRemoved}
           </span>
-          <span className="text-emerald-600">
+          <span className="text-[var(--workspace-success)]">
             + {reductionWorkspaceContent.detail.diffLegendAdded}
           </span>
         </span>
