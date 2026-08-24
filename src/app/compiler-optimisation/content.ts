@@ -4,6 +4,18 @@ export const compilerWorkflowContent = {
     "Choose a local source file to compile and inspect its LLVM optimisation passes.",
   uploadHelp: ".c and .cpp files up to 50,000 characters",
   compactRegionLabel: "Source file actions",
+  level: {
+    label: "Optimisation level",
+    selectLabel: "Optimisation pipeline level",
+    descriptions: {
+      O0: "O0 - No optimisation",
+      O1: "O1 - Basic optimisation",
+      O2: "O2 - Standard optimisation",
+      O3: "O3 - Aggressive optimisation",
+      Os: "Os - Optimise for size",
+      Oz: "Oz - Aggressively optimise for size",
+    },
+  },
   actions: {
     upload: "Upload C/C++ file",
     uploadAnother: "Upload another file",
