@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -127,5 +127,46 @@ describe("CompilerWorkflowForm", () => {
       source,
     });
     expect(screen.getByLabelText("Upload C/C++ file")).toBeEnabled();
+  });
+
+  test("optimises at O1 by default", async () => {
+    const user = userEvent.setup();
+    mutationMocks.compile.mockResolvedValue({ ir: "define i32 @main() {}" });
+    mutationMocks.optimise.mockResolvedValue({});
+    render(<CompilerWorkflowForm onRunStart={vi.fn()} onResult={vi.fn()} />);
+
+    await user.upload(
+      screen.getByLabelText("Upload C/C++ file"),
+      createSourceFile("program.c", "int main() { return 0; }"),
+    );
+
+    await waitFor(() =>
+      expect(mutationMocks.optimise).toHaveBeenCalledWith({
+        filename: "program.c",
+        ir: "define i32 @main() {}",
+        level: "O1",
+      }),
+    );
+  });
+
+  test("passes the selected optimisation level to the structured mutation", async () => {
+    const user = userEvent.setup();
+    mutationMocks.compile.mockResolvedValue({ ir: "define i32 @main() {}" });
+    mutationMocks.optimise.mockResolvedValue({});
+    render(<CompilerWorkflowForm onRunStart={vi.fn()} onResult={vi.fn()} />);
+
+    await user.selectOptions(screen.getByRole("combobox"), "O3");
+    await user.upload(
+      screen.getByLabelText("Upload C/C++ file"),
+      createSourceFile("program.c", "int main() { return 0; }"),
+    );
+
+    await waitFor(() =>
+      expect(mutationMocks.optimise).toHaveBeenCalledWith({
+        filename: "program.c",
+        ir: "define i32 @main() {}",
+        level: "O3",
+      }),
+    );
   });
 });
