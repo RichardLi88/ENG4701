@@ -11,6 +11,13 @@ const execAsync = promisify(exec);
 const app = express();
 app.use(express.json({ limit: "2mb" }));
 
+// Allowlisted `opt` pipeline levels. This is the shell-boundary guard: the level
+// is interpolated into the `opt -passes="default<...>"` command, so it must be
+// validated here regardless of any upstream (tRPC) validation. All values are
+// alphanumeric, which closes the command-injection surface.
+const OPTIMISATION_LEVELS = new Set(["O0", "O1", "O2", "O3", "Os", "Oz"]);
+const DEFAULT_OPTIMISATION_LEVEL = "O1";
+
 // Health Check
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
@@ -57,7 +64,13 @@ app.post("/compile", async (req, res) => {
   }
 });
 
-async function optimiseIr(ir) {
+async function optimiseIr(ir, level = DEFAULT_OPTIMISATION_LEVEL) {
+  // Callers must pass an allowlisted level; guard here too since this builds the
+  // shell command directly.
+  if (!OPTIMISATION_LEVELS.has(level)) {
+    throw new Error(`Unsupported optimisation level: ${level}`);
+  }
+
   const id = crypto.randomUUID();
   const inPath = join(tmpdir(), `${id}_in.ll`);
   const outPath = join(tmpdir(), `${id}_out.ll`);
@@ -66,7 +79,7 @@ async function optimiseIr(ir) {
     await writeFile(inPath, ir);
 
     const { stderr } = await execAsync(
-      `opt -passes="default<O1>" -print-before-all -print-after-all -S "${inPath}" -o "${outPath}"`,
+      `opt -passes="default<${level}>" -print-before-all -print-after-all -S "${inPath}" -o "${outPath}"`,
       { timeout: 30_000, maxBuffer: 50 * 1024 * 1024 },
     );
 
@@ -78,17 +91,21 @@ async function optimiseIr(ir) {
 }
 
 // POST /optimise -------------------------------------------------------
-// Body: { ir: string } - unoptimised LLVM IR
+// Body: { ir: string, level?: string } - unoptimised LLVM IR and optional pipeline level
 // Returns: { optimisedIr: string, beforeAfterLog: string } - legacy raw response
 app.post("/optimise", async (req, res) => {
-  const { ir } = req.body;
+  const { ir, level = DEFAULT_OPTIMISATION_LEVEL } = req.body;
 
   if (!ir || typeof ir !== "string") {
     return res.status(400).json({ error: "ir is required" });
   }
 
+  if (!OPTIMISATION_LEVELS.has(level)) {
+    return res.status(400).json({ error: "invalid optimisation level" });
+  }
+
   try {
-    res.json(await optimiseIr(ir));
+    res.json(await optimiseIr(ir, level));
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown LLVM error";
     res.status(500).json({ error: message });
@@ -96,10 +113,10 @@ app.post("/optimise", async (req, res) => {
 });
 
 // POST /optimise-structured -------------------------------------------
-// Body: { ir: string, filename: string }
+// Body: { ir: string, filename: string, level?: string }
 // Returns: a versioned OptimisationResult payload derived from real LLVM dumps
 app.post("/optimise-structured", async (req, res) => {
-  const { ir, filename } = req.body;
+  const { ir, filename, level = DEFAULT_OPTIMISATION_LEVEL } = req.body;
 
   if (!ir || typeof ir !== "string") {
     return res.status(400).json({ error: "ir is required" });
@@ -113,8 +130,12 @@ app.post("/optimise-structured", async (req, res) => {
     return res.status(400).json({ error: "a .c or .cpp filename is required" });
   }
 
+  if (!OPTIMISATION_LEVELS.has(level)) {
+    return res.status(400).json({ error: "invalid optimisation level" });
+  }
+
   try {
-    const result = await optimiseIr(ir);
+    const result = await optimiseIr(ir, level);
     const {
       analysesByDump,
       cfgByDump: measuredCfgByDump,
@@ -128,6 +149,7 @@ app.post("/optimise-structured", async (req, res) => {
         measuredMetricsByDump,
         sourceFile: filename,
         unoptimisedIr: ir,
+        optimisationLevel: level,
       }),
     );
   } catch (err) {

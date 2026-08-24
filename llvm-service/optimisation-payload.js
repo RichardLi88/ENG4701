@@ -590,6 +590,7 @@ function createOptimisationPayload({
   measuredMetricsByDump,
   sourceFile,
   unoptimisedIr,
+  optimisationLevel = "O1",
 }) {
   const functions = extractFunctions(unoptimisedIr);
   const functionNames = new Set(functions.map((fn) => fn.name));
@@ -685,7 +686,7 @@ function createOptimisationPayload({
     schemaVersion: "1.1.0",
     meta: {
       sourceFile,
-      optimisationLevel: "O1",
+      optimisationLevel,
       totalPasses: passes.length,
     },
     functions,
