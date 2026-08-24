@@ -5,6 +5,10 @@ import { callLlvmService } from "~/server/api/llvm-service-client";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 import { optimisationResultSchema } from "~/app/compiler-optimisation/_lib/optimisation-schema";
+import {
+  DEFAULT_OPTIMISATION_LEVEL,
+  OPTIMISATION_LEVELS,
+} from "~/app/compiler-optimisation/_lib/optimisation-levels";
 
 const LLVM_URL = env.LLVM_SERVICE_URL;
 const compilationResponseSchema = z.object({ ir: z.string().min(1) });
@@ -48,13 +52,14 @@ export const compilerRouter = createTRPCRouter({
     .input(
       z.object({
         ir: z.string().min(1),
+        level: z.enum(OPTIMISATION_LEVELS).default(DEFAULT_OPTIMISATION_LEVEL),
       }),
     )
     .mutation(async ({ input }) => {
       const payload = await callLlvmService({
         serviceUrl: LLVM_URL,
         endpoint: "optimise",
-        body: { ir: input.ir },
+        body: { ir: input.ir, level: input.level },
         timeoutMs: 35_000,
       });
 
@@ -69,6 +74,7 @@ export const compilerRouter = createTRPCRouter({
       z.object({
         ir: z.string().min(1),
         filename: z.string().regex(/\.(c|cpp)$/i),
+        level: z.enum(OPTIMISATION_LEVELS).default(DEFAULT_OPTIMISATION_LEVEL),
       }),
     )
     .output(optimisationResultSchema)
@@ -76,7 +82,7 @@ export const compilerRouter = createTRPCRouter({
       const payload = await callLlvmService({
         serviceUrl: LLVM_URL,
         endpoint: "optimise-structured",
-        body: { ir: input.ir, filename: input.filename },
+        body: { ir: input.ir, filename: input.filename, level: input.level },
         timeoutMs: 35_000,
       });
 
