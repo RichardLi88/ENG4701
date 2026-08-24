@@ -5,6 +5,8 @@ import { useState } from "react";
 import { programReductionContent } from "../content";
 import type { ReductionTraceViewModel } from "../_lib/reduction-trace-adapter";
 import { JsonFileUpload } from "./json-file-upload";
+import { ExplanationContainer } from "~/app/_components/ai/explanation-container";
+import { toExplainInput } from "../_lib/ai-explain-input";
 import { ReductionWorkspace } from "./reduction-workspace";
 
 export function ProgramReductionHome() {
@@ -42,6 +44,12 @@ export function ProgramReductionHome() {
           <ReductionWorkspace
             model={loadedTrace.model}
             resultKey={loadedTrace.resultKey}
+            renderCandidateExtras={(candidate) => (
+              <ExplanationContainer
+                input={toExplainInput(candidate)}
+                selectionKey={candidate.candidateId}
+              />
+            )}
           />
         ) : null}
       </section>

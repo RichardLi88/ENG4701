@@ -23,7 +23,7 @@
     "test:e2e:llvm": "npm run test:e2e:llvm:success && npm run test:e2e:llvm:failure",
     "test:e2e:llvm:failure": "node --experimental-strip-types scripts/run-llvm-failure-cases.mjs",
     "test:e2e:llvm:success": "node --experimental-strip-types scripts/run-llvm-real-cases.mjs",
-    "test:unit": "node --test src/app/_helpers/*.test.mjs src/app/compiler-optimisation/_lib/*.test.mjs src/app/program-reduction/_lib/*.test.mjs src/server/api/llvm-service-client.test.mjs llvm-service/optimisation-payload.test.js llvm-service/measured-metrics.test.js",
+    "test:unit": "node --test src/app/_helpers/*.test.mjs src/app/compiler-optimisation/_lib/*.test.mjs src/app/program-reduction/_lib/*.test.mjs src/server/ai/tests/*.test.mjs src/server/api/llvm-service-client.test.mjs llvm-service/optimisation-payload.test.js llvm-service/measured-metrics.test.js",
     "test:optimisation-schema": "node --experimental-strip-types --test src/app/compiler-optimisation/_lib/optimisation-schema.test.mjs",
     "test:optimisation-adapter": "node --experimental-strip-types --test src/app/compiler-optimisation/_lib/optimisation-adapter.test.mjs",
     "test:optimisation-diff": "node --experimental-strip-types --test src/app/_helpers/text-diff.test.mjs",
@@ -34,12 +34,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ai-sdk/google": "^4.0.50",
     "@prisma/client": "^6.6.0",
     "@t3-oss/env-nextjs": "^0.12.0",
     "@tanstack/react-query": "^5.69.0",
     "@trpc/client": "^11.0.0",
     "@trpc/react-query": "^11.0.0",
     "@trpc/server": "^11.0.0",
+    "ai": "^7.0.77",
     "next": "^15.2.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

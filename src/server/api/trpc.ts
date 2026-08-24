@@ -11,6 +11,7 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { db } from "~/server/db";
+import { isAiError } from "~/server/ai/errors";
 
 /**
  * 1. CONTEXT
@@ -47,6 +48,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
         ...shape.data,
         zodError:
           error.cause instanceof ZodError ? error.cause.flatten() : null,
+        aiError: isAiError(error.cause) ? error.cause : null,
       },
     };
   },

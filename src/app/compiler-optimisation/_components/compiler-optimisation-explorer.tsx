@@ -4,6 +4,8 @@ import { useRef, useState } from "react";
 
 import type { OptimisationViewModel } from "../_lib/optimisation-types";
 import { CompilerWorkflowForm } from "./compiler-workflow-form";
+import { ExplanationContainer } from "~/app/_components/ai/explanation-container";
+import { toExplainInput } from "../_lib/ai-explain-input";
 import { OptimisationWorkspace } from "./optimisation-workspace";
 
 type DisplayResult = Readonly<{
@@ -43,6 +45,12 @@ export function CompilerOptimisationExplorer() {
         <OptimisationWorkspace
           model={displayResult.model}
           resultKey={displayResult.key}
+          renderPassExtras={(pass) => (
+            <ExplanationContainer
+              input={toExplainInput(pass)}
+              selectionKey={pass.id}
+            />
+          )}
         />
       ) : null}
     </main>

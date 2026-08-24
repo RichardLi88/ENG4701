@@ -9,6 +9,10 @@ export const env = createEnv({
   server: {
     DATABASE_URL: z.string().url(),
     LLVM_SERVICE_URL: z.string().url(),
+    GOOGLE_GENERATIVE_AI_API_KEY: z.string().min(1).optional(),
+    AI_PROVIDER: z.enum(["google"]).default("google"),
+    AI_MODEL_ID: z.string().min(1).optional(),
+    AI_TEMPERATURE: z.coerce.number().min(0).max(2).default(0),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -30,6 +34,10 @@ export const env = createEnv({
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
     LLVM_SERVICE_URL: process.env.LLVM_SERVICE_URL,
+    GOOGLE_GENERATIVE_AI_API_KEY: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+    AI_PROVIDER: process.env.AI_PROVIDER,
+    AI_MODEL_ID: process.env.AI_MODEL_ID,
+    AI_TEMPERATURE: process.env.AI_TEMPERATURE,
     NODE_ENV: process.env.NODE_ENV,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
