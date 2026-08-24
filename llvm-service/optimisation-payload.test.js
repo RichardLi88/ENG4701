@@ -128,6 +128,40 @@ define i32 @main() {
   });
 });
 
+const levelDumpLog = `*** IR Dump Before SimplifyCFGPass on main ***
+define i32 @main() {
+  br label %1
+1:
+  ret i32 0
+}
+*** IR Dump After SimplifyCFGPass on main ***
+define i32 @main() {
+  ret i32 0
+}`;
+
+test("defaults meta.optimisationLevel to O1 when none is provided", () => {
+  const payload = createOptimisationPayload({
+    sourceFile: "example.c",
+    unoptimisedIr: inputIr,
+    beforeAfterLog: levelDumpLog,
+  });
+
+  assert.equal(payload.meta.optimisationLevel, "O1");
+});
+
+test("reflects the supplied optimisationLevel in meta", () => {
+  for (const level of ["O0", "O2", "O3", "Os", "Oz"]) {
+    const payload = createOptimisationPayload({
+      sourceFile: "example.c",
+      unoptimisedIr: inputIr,
+      beforeAfterLog: levelDumpLog,
+      optimisationLevel: level,
+    });
+
+    assert.equal(payload.meta.optimisationLevel, level);
+  }
+});
+
 test("extracts function signatures from unoptimised LLVM IR", () => {
   const manualTestIr = `define internal i32 @square(i32 noundef %value) {
   ret i32 %value
