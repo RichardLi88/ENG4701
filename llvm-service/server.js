@@ -140,7 +140,7 @@ app.post("/optimise-structured", async (req, res) => {
       analysesByDump,
       cfgByDump: measuredCfgByDump,
       metricsByDump: measuredMetricsByDump,
-    } = await measureIrDumpData(result.beforeAfterLog, ir);
+    } = await measureIrDumpData(result.beforeAfterLog, ir, level);
     res.json(
       createOptimisationPayload({
         beforeAfterLog: result.beforeAfterLog,

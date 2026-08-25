@@ -366,9 +366,28 @@ void printSyntheticModulePass(StringRef PassId, const Module &ModuleValue) {
 
 } // namespace
 
+// Maps an `opt`-style level flag to the matching OptimizationLevel constant.
+// Must be run with the same level as the `opt` invocation that produced the
+// dump log being measured, or pass events will not align with the dumps.
+static std::optional<OptimizationLevel> parseOptimizationLevel(StringRef Level) {
+  if (Level == "O0") return OptimizationLevel::O0;
+  if (Level == "O1") return OptimizationLevel::O1;
+  if (Level == "O2") return OptimizationLevel::O2;
+  if (Level == "O3") return OptimizationLevel::O3;
+  if (Level == "Os") return OptimizationLevel::Os;
+  if (Level == "Oz") return OptimizationLevel::Oz;
+  return std::nullopt;
+}
+
 int main(int ArgumentCount, char **Arguments) {
-  if (ArgumentCount != 2) {
-    errs() << "usage: llvm-ir-metrics <original-ir>\n";
+  if (ArgumentCount != 3) {
+    errs() << "usage: llvm-ir-metrics <original-ir> <O0|O1|O2|O3|Os|Oz>\n";
+    return 2;
+  }
+
+  std::optional<OptimizationLevel> Level = parseOptimizationLevel(Arguments[2]);
+  if (!Level) {
+    errs() << "invalid optimisation level: " << Arguments[2] << '\n';
     return 2;
   }
 
@@ -412,8 +431,16 @@ int main(int ArgumentCount, char **Arguments) {
   FunctionAnalysisManager FunctionAnalyses;
   CGSCCAnalysisManager CgsccAnalyses;
   ModuleAnalysisManager ModuleAnalyses;
-  PassBuilder Builder(nullptr, PipelineTuningOptions(), None,
-                      &InstrumentationCallbacks);
+
+  // A default-constructed PipelineTuningOptions leaves SLPVectorization off;
+  // the `opt` CLI enables it explicitly for every level unless the user opts
+  // out. Without this, SLPVectorizerPass is silently missing from the built
+  // pipeline at O2/O3/Os, so its dumps in the `opt` log never get a matching
+  // measurement event.
+  PipelineTuningOptions TuningOptions;
+  TuningOptions.SLPVectorization = true;
+
+  PassBuilder Builder(nullptr, TuningOptions, None, &InstrumentationCallbacks);
 
   FunctionAnalyses.registerPass([&] { return Builder.buildDefaultAAPipeline(); });
   Builder.registerModuleAnalyses(ModuleAnalyses);
@@ -423,8 +450,15 @@ int main(int ArgumentCount, char **Arguments) {
   Builder.crossRegisterProxies(LoopAnalyses, FunctionAnalyses, CgsccAnalyses,
                                ModuleAnalyses);
 
+  // `PassBuilder::buildPerModuleDefaultPipeline` does not special-case O0 in
+  // this LLVM version - it silently builds the full optimisation pipeline
+  // regardless of level. `opt`'s own `default<O0>` pipeline text is handled by
+  // `buildO0DefaultPipeline` instead, so this collector must dispatch the same
+  // way or its measured events will not correspond to the O0 dump log at all.
   ModulePassManager Pipeline =
-      Builder.buildPerModuleDefaultPipeline(OptimizationLevel::O1);
+      *Level == OptimizationLevel::O0
+          ? Builder.buildO0DefaultPipeline(*Level)
+          : Builder.buildPerModuleDefaultPipeline(*Level);
   // The opt driver wraps textual pipelines with these utility passes. They do
   // not appear in PassBuilder's pipeline, but they do appear in
   // -print-before-all/-print-after-all output and leave the module unchanged.

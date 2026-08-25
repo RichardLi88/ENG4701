@@ -212,7 +212,7 @@ function parseMeasuredMetrics(output, beforeAfterLog) {
   return parseMeasuredPassData(output, beforeAfterLog).metricsByDump;
 }
 
-async function measureIrDumpData(beforeAfterLog, originalIr) {
+async function measureIrDumpData(beforeAfterLog, originalIr, level) {
   const irPath = join(tmpdir(), `${randomUUID()}_original.ll`);
 
   try {
@@ -221,10 +221,16 @@ async function measureIrDumpData(beforeAfterLog, originalIr) {
     let stdout;
     let stderr;
     try {
-      ({ stdout, stderr } = await execFileAsync(executable, [irPath], {
-        timeout: 30_000,
-        maxBuffer: 10 * 1024 * 1024,
-      }));
+      // The collector must rebuild the same pipeline `opt` ran; a mismatched
+      // level produces pass events that do not line up with the dump log.
+      ({ stdout, stderr } = await execFileAsync(
+        executable,
+        [irPath, level],
+        {
+          timeout: 30_000,
+          maxBuffer: 10 * 1024 * 1024,
+        },
+      ));
     } catch (error) {
       const stderr =
         error instanceof Error && "stderr" in error
