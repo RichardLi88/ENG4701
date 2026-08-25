@@ -80,6 +80,29 @@ describe("CompilerWorkflowForm", () => {
     ).not.toBeInTheDocument();
   });
 
+  test("keeps the optimisation level editable in compact mode", async () => {
+    const user = userEvent.setup();
+    mutationMocks.compile.mockResolvedValue({ ir: "define i32 @main() {}" });
+    mutationMocks.optimise.mockResolvedValue({});
+    render(
+      <CompilerWorkflowForm onRunStart={vi.fn()} onResult={vi.fn()} compact />,
+    );
+
+    await user.selectOptions(screen.getByRole("combobox"), "O2");
+    await user.upload(
+      screen.getByLabelText("Upload another file"),
+      createSourceFile("program.c", "int main() { return 0; }"),
+    );
+
+    await waitFor(() =>
+      expect(mutationMocks.optimise).toHaveBeenCalledWith({
+        filename: "program.c",
+        ir: "define i32 @main() {}",
+        level: "O2",
+      }),
+    );
+  });
+
   test("prevents duplicate submission while compilation is pending", async () => {
     const user = userEvent.setup();
     const compilation = deferred<{ ir: string }>();
