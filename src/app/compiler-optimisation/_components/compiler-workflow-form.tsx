@@ -166,8 +166,13 @@ export function CompilerWorkflowForm({
     return (
       <section
         aria-label={compilerWorkflowContent.compactRegionLabel}
-        className="flex justify-end"
+        className="flex items-center justify-end gap-3"
       >
+        <OptimisationLevelSelect
+          level={level}
+          onChange={setLevel}
+          disabled={isPending}
+        />
         <label className="inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-slate-200 transition-colors focus-within:ring-2 focus-within:ring-cyan-300 focus-within:outline-none hover:border-slate-600 hover:bg-slate-800 has-disabled:cursor-not-allowed has-disabled:opacity-50">
           <UploadIcon />
           {isPending
@@ -203,35 +208,12 @@ export function CompilerWorkflowForm({
         >
           {compilerWorkflowContent.level.label}
         </label>
-        <div className="relative mt-2 inline-block">
-          <select
-            id="optimisation-level"
-            aria-label={compilerWorkflowContent.level.selectLabel}
-            value={level}
+        <div className="mt-2">
+          <OptimisationLevelSelect
+            level={level}
+            onChange={setLevel}
             disabled={isPending}
-            onChange={(event) =>
-              setLevel(event.target.value as OptimisationLevel)
-            }
-            className="min-h-11 appearance-none rounded-xl border border-slate-700 bg-slate-900 py-2 pr-10 pl-3 text-sm font-semibold text-slate-200 transition-colors focus:ring-2 focus:ring-cyan-300 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {OPTIMISATION_LEVELS.map((option) => (
-              <option key={option} value={option}>
-                {compilerWorkflowContent.level.descriptions[option]}
-              </option>
-            ))}
-          </select>
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-slate-400"
-          >
-            <path d="m6 9 6 6 6-6" />
-          </svg>
+          />
         </div>
       </div>
 
@@ -270,6 +252,49 @@ export function CompilerWorkflowForm({
         </div>
       ) : null}
     </section>
+  );
+}
+
+type OptimisationLevelSelectProps = Readonly<{
+  level: OptimisationLevel;
+  onChange: (level: OptimisationLevel) => void;
+  disabled: boolean;
+}>;
+
+function OptimisationLevelSelect({
+  level,
+  onChange,
+  disabled,
+}: OptimisationLevelSelectProps) {
+  return (
+    <div className="relative inline-block">
+      <select
+        id="optimisation-level"
+        aria-label={compilerWorkflowContent.level.selectLabel}
+        value={level}
+        disabled={disabled}
+        onChange={(event) => onChange(event.target.value as OptimisationLevel)}
+        className="min-h-11 appearance-none rounded-xl border border-slate-700 bg-slate-900 py-2 pr-10 pl-3 text-sm font-semibold text-slate-200 transition-colors focus:ring-2 focus:ring-cyan-300 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {OPTIMISATION_LEVELS.map((option) => (
+          <option key={option} value={option}>
+            {compilerWorkflowContent.level.descriptions[option]}
+          </option>
+        ))}
+      </select>
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-slate-400"
+      >
+        <path d="m6 9 6 6 6-6" />
+      </svg>
+    </div>
   );
 }
 
