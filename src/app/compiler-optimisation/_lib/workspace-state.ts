@@ -23,6 +23,8 @@ export type DiffMode = "side-by-side" | "unified";
 export type PassFilters = Readonly<{
   type: PassTypeFilter;
   change: PassChangeFilter;
+  /** Free-text query over Pass names. */
+  search: string;
 }>;
 
 export type PassFilterCounts = Readonly<{
@@ -53,7 +55,26 @@ function getSelectedScopePasses(
 export const DEFAULT_PASS_FILTERS: PassFilters = Object.freeze({
   type: "all",
   change: "all",
+  search: "",
 });
+
+/** Trim and case-fold once so every comparison below is a plain substring test. */
+export function normalisePassSearch(search: string): string {
+  return search.trim().toLocaleLowerCase();
+}
+
+function matchesSearchFilter(pass: OptimisationPassViewModel, search: string) {
+  const query = normalisePassSearch(search);
+
+  if (query.length === 0) return true;
+
+  const haystack = [
+    pass.name,
+    pass.fullName.status === "available" ? pass.fullName.data : undefined,
+  ];
+
+  return haystack.some((value) => value?.toLocaleLowerCase().includes(query));
+}
 
 function matchesTypeFilter(
   pass: OptimisationPassViewModel,
@@ -79,7 +100,8 @@ export function filterPasses(
   return passes.filter(
     (pass) =>
       matchesTypeFilter(pass, filters.type) &&
-      matchesChangeFilter(pass, filters.change),
+      matchesChangeFilter(pass, filters.change) &&
+      matchesSearchFilter(pass, filters.search),
   );
 }
 
@@ -91,10 +113,13 @@ export function calculatePassFilterCounts(
   passes: ReadonlyArray<OptimisationPassViewModel>,
   filters: PassFilters,
 ): PassFilterCounts {
-  const passesForTypeCounts = passes.filter((pass) =>
+  const searchMatches = passes.filter((pass) =>
+    matchesSearchFilter(pass, filters.search),
+  );
+  const passesForTypeCounts = searchMatches.filter((pass) =>
     matchesChangeFilter(pass, filters.change),
   );
-  const passesForChangeCounts = passes.filter((pass) =>
+  const passesForChangeCounts = searchMatches.filter((pass) =>
     matchesTypeFilter(pass, filters.type),
   );
 
@@ -254,6 +279,17 @@ export function setWorkspacePassChangeFilter(
   return normaliseWorkspacePassSelection(model, {
     ...state,
     passFilters: { ...state.passFilters, change },
+  });
+}
+
+export function setWorkspacePassSearch(
+  model: OptimisationViewModel,
+  state: WorkspaceState,
+  search: string,
+): WorkspaceState {
+  return normaliseWorkspacePassSelection(model, {
+    ...state,
+    passFilters: { ...state.passFilters, search },
   });
 }
 

@@ -21,6 +21,7 @@ import {
   selectWorkspacePass,
   setWorkspaceDiffMode,
   setWorkspacePassChangeFilter,
+  setWorkspacePassSearch,
   setWorkspacePassTypeFilter,
   type PassChangeFilter,
   type DiffMode,
@@ -139,7 +140,8 @@ function OptimisationWorkspaceSession({
   );
   const hasActiveFilters =
     workspaceState.passFilters.type !== "all" ||
-    workspaceState.passFilters.change !== "all";
+    workspaceState.passFilters.change !== "all" ||
+    workspaceState.passFilters.search.trim().length > 0;
   const selectedPassIndex = useMemo(
     () =>
       selectedPass
@@ -196,6 +198,15 @@ function OptimisationWorkspaceSession({
     (filter: PassChangeFilter) => {
       setWorkspaceState((state) =>
         setWorkspacePassChangeFilter(model, state, filter),
+      );
+    },
+    [model],
+  );
+
+  const setSearchFilter = useCallback(
+    (search: string) => {
+      setWorkspaceState((state) =>
+        setWorkspacePassSearch(model, state, search),
       );
     },
     [model],
@@ -287,6 +298,7 @@ function OptimisationWorkspaceSession({
                 counts={filterCounts}
                 onTypeChange={setTypeFilter}
                 onChangeChange={setChangeFilter}
+                onSearchChange={setSearchFilter}
               />
               <PassList
                 passes={visiblePasses}

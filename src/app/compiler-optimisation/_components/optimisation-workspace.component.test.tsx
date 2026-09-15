@@ -100,6 +100,26 @@ describe("OptimisationWorkspace", () => {
     ).toBeInTheDocument();
   });
 
+  test("searching the Pass list filters the timeline and updates the facet counts", async () => {
+    const user = userEvent.setup();
+    renderWorkspace();
+
+    await user.type(
+      screen.getByRole("searchbox", { name: "Search Passes" }),
+      "instcombine",
+    );
+
+    expect(
+      screen.getByRole("button", { name: /^Pass 2, instcombine/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /^Pass 4, loop-delete/ }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Transform/ })).toHaveTextContent(
+      "Transform1",
+    );
+  });
+
   test("navigates between function and global Pass timelines", async () => {
     const user = userEvent.setup();
     renderWorkspace();

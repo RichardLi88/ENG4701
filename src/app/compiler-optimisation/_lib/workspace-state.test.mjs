@@ -16,11 +16,12 @@ import {
   selectWorkspaceGlobalPasses,
   selectWorkspacePass,
   setWorkspacePassChangeFilter,
+  setWorkspacePassSearch,
   setWorkspaceDiffMode,
   setWorkspacePassTypeFilter,
 } from "./workspace-state.ts";
 
-const ALL_FILTERS = { type: "all", change: "all" };
+const ALL_FILTERS = { type: "all", change: "all", search: "" };
 
 const fixtureDirectory = new URL(
   "../../../test-data/compiler-optimisation/",
@@ -228,33 +229,35 @@ test("type and change filters work alone and in combination", () => {
   const passes = readModel("multi-function.json").passes;
 
   assert.deepEqual(
-    filterPasses(passes, { type: "transform", change: "all" }).map(
+    filterPasses(passes, { type: "transform", change: "all", search: "" }).map(
       (pass) => pass.name,
     ),
     ["instcombine", "simplifycfg", "loop-delete"],
   );
   assert.deepEqual(
-    filterPasses(passes, { type: "analysis", change: "all" }).map(
+    filterPasses(passes, { type: "analysis", change: "all", search: "" }).map(
       (pass) => pass.name,
     ),
     ["verify"],
   );
   assert.deepEqual(
-    filterPasses(passes, { type: "all", change: "changed" }).map(
+    filterPasses(passes, { type: "all", change: "changed", search: "" }).map(
       (pass) => pass.name,
     ),
     ["instcombine", "loop-delete"],
   );
   assert.deepEqual(
-    filterPasses(passes, { type: "all", change: "unchanged" }).map(
+    filterPasses(passes, { type: "all", change: "unchanged", search: "" }).map(
       (pass) => pass.name,
     ),
     ["verify", "simplifycfg", "future-pass"],
   );
   assert.deepEqual(
-    filterPasses(passes, { type: "transform", change: "unchanged" }).map(
-      (pass) => pass.name,
-    ),
+    filterPasses(passes, {
+      type: "transform",
+      change: "unchanged",
+      search: "",
+    }).map((pass) => pass.name),
     ["simplifycfg"],
   );
 });
@@ -265,6 +268,7 @@ test("filtering is pure and does not reorder or mutate source Passes", () => {
   const filtered = filterPasses(passes, {
     type: "transform",
     change: "changed",
+    search: "",
   });
 
   assert.notEqual(filtered, passes);
@@ -289,6 +293,7 @@ test("faceted counts respect the other active filter", () => {
     calculatePassFilterCounts(passes, {
       type: "transform",
       change: "unchanged",
+      search: "",
     }),
     {
       type: { all: 3, transform: 1, analysis: 1 },
@@ -418,5 +423,45 @@ test("large timeline fixture preserves all 60 Passes in global order", () => {
   assert.deepEqual(
     selection.visiblePasses.map((pass) => pass.position.global),
     Array.from({ length: 60 }, (_, index) => index),
+  );
+});
+
+test("search matches Pass names and full names", () => {
+  const passes = readModel("multi-function.json").passes;
+  const search = (query) =>
+    filterPasses(passes, { ...ALL_FILTERS, search: query }).map(
+      (pass) => pass.name,
+    );
+
+  assert.deepEqual(search("INSTcombine"), ["instcombine"]);
+  assert.deepEqual(search("  instcombine  "), ["instcombine"]);
+  assert.deepEqual(search("VerifierPass"), ["verify"]);
+  assert.deepEqual(search("nothing matches this"), []);
+  assert.deepEqual(search("   "), search(""));
+});
+
+test("faceted counts stay correct under an active search", () => {
+  const passes = readModel("multi-function.json").passes;
+  const counts = calculatePassFilterCounts(passes, {
+    ...ALL_FILTERS,
+    search: "instcombine",
+  });
+
+  assert.deepEqual(counts, {
+    type: { all: 1, transform: 1, analysis: 0 },
+    change: { all: 1, changed: 1, unchanged: 0 },
+  });
+});
+
+test("a search that hides the current Pass moves the selection into the results", () => {
+  const model = readModel("multi-function.json");
+  const initial = createInitialWorkspaceState(model);
+  const searched = setWorkspacePassSearch(model, initial, "loop-delete");
+
+  assert.equal(initial.selectedPassId, "pass:000001:aW5zdGNvbWJpbmU");
+  assert.equal(searched.selectedPassId, "pass:000003:bG9vcC1kZWxldGU");
+  assert.deepEqual(
+    clearWorkspacePassFilters(model, searched).passFilters,
+    ALL_FILTERS,
   );
 });

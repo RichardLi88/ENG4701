@@ -88,8 +88,31 @@ export const compilerWorkspaceContent = {
       linesArrow: " -> ",
     },
   },
+  filters: {
+    regionLabel: "Pass filters",
+    searchLabel: "Search Passes",
+    searchPlaceholder: "Find a Pass by name",
+    searchHint: "Filters the timeline by Pass name.",
+    clearSearch: "Clear the Pass search",
+    typeLegend: "Type",
+    changesLegend: "Changes",
+    options: {
+      all: "All",
+      transform: "Transform",
+      analysis: "Analysis",
+      changed: "Changed",
+      unchanged: "Unchanged",
+    },
+    typeTooltips: {
+      all: "Every Pass in this timeline.",
+      transform:
+        "Transform and Analysis are guessed from the Pass name, not reported by LLVM. A Pass labelled Transform may still have changed nothing.",
+      analysis:
+        "Transform and Analysis are guessed from the Pass name, not reported by LLVM. A Pass labelled Analysis is one that only inspects the program.",
+    },
+  },
   scopes: {
-    heading: "Pass scopes",
+    heading: "Functions",
     globalName: "Global Passes",
     globalDescription: "Module and unassigned Passes",
   },

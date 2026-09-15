@@ -6,6 +6,7 @@ import {
   selectWorkspacePass,
   setWorkspaceDiffMode,
   setWorkspacePassChangeFilter,
+  setWorkspacePassSearch,
   setWorkspacePassTypeFilter,
   type PassChangeFilter,
   type PassTypeFilter,
@@ -19,6 +20,7 @@ export const WORKSPACE_QUERY_KEYS = Object.freeze({
   passId: "pass",
   passType: "passType",
   change: "change",
+  search: "search",
   diffMode: "diff",
 });
 
@@ -84,6 +86,12 @@ export function parseWorkspaceUrlState(
     state = setWorkspacePassChangeFilter(model, state, requestedChange);
   }
 
+  const requestedSearch = searchParams.get(WORKSPACE_QUERY_KEYS.search);
+
+  if (requestedSearch !== null && requestedSearch.trim().length > 0) {
+    state = setWorkspacePassSearch(model, state, requestedSearch);
+  }
+
   const requestedDiffMode = searchParams.get(WORKSPACE_QUERY_KEYS.diffMode);
 
   if (isDiffMode(requestedDiffMode)) {
@@ -130,6 +138,13 @@ export function createWorkspaceUrlSearchParams(
 
   if (state.passFilters.change !== "all") {
     nextSearchParams.set(WORKSPACE_QUERY_KEYS.change, state.passFilters.change);
+  }
+
+  if (state.passFilters.search.trim().length > 0) {
+    nextSearchParams.set(
+      WORKSPACE_QUERY_KEYS.search,
+      state.passFilters.search.trim(),
+    );
   }
 
   if (state.diffMode !== "side-by-side") {
