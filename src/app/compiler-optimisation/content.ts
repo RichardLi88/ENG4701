@@ -67,6 +67,27 @@ export const compilerWorkflowContent = {
 } as const;
 
 export const compilerWorkspaceContent = {
+  overallIr: {
+    heading: "Whole program, before and after",
+    description:
+      "The IR the pipeline started from, compared with the IR it finished with. Individual Passes are not attributed here.",
+    show: "Show comparison",
+    hide: "Hide comparison",
+    unavailable:
+      "This run reported no Passes, so there is no start or end IR to compare.",
+    diffHeading: "Initial IR compared with final IR",
+    diffDescription:
+      "The combined effect of every Pass in the pipeline, in one comparison.",
+    summary: {
+      passRan: "pass ran",
+      passesRan: "passes ran",
+      changedProgram: "changed the program",
+      line: "line",
+      lines: "lines",
+      separator: " · ",
+      linesArrow: " -> ",
+    },
+  },
   scopes: {
     heading: "Pass scopes",
     globalName: "Global Passes",
@@ -117,6 +138,7 @@ export const routeErrorContent = {
 } as const;
 
 export const irDiffContent = {
+  heading: "Intermediate representation",
   viewLabel: "Diff view",
   modes: {
     sideBySide: "Side by side",

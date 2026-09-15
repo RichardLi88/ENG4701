@@ -13,6 +13,10 @@ export type IrDiffViewerProps = Readonly<{
   structuredDiff?: ReadonlyArray<IrDiffLine> | null;
   mode?: DiffMode;
   onModeChange?: (mode: DiffMode) => void;
+  /** Distinguishes headings when more than one viewer is on the page. */
+  headingId?: string;
+  heading?: string;
+  description?: string;
 }>;
 
 type DiffRow = Readonly<{
@@ -274,6 +278,9 @@ export function IrDiffViewer({
   structuredDiff,
   mode = "side-by-side",
   onModeChange = ignoreModeChange,
+  headingId = "ir-diff-heading",
+  heading = irDiffContent.heading,
+  description,
 }: IrDiffViewerProps) {
   const { diff, rows } = useMemo(() => {
     const currentDiff = createIrDiff({ before, after, structuredDiff });
@@ -292,13 +299,13 @@ export function IrDiffViewer({
       <section
         className="rounded-xl border border-rose-400/30 bg-rose-950/20 px-5 py-6"
         role="alert"
-        aria-labelledby="ir-diff-error-heading"
+        aria-labelledby={`${headingId}-error`}
       >
         <p className="font-mono text-xs font-semibold tracking-[0.16em] text-rose-300 uppercase">
           Data error
         </p>
         <h3
-          id="ir-diff-error-heading"
+          id={`${headingId}-error`}
           className="mt-2 text-base font-semibold text-rose-100"
         >
           IR comparison is unavailable
@@ -311,19 +318,20 @@ export function IrDiffViewer({
   }
 
   return (
-    <section aria-labelledby="ir-diff-heading" data-diff-source={diff.source}>
+    <section aria-labelledby={headingId} data-diff-source={diff.source}>
       <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h3
-            id="ir-diff-heading"
+            id={headingId}
             className="text-xs font-semibold tracking-[0.18em] text-slate-400 uppercase"
           >
-            Intermediate representation
+            {heading}
           </h3>
           <p className="mt-1 text-xs text-slate-600">
-            {mode === "side-by-side"
-              ? irDiffContent.descriptions.sideBySide
-              : irDiffContent.descriptions.unified}
+            {description ??
+              (mode === "side-by-side"
+                ? irDiffContent.descriptions.sideBySide
+                : irDiffContent.descriptions.unified)}
           </p>
         </div>
         <div className="flex flex-wrap items-center justify-end gap-3">
