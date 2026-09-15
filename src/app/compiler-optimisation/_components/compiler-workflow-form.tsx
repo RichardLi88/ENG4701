@@ -14,7 +14,10 @@ import {
   OPTIMISATION_LEVELS,
   type OptimisationLevel,
 } from "../_lib/optimisation-levels";
-import type { OptimisationViewModel } from "../_lib/optimisation-types";
+import type {
+  OptimisationViewModel,
+  SourceFileViewModel,
+} from "../_lib/optimisation-types";
 import {
   classifyCompilerWorkflowFailure,
   isCompilerWorkflowPending,
@@ -27,7 +30,7 @@ const initialWorkflowState: CompilerWorkflowState = { status: "idle" };
 
 type CompilerWorkflowFormProps = Readonly<{
   onRunStart: () => void;
-  onResult: (model: OptimisationViewModel) => void;
+  onResult: (model: OptimisationViewModel, source: SourceFileViewModel) => void;
   compact?: boolean;
 }>;
 
@@ -124,7 +127,10 @@ export function CompilerWorkflowForm({
           return;
         }
 
-        onResult(result.data);
+        onResult(result.data, {
+          name: validation.filename,
+          text: validation.source,
+        });
         await new Promise<void>((resolve) =>
           requestAnimationFrame(() => resolve()),
         );

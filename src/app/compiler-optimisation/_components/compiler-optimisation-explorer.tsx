@@ -2,13 +2,18 @@
 
 import { useRef, useState } from "react";
 
-import type { OptimisationViewModel } from "../_lib/optimisation-types";
+import type {
+  DataAvailability,
+  OptimisationViewModel,
+  SourceFileViewModel,
+} from "../_lib/optimisation-types";
 import { CompilerWorkflowForm } from "./compiler-workflow-form";
 import { OptimisationWorkspace } from "./optimisation-workspace";
 
 type DisplayResult = Readonly<{
   key: string;
   model: OptimisationViewModel;
+  source: DataAvailability<SourceFileViewModel>;
 }>;
 
 export function CompilerOptimisationExplorer() {
@@ -21,9 +26,16 @@ export function CompilerOptimisationExplorer() {
     setDisplayResult(undefined);
   }
 
-  function loadResult(model: OptimisationViewModel) {
+  function loadResult(
+    model: OptimisationViewModel,
+    source: SourceFileViewModel,
+  ) {
     nextRunIdRef.current += 1;
-    setDisplayResult({ key: `run:${nextRunIdRef.current}`, model });
+    setDisplayResult({
+      key: `run:${nextRunIdRef.current}`,
+      model,
+      source: { status: "available", data: source },
+    });
   }
 
   return (
@@ -42,6 +54,7 @@ export function CompilerOptimisationExplorer() {
       {displayResult !== undefined ? (
         <OptimisationWorkspace
           model={displayResult.model}
+          source={displayResult.source}
           resultKey={displayResult.key}
         />
       ) : null}

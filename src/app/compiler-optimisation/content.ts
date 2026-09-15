@@ -165,6 +165,15 @@ export const passDetailContent = {
  * general. None of them describes what happened to the program on screen:
  * the reader combines this with the metrics, Diff and CFG to work that out.
  */
+export const sourcePanelContent = {
+  heading: "Original source",
+  description:
+    "The file you uploaded, for orientation. Lines are not mapped to the IR.",
+  toggle: "Show the uploaded source file",
+  regionLabel: "Uploaded source file, read only",
+  unavailable: "The uploaded source file is not available for this run.",
+} as const;
+
 export const passDescriptionContent = {
   heading: "What this Pass does",
   fallbackLabel: "General description",

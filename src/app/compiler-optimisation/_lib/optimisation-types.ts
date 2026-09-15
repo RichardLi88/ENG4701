@@ -239,9 +239,17 @@ export type ParseOptimisationResult =
   | Readonly<{ ok: true; data: OptimisationViewModel }>
   | Readonly<{ ok: false; error: OptimisationDataError }>;
 
+/** The uploaded file, kept client-side so the workspace never re-reads it. */
+export type SourceFileViewModel = Readonly<{
+  name: string;
+  text: string;
+}>;
+
 /** Props boundary for the Day 4 workspace and its function/Pass views. */
 export type OptimisationWorkspaceProps = Readonly<{
   model: OptimisationViewModel;
+  /** Orientation for readers who can follow C but not IR. */
+  source?: DataAvailability<SourceFileViewModel>;
 }>;
 
 export type OptimisationFunctionViewProps = Readonly<{
