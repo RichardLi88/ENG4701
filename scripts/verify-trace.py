@@ -33,6 +33,7 @@ ATTRIBUTE_GROUP = re.compile(r"^attributes #\d+ = \{[^}\n]*\}$", re.MULTILINE)
 FUNCTION_ATTRS_COMMENT = re.compile(r"^; Function Attrs:.*$", re.MULTILINE)
 NOINLINE_TOKEN = re.compile(r"(?<=[{\s:])noinline(?![-\w])[ ]?")
 BLOCK_LABEL = re.compile(r"^([A-Za-z0-9_.$-]+):")
+TARGET_TRIPLE = re.compile(r'^target triple = "(.+)"$', re.MULTILINE)
 DEFINE_LINE = re.compile(r"^define\b")
 
 
@@ -201,12 +202,18 @@ def run_pipeline(source: Path, level: str) -> tuple[str, list[Pass], str]:
     return log, pair_dumps(parse_dumps(log)), final_ir
 
 
+def triple_of(ir: str) -> str | None:
+    match = TARGET_TRIPLE.search(ir)
+    return match.group(1) if match else None
+
+
 def summarise(source: Path, level: str, log: str, passes: list[Pass], final_ir: str):
     changed = [p for p in passes if p.changed]
     last = changed[-1].order if changed else None
     return {
         "program": source.name,
         "level": level,
+        "target_triple": triple_of(final_ir),
         "total_passes": len(passes),
         "changed_passes": len(changed),
         "changed": [
@@ -250,9 +257,16 @@ def app_payload(source: Path, level: str, service: str):
     )
 
 
-def compare(truth: list[Pass], payload) -> list[str]:
+def compare(truth: list[Pass], payload, truth_triple: str | None) -> list[str]:
     problems: list[str] = []
     app_passes = payload["passes"]
+    # Pass counts are target-specific: the same source gives 96 passes on
+    # aarch64 and 97 on x86-64. An answer key is only valid for one target.
+    app_triple = triple_of(app_passes[0]["ir"]["before"]) if app_passes else None
+    if app_triple != truth_triple:
+        problems.append(
+            f"target triple: ground truth {truth_triple}, app {app_triple}"
+        )
     if len(app_passes) != len(truth):
         problems.append(
             f"pass count: ground truth {len(truth)}, app {len(app_passes)}"
@@ -301,7 +315,9 @@ def main() -> None:
         stats["log_path"] = str(log_path)
     else:
         stats["discrepancies"] = compare(
-            passes, app_payload(args.source, args.level, args.service)
+            passes,
+            app_payload(args.source, args.level, args.service),
+            stats["target_triple"],
         )
 
     print(json.dumps(stats, indent=2))
