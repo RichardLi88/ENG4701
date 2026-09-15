@@ -63,11 +63,14 @@ describe("OptimisationWorkspace", () => {
     );
     renderWorkspace();
 
+    await user.click(
+      within(screen.getByRole("article")).getByRole("button", {
+        name: "Unified",
+      }),
+    );
     await user.click(screen.getByRole("button", { name: /helper 2 Passes/ }));
     await user.click(screen.getByRole("button", { name: /^Unchanged/ }));
     await user.click(screen.getByRole("button", { name: "Next Pass" }));
-    const passDetail = within(screen.getByRole("article"));
-    await user.click(passDetail.getByRole("button", { name: "Unified" }));
 
     const params = new URLSearchParams(window.location.search);
     expect(params.get("campaign")).toBe("demo");
@@ -75,8 +78,25 @@ describe("OptimisationWorkspace", () => {
     expect(params.get("pass")).toBe("pass:000004:ZnV0dXJlLXBhc3M");
     expect(params.get("change")).toBe("unchanged");
     expect(params.get("diff")).toBe("unified");
+  });
+
+  test("a Pass that changed nothing shows one IR pane instead of a comparison", async () => {
+    const user = userEvent.setup();
+    renderWorkspace();
+
+    await user.click(screen.getByRole("button", { name: /helper 2 Passes/ }));
+    await user.click(screen.getByRole("button", { name: /^Unchanged/ }));
+
+    const passDetail = within(screen.getByRole("article"));
+
     expect(
-      passDetail.getByRole("region", { name: "Unified optimisation IR" }),
+      passDetail.queryByRole("region", { name: /optimisation IR/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      passDetail.queryByRole("group", { name: "Diff view" }),
+    ).not.toBeInTheDocument();
+    expect(
+      passDetail.getByText("IR at this point in the pipeline"),
     ).toBeInTheDocument();
   });
 
