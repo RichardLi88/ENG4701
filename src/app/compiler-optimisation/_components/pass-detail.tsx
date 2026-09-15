@@ -1,6 +1,10 @@
 import { memo } from "react";
 
-import { cfgContent, passDetailContent } from "../content";
+import {
+  cfgContent,
+  passDescriptionContent,
+  passDetailContent,
+} from "../content";
 import type {
   OptimisationPassViewModel,
   OptimisationPassViewProps,
@@ -13,6 +17,7 @@ import {
   getPassMetric,
   PASS_METRIC_DEFINITIONS,
 } from "../_lib/pass-detail-display";
+import { describePassBehaviour } from "../_lib/pass-descriptions";
 import { DeferredCfgView } from "./deferred-cfg-view";
 import { IrDiffViewer } from "./ir-diff-viewer";
 import { IrSnapshotView } from "./ir-snapshot-view";
@@ -42,6 +47,7 @@ export const PassDetail = memo(function PassDetail({
       : NOT_AVAILABLE;
   const fullName =
     pass.fullName.status === "available" ? pass.fullName.data : NOT_AVAILABLE;
+  const description = describePassBehaviour(pass);
   const analysisActivity = pass.analysisActivity;
   const computedAnalyses =
     analysisActivity?.status === "available"
@@ -293,6 +299,33 @@ export const PassDetail = memo(function PassDetail({
         >
           {pass.name}
         </h2>
+        {description.status === "available" ? (
+          <section className="mt-3" aria-labelledby="pass-description-heading">
+            <h3 id="pass-description-heading" className="sr-only">
+              {passDescriptionContent.heading}
+            </h3>
+            <p className="max-w-3xl text-sm leading-6 text-slate-300">
+              {description.data.text}
+            </p>
+            <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500">
+              {description.data.category.status === "available" ? (
+                <span>
+                  <span className="tracking-wide uppercase">
+                    {passDescriptionContent.categoryLabel}
+                  </span>{" "}
+                  <span className="font-mono text-slate-400">
+                    {description.data.category.data}
+                  </span>
+                </span>
+              ) : null}
+              {description.data.source === "generated" ? (
+                <span className="rounded-full bg-slate-800/80 px-2 py-0.5">
+                  {passDescriptionContent.fallbackLabel}
+                </span>
+              ) : null}
+            </p>
+          </section>
+        ) : null}
         <div className="mt-2 flex min-w-0 flex-wrap items-end justify-between gap-x-6 gap-y-3">
           <code
             className="min-w-0 truncate text-xs text-slate-400"
