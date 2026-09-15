@@ -213,6 +213,40 @@ export const passDescriptionContent = {
   },
 } as const;
 
+/**
+ * Fragments for the computed change line. It is assembled in `_lib` from
+ * measured metric deltas and CFG block counts only, so it can never make a
+ * claim the payload does not support.
+ */
+export const passChangeSummaryContent = {
+  heading: "What changed",
+  removed: "Removed",
+  added: "Added",
+  addedContinued: "added",
+  listSeparator: ", ",
+  listConjunction: " and ",
+  metricNouns: {
+    basicBlocks: { one: "basic block", other: "basic blocks" },
+    instructions: { one: "instruction", other: "instructions" },
+    memoryOperations: { one: "memory operation", other: "memory operations" },
+    branches: { one: "branch", other: "branches" },
+  },
+  controlFlow: {
+    simplified: "Control flow simplified from",
+    expanded: "Control flow expanded from",
+    to: "to",
+    blockNoun: { one: "block", other: "blocks" },
+    unchanged: "Control flow unchanged.",
+  },
+  noMetricMovement: "The IR changed, but none of the tracked metrics moved.",
+  unavailable: {
+    notProvided:
+      "Measured metrics were not reported for this Pass, so there is no change summary.",
+    estimated:
+      "Some metrics for this Pass are estimated rather than measured, so no change summary is shown.",
+  },
+} as const;
+
 export const routeErrorContent = {
   eyebrow: "Route error",
   title: "The optimisation workspace could not be loaded",

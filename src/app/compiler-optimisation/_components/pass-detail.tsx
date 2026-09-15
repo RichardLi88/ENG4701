@@ -2,6 +2,7 @@ import { memo } from "react";
 
 import {
   cfgContent,
+  passChangeSummaryContent,
   passDescriptionContent,
   passDetailContent,
 } from "../content";
@@ -17,6 +18,7 @@ import {
   getPassMetric,
   PASS_METRIC_DEFINITIONS,
 } from "../_lib/pass-detail-display";
+import { summarisePassChange } from "../_lib/pass-change-summary";
 import { describePassBehaviour } from "../_lib/pass-descriptions";
 import { DeferredCfgView } from "./deferred-cfg-view";
 import { IrDiffViewer } from "./ir-diff-viewer";
@@ -48,11 +50,37 @@ export const PassDetail = memo(function PassDetail({
   const fullName =
     pass.fullName.status === "available" ? pass.fullName.data : NOT_AVAILABLE;
   const description = describePassBehaviour(pass);
+  const changeSummary = summarisePassChange(pass);
   const analysisActivity = pass.analysisActivity;
   const computedAnalyses =
     analysisActivity?.status === "available"
       ? analysisActivity.data.computed
       : [];
+
+  const changeSummarySection = (
+    <section
+      aria-labelledby="pass-change-summary-heading"
+      className="mb-5 rounded-xl border border-cyan-400/20 bg-cyan-400/5 px-4 py-3"
+    >
+      <h3
+        id="pass-change-summary-heading"
+        className="text-xs font-semibold tracking-[0.14em] text-slate-400 uppercase"
+      >
+        {passChangeSummaryContent.heading}
+      </h3>
+      {changeSummary.status === "available" ? (
+        <p className="mt-1.5 text-sm leading-6 text-slate-100">
+          {changeSummary.data}
+        </p>
+      ) : (
+        <p className="mt-1.5 text-sm leading-6 text-amber-200">
+          {changeSummary.reason === "not-provided"
+            ? passChangeSummaryContent.unavailable.notProvided
+            : passChangeSummaryContent.unavailable.estimated}
+        </p>
+      )}
+    </section>
+  );
 
   const metricsSection = (
     <section aria-labelledby="pass-metrics-heading" className="mb-5">
@@ -362,6 +390,7 @@ export const PassDetail = memo(function PassDetail({
 
       {pass.changed ? (
         <>
+          {changeSummarySection}
           {metricsSection}
           {analysisSection}
         </>
