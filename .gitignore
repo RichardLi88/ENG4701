@@ -52,3 +52,6 @@ yarn-error.log*
 # local project documentation
 /docs/
 /tests/
+# Python bytecode from scripts/
+__pycache__/
+*.pyc
