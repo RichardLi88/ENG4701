@@ -29,6 +29,12 @@ type CfgViewProps = Readonly<{
 }>;
 type ScaleState = Readonly<Record<CfgSide, number>>;
 
+/**
+ * Minimum measured width of the graph workspace before the before/after panes
+ * sit side by side. A 1440px viewport leaves this pane around 970px, and the
+ * comparison is the whole point of the view, so it has to split there.
+ */
+const SPLIT_MIN_WIDTH = 900;
 const MIN_SCALE = 0.35;
 const MAX_SCALE = 1.75;
 const SCALE_STEP = 0.15;
@@ -302,7 +308,7 @@ export function CfgView({ cfg, initialMode = "split" }: CfgViewProps) {
     const element = workspaceRef.current;
     if (element === null) return;
     const update = (width: number) => {
-      if (width > 0) setWideEnoughForSplit(width >= 1080);
+      if (width > 0) setWideEnoughForSplit(width >= SPLIT_MIN_WIDTH);
     };
     update(element.getBoundingClientRect().width);
     if (typeof ResizeObserver === "undefined") return;
@@ -489,7 +495,7 @@ export function CfgView({ cfg, initialMode = "split" }: CfgViewProps) {
         >
           <div
             className={`grid min-h-0 min-w-0 gap-3 p-3 ${
-              effectiveMode === "split" ? "xl:grid-cols-2" : "grid-cols-1"
+              effectiveMode === "split" ? "grid-cols-2" : "grid-cols-1"
             }`}
           >
             {showBefore ? (
