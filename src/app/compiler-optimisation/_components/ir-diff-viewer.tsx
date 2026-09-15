@@ -1,7 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 
+import {
+  foldUnchangedRuns,
+  type DiffSegment,
+} from "~/app/_helpers/diff-folding";
 import { createIrDiff, type IrDiffLine } from "~/app/_helpers/text-diff";
 
 import { irDiffContent } from "../content";
@@ -71,12 +75,50 @@ function unavailableMessage(
   }
 }
 
-type DiffPaneProps = Readonly<{
-  side: "before" | "after";
-  rows: ReadonlyArray<DiffRow>;
+function foldLabel(count: number) {
+  const noun =
+    count === 1
+      ? irDiffContent.fold.unchangedLine
+      : irDiffContent.fold.unchangedLines;
+
+  return `${irDiffContent.fold.expand} ${count} ${noun}`;
+}
+
+type FoldRowProps = Readonly<{
+  columns: string;
+  count: number;
+  onExpand: () => void;
 }>;
 
-function DiffPane({ side, rows }: DiffPaneProps) {
+function FoldRow({ columns, count, onExpand }: FoldRowProps) {
+  return (
+    <div className={`grid min-h-6 ${columns} bg-slate-900/50`}>
+      <span className="col-span-full">
+        <button
+          type="button"
+          onClick={onExpand}
+          className="w-full px-4 py-1 text-left text-[0.72rem] font-semibold text-cyan-300 transition hover:text-cyan-100 focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:outline-none focus-visible:ring-inset"
+        >
+          {foldLabel(count)}
+        </button>
+      </span>
+    </div>
+  );
+}
+
+type DiffPaneProps = Readonly<{
+  side: "before" | "after";
+  segments: ReadonlyArray<DiffSegment<DiffRow>>;
+  expandedFolds: ReadonlySet<number>;
+  onExpandFold: (index: number) => void;
+}>;
+
+function DiffPane({
+  side,
+  segments,
+  expandedFolds,
+  onExpandFold,
+}: DiffPaneProps) {
   const isBefore = side === "before";
   const label = isBefore ? "Before" : "After";
 
@@ -107,65 +149,76 @@ function DiffPane({ side, rows }: DiffPaneProps) {
         aria-label={`${label} IR Diff, read only`}
       >
         <div className="w-max min-w-full py-2 font-mono text-[0.78rem] leading-6">
-          {rows.map((row, index) => {
-            const line = isBefore ? row.before : row.after;
+          {segments.map((segment, segmentIndex) =>
+            segment.kind === "collapsed" && !expandedFolds.has(segmentIndex) ? (
+              <FoldRow
+                key={`${side}-fold-${segmentIndex}`}
+                columns="grid-cols-[2rem_3.5rem_minmax(0,1fr)]"
+                count={segment.items.length}
+                onExpand={() => onExpandFold(segmentIndex)}
+              />
+            ) : (
+              segment.items.map((row, index) => {
+                const line = isBefore ? row.before : row.after;
 
-            if (line === null) {
-              return (
-                <div
-                  key={`${side}-empty-${index}`}
-                  className="grid min-h-6 grid-cols-[2rem_3.5rem_minmax(0,1fr)] bg-slate-950/35"
-                  aria-hidden="true"
-                >
-                  <span />
-                  <span className="border-r border-slate-800/70" />
-                  <span />
-                </div>
-              );
-            }
+                if (line === null) {
+                  return (
+                    <div
+                      key={`${side}-empty-${segmentIndex}-${index}`}
+                      className="grid min-h-6 grid-cols-[2rem_3.5rem_minmax(0,1fr)] bg-slate-950/35"
+                      aria-hidden="true"
+                    >
+                      <span />
+                      <span className="border-r border-slate-800/70" />
+                      <span />
+                    </div>
+                  );
+                }
 
-            const changed = line.kind !== "unchanged";
-            const symbol = line.kind === "removed" ? "-" : "+";
-            const lineNumber = isBefore
-              ? line.beforeLineNumber
-              : line.afterLineNumber;
-            const rowTone =
-              line.kind === "removed"
-                ? "bg-rose-950/35 text-rose-100"
-                : line.kind === "added"
-                  ? "bg-emerald-950/30 text-emerald-100"
-                  : "text-slate-300";
-            const symbolTone =
-              line.kind === "removed"
-                ? "bg-rose-400/15 text-rose-300"
-                : "bg-emerald-400/15 text-emerald-300";
+                const changed = line.kind !== "unchanged";
+                const symbol = line.kind === "removed" ? "-" : "+";
+                const lineNumber = isBefore
+                  ? line.beforeLineNumber
+                  : line.afterLineNumber;
+                const rowTone =
+                  line.kind === "removed"
+                    ? "bg-rose-950/35 text-rose-100"
+                    : line.kind === "added"
+                      ? "bg-emerald-950/30 text-emerald-100"
+                      : "text-slate-300";
+                const symbolTone =
+                  line.kind === "removed"
+                    ? "bg-rose-400/15 text-rose-300"
+                    : "bg-emerald-400/15 text-emerald-300";
 
-            return (
-              <div
-                key={`${side}-${index}-${lineNumber ?? "none"}`}
-                className={`grid min-h-6 grid-cols-[2rem_3.5rem_minmax(0,1fr)] ${rowTone}`}
-              >
-                <span
-                  className={`text-center font-bold select-none ${changed ? symbolTone : "text-slate-700"}`}
-                  aria-label={
-                    changed
-                      ? line.kind === "removed"
-                        ? "Removed line"
-                        : "Added line"
-                      : "Unchanged line"
-                  }
-                >
-                  {changed ? symbol : " "}
-                </span>
-                <span className="border-r border-slate-800/70 pr-3 text-right text-slate-600 select-none">
-                  {lineNumber}
-                </span>
-                <code className="px-4 whitespace-pre">
-                  {line.content || " "}
-                </code>
-              </div>
-            );
-          })}
+                return (
+                  <div
+                    key={`${side}-${segmentIndex}-${index}-${lineNumber ?? "none"}`}
+                    className={`grid min-h-6 grid-cols-[2rem_3.5rem_minmax(0,1fr)] ${rowTone}`}
+                  >
+                    <span
+                      className={`text-center font-bold select-none ${changed ? symbolTone : "text-slate-700"}`}
+                      aria-label={
+                        changed
+                          ? line.kind === "removed"
+                            ? "Removed line"
+                            : "Added line"
+                          : "Unchanged line"
+                      }
+                    >
+                      {changed ? symbol : " "}
+                    </span>
+                    <span className="border-r border-slate-800/70 pr-3 text-right text-slate-600 select-none">
+                      {lineNumber}
+                    </span>
+                    <code className="px-4 whitespace-pre">
+                      {line.content || " "}
+                    </code>
+                  </div>
+                );
+              })
+            ),
+          )}
         </div>
       </div>
     </section>
@@ -173,10 +226,16 @@ function DiffPane({ side, rows }: DiffPaneProps) {
 }
 
 type UnifiedDiffProps = Readonly<{
-  lines: ReadonlyArray<IrDiffLine>;
+  segments: ReadonlyArray<DiffSegment<IrDiffLine>>;
+  expandedFolds: ReadonlySet<number>;
+  onExpandFold: (index: number) => void;
 }>;
 
-function UnifiedDiff({ lines }: UnifiedDiffProps) {
+function UnifiedDiff({
+  segments,
+  expandedFolds,
+  onExpandFold,
+}: UnifiedDiffProps) {
   return (
     <section
       className="min-h-80 min-w-0 overflow-hidden rounded-xl border border-slate-800 bg-[var(--workspace-code-bg)] xl:min-h-[30rem]"
@@ -204,66 +263,81 @@ function UnifiedDiff({ lines }: UnifiedDiffProps) {
         aria-label="Unified IR Diff, read only"
       >
         <div className="w-max min-w-full py-2 font-mono text-[0.78rem] leading-6">
-          {lines.map((line, index) => {
-            const changed = line.kind !== "unchanged";
-            const symbol =
-              line.kind === "removed" ? "-" : line.kind === "added" ? "+" : " ";
-            const rowTone =
-              line.kind === "removed"
-                ? "bg-rose-950/35 text-rose-100"
-                : line.kind === "added"
-                  ? "bg-emerald-950/30 text-emerald-100"
-                  : "text-slate-300";
-            const symbolTone =
-              line.kind === "removed"
-                ? "bg-rose-400/15 text-rose-300"
-                : "bg-emerald-400/15 text-emerald-300";
+          {segments.map((segment, segmentIndex) =>
+            segment.kind === "collapsed" && !expandedFolds.has(segmentIndex) ? (
+              <FoldRow
+                key={`unified-fold-${segmentIndex}`}
+                columns="grid-cols-[2rem_3.5rem_3.5rem_minmax(0,1fr)]"
+                count={segment.items.length}
+                onExpand={() => onExpandFold(segmentIndex)}
+              />
+            ) : (
+              segment.items.map((line, index) => {
+                const changed = line.kind !== "unchanged";
+                const symbol =
+                  line.kind === "removed"
+                    ? "-"
+                    : line.kind === "added"
+                      ? "+"
+                      : " ";
+                const rowTone =
+                  line.kind === "removed"
+                    ? "bg-rose-950/35 text-rose-100"
+                    : line.kind === "added"
+                      ? "bg-emerald-950/30 text-emerald-100"
+                      : "text-slate-300";
+                const symbolTone =
+                  line.kind === "removed"
+                    ? "bg-rose-400/15 text-rose-300"
+                    : "bg-emerald-400/15 text-emerald-300";
 
-            return (
-              <div
-                key={`unified-${index}-${line.beforeLineNumber ?? "none"}-${line.afterLineNumber ?? "none"}`}
-                className={`grid min-h-6 grid-cols-[2rem_3.5rem_3.5rem_minmax(0,1fr)] ${rowTone}`}
-              >
-                <span
-                  className={`text-center font-bold select-none ${changed ? symbolTone : "text-slate-700"}`}
-                  aria-label={
-                    line.kind === "removed"
-                      ? "Removed line"
-                      : line.kind === "added"
-                        ? "Added line"
-                        : "Unchanged line"
-                  }
-                >
-                  {symbol}
-                </span>
-                <span
-                  className="border-r border-slate-800/70 pr-3 text-right text-slate-600 select-none"
-                  aria-label={
-                    line.beforeLineNumber === null
-                      ? undefined
-                      : `Before line ${line.beforeLineNumber}`
-                  }
-                  aria-hidden={line.beforeLineNumber === null}
-                >
-                  {line.beforeLineNumber}
-                </span>
-                <span
-                  className="border-r border-slate-800/70 pr-3 text-right text-slate-600 select-none"
-                  aria-label={
-                    line.afterLineNumber === null
-                      ? undefined
-                      : `After line ${line.afterLineNumber}`
-                  }
-                  aria-hidden={line.afterLineNumber === null}
-                >
-                  {line.afterLineNumber}
-                </span>
-                <code className="px-4 whitespace-pre">
-                  {line.content || " "}
-                </code>
-              </div>
-            );
-          })}
+                return (
+                  <div
+                    key={`unified-${segmentIndex}-${index}-${line.beforeLineNumber ?? "none"}-${line.afterLineNumber ?? "none"}`}
+                    className={`grid min-h-6 grid-cols-[2rem_3.5rem_3.5rem_minmax(0,1fr)] ${rowTone}`}
+                  >
+                    <span
+                      className={`text-center font-bold select-none ${changed ? symbolTone : "text-slate-700"}`}
+                      aria-label={
+                        line.kind === "removed"
+                          ? "Removed line"
+                          : line.kind === "added"
+                            ? "Added line"
+                            : "Unchanged line"
+                      }
+                    >
+                      {symbol}
+                    </span>
+                    <span
+                      className="border-r border-slate-800/70 pr-3 text-right text-slate-600 select-none"
+                      aria-label={
+                        line.beforeLineNumber === null
+                          ? undefined
+                          : `Before line ${line.beforeLineNumber}`
+                      }
+                      aria-hidden={line.beforeLineNumber === null}
+                    >
+                      {line.beforeLineNumber}
+                    </span>
+                    <span
+                      className="border-r border-slate-800/70 pr-3 text-right text-slate-600 select-none"
+                      aria-label={
+                        line.afterLineNumber === null
+                          ? undefined
+                          : `After line ${line.afterLineNumber}`
+                      }
+                      aria-hidden={line.afterLineNumber === null}
+                    >
+                      {line.afterLineNumber}
+                    </span>
+                    <code className="px-4 whitespace-pre">
+                      {line.content || " "}
+                    </code>
+                  </div>
+                );
+              })
+            ),
+          )}
         </div>
       </div>
     </section>
@@ -282,17 +356,42 @@ export function IrDiffViewer({
   heading = irDiffContent.heading,
   description,
 }: IrDiffViewerProps) {
-  const { diff, rows } = useMemo(() => {
+  const { diff, rowSegments, lineSegments } = useMemo(() => {
     const currentDiff = createIrDiff({ before, after, structuredDiff });
+
+    if (currentDiff.status === "unavailable") {
+      return { diff: currentDiff, rowSegments: [], lineSegments: [] };
+    }
 
     return {
       diff: currentDiff,
-      rows:
-        currentDiff.status === "unavailable"
-          ? []
-          : alignDiffRows(currentDiff.lines),
+      rowSegments: foldUnchangedRuns(
+        alignDiffRows(currentDiff.lines),
+        (row) => row.before?.kind === "unchanged",
+      ),
+      lineSegments: foldUnchangedRuns(
+        currentDiff.lines,
+        (line) => line.kind === "unchanged",
+      ),
     };
   }, [before, after, structuredDiff]);
+  /*
+   * Tracked per mode because the two modes segment the diff differently, so a
+   * segment index means different things in each. Within side-by-side the one
+   * set is shared by both panes, so their rows cannot drift out of step.
+   */
+  const [expandedFolds, setExpandedFolds] = useState<
+    Readonly<Record<DiffMode, ReadonlySet<number>>>
+  >(() => ({ "side-by-side": new Set(), unified: new Set() }));
+  const expandFold = useCallback(
+    (index: number) => {
+      setExpandedFolds((current) => ({
+        ...current,
+        [mode]: new Set(current[mode]).add(index),
+      }));
+    },
+    [mode],
+  );
 
   if (diff.status === "unavailable") {
     return (
@@ -393,11 +492,25 @@ export function IrDiffViewer({
 
       {mode === "side-by-side" ? (
         <div className="grid min-w-0 overflow-hidden rounded-xl border border-slate-800 xl:grid-cols-2">
-          <DiffPane side="before" rows={rows} />
-          <DiffPane side="after" rows={rows} />
+          <DiffPane
+            side="before"
+            segments={rowSegments}
+            expandedFolds={expandedFolds[mode]}
+            onExpandFold={expandFold}
+          />
+          <DiffPane
+            side="after"
+            segments={rowSegments}
+            expandedFolds={expandedFolds[mode]}
+            onExpandFold={expandFold}
+          />
         </div>
       ) : (
-        <UnifiedDiff lines={diff.lines} />
+        <UnifiedDiff
+          segments={lineSegments}
+          expandedFolds={expandedFolds[mode]}
+          onExpandFold={expandFold}
+        />
       )}
     </section>
   );
