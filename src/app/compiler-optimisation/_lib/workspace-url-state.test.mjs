@@ -38,6 +38,7 @@ test("restores a function, visible Pass, and filters from the URL", () => {
   assert.deepEqual(state.passFilters, {
     type: "transform",
     change: "unchanged",
+    search: "",
   });
   assert.equal(state.diffMode, "unified");
 });
@@ -83,7 +84,11 @@ test("invalid URL values safely fall back to the default workspace state", () =>
 
   assert.equal(state.selectedFunctionId, model.functions[0]?.id);
   assert.equal(state.selectedPassId, model.functions[0]?.passes[0]?.id);
-  assert.deepEqual(state.passFilters, { type: "all", change: "all" });
+  assert.deepEqual(state.passFilters, {
+    type: "all",
+    change: "all",
+    search: "",
+  });
 });
 
 test("serialises state while preserving unrelated query parameters", () => {
@@ -97,7 +102,7 @@ test("serialises state while preserving unrelated query parameters", () => {
     {
       selectedFunctionId: helper.id,
       selectedPassId: futurePass.id,
-      passFilters: { type: "transform", change: "unchanged" },
+      passFilters: { type: "transform", change: "unchanged", search: "" },
       diffMode: "unified",
     },
     new URLSearchParams({ fixture: "multi", campaign: "demo" }),
@@ -122,7 +127,7 @@ test("serialises the global scope and omits default filters", () => {
     {
       selectedFunctionId: undefined,
       selectedPassId: globalPass.id,
-      passFilters: { type: "all", change: "all" },
+      passFilters: { type: "all", change: "all", search: "" },
       diffMode: "side-by-side",
     },
     new URLSearchParams({ function: "stale", passType: "analysis" }),
@@ -134,4 +139,35 @@ test("serialises the global scope and omits default filters", () => {
   assert.equal(query.get("passType"), null);
   assert.equal(query.get("change"), null);
   assert.equal(query.get("diff"), null);
+});
+
+test("round-trips the Pass search through the URL", () => {
+  const state = parseWorkspaceUrlState(
+    model,
+    new URLSearchParams({ search: " instcombine " }),
+  );
+
+  assert.equal(state.passFilters.search, " instcombine ");
+  assert.equal(state.selectedPassId, "pass:000001:aW5zdGNvbWJpbmU");
+  assert.equal(
+    createWorkspaceUrlSearchParams(model, state, new URLSearchParams()).get(
+      "search",
+    ),
+    "instcombine",
+  );
+});
+
+test("a blank search is not written to the URL", () => {
+  const state = parseWorkspaceUrlState(
+    model,
+    new URLSearchParams({ search: "   " }),
+  );
+
+  assert.equal(state.passFilters.search, "");
+  assert.equal(
+    createWorkspaceUrlSearchParams(model, state, new URLSearchParams()).has(
+      "search",
+    ),
+    false,
+  );
 });
