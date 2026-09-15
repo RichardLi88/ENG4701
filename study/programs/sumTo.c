@@ -1,6 +1,6 @@
-/* Tail-recursive: the recursive call is the last thing the function does.
-   One optimisation level turns this into a loop; the other leaves the
-   recursion in place. */
+/* Tail-recursive sum of 1..n: the recursive call is the last thing the
+   function does, and the running total is carried in acc.
+   The two optimisation levels treat this very differently. */
 int sumTo(int n, int acc) {
     if (n <= 0) {
         return acc;

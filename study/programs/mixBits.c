@@ -1,6 +1,6 @@
-/* Tail-recursive like sumTo, but combining bits instead of summing, so the
-   same structural question can be asked without reusing the same program.
-   One optimisation level turns the recursion into a loop; the other does not. */
+/* Also tail-recursive, but combining bits rather than summing, so there is
+   no closed form for the result. Matched to sumTo.c in shape and in the
+   optimisation that applies, but it does not end up in the same place. */
 int mixBits(int n, int acc) {
     if (n <= 0) {
         return acc;
