@@ -109,6 +109,17 @@ export const passDetailContent = {
     globalOrder: "Global",
     functionOrder: "Function",
   },
+  metrics: {
+    unchangedDeltaNote:
+      "Every delta is zero because this Pass did not change the IR it ran on.",
+  },
+  changeBadge: {
+    changed: "IR changed",
+    unchanged: "IR unchanged",
+    /** Participants otherwise read the badge as "nothing happened to my program". */
+    tooltip:
+      "Unchanged means the IR unit this Pass ran on did not change. A function Pass reports on that function only, not on the whole program.",
+  },
   analysisContext: {
     heading: "Analysis & pipeline context",
     preservation: "Analysis preservation",
@@ -139,6 +150,14 @@ export const routeErrorContent = {
 
 export const irDiffContent = {
   heading: "Intermediate representation",
+  /** Shown instead of a Diff when a Pass left its IR unit untouched. */
+  snapshot: {
+    heading: "Intermediate representation",
+    description:
+      "This Pass left the IR it ran on unchanged, so there is nothing to compare. The IR at this point in the pipeline is shown once.",
+    toggle: "IR at this point in the pipeline",
+    regionLabel: "IR at this point in the pipeline, read only",
+  },
   viewLabel: "Diff view",
   modes: {
     sideBySide: "Side by side",
@@ -152,6 +171,11 @@ export const irDiffContent = {
 
 export const cfgContent = {
   heading: "Control flow graph",
+  unchanged: {
+    description:
+      "This Pass left the control flow unchanged, so one graph is shown instead of a comparison.",
+    toggle: "Control flow graph at this point",
+  },
   description: "Topology-aligned basic-block flow before and after this Pass.",
   unavailable: "CFG data was not provided for this Pass.",
   empty: "This CFG snapshot contains no basic blocks.",

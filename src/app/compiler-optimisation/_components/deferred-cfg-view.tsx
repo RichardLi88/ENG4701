@@ -15,6 +15,7 @@ const LazyCfgView = lazy(async () => {
 
 type DeferredCfgViewProps = Readonly<{
   cfg: DataAvailability<PassControlFlowGraphViewModel>;
+  initialMode?: "split" | "before" | "after";
 }>;
 
 type CfgPlaceholderProps = Readonly<{
@@ -46,7 +47,7 @@ function CfgPlaceholder({ loading }: CfgPlaceholderProps) {
   );
 }
 
-export function DeferredCfgView({ cfg }: DeferredCfgViewProps) {
+export function DeferredCfgView({ cfg, initialMode }: DeferredCfgViewProps) {
   const [shouldLoad, setShouldLoad] = useState(false);
   const boundaryRef = useRef<HTMLDivElement>(null);
 
@@ -79,7 +80,7 @@ export function DeferredCfgView({ cfg }: DeferredCfgViewProps) {
     <div ref={boundaryRef}>
       {shouldLoad ? (
         <Suspense fallback={<CfgPlaceholder loading />}>
-          <LazyCfgView cfg={cfg} />
+          <LazyCfgView cfg={cfg} initialMode={initialMode} />
         </Suspense>
       ) : (
         <CfgPlaceholder loading={false} />

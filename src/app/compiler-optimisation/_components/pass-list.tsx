@@ -8,6 +8,7 @@ import {
   type UIEvent,
 } from "react";
 
+import { passDetailContent } from "../content";
 import type { OptimisationPassViewModel } from "../_lib/optimisation-types";
 
 type PassListProps = Readonly<{
@@ -239,6 +240,11 @@ export const PassList = memo(function PassList({
                     ? "bg-emerald-400/15 text-emerald-300"
                     : "bg-slate-800 text-slate-400"
                 }`}
+                title={
+                  pass.changed
+                    ? undefined
+                    : passDetailContent.changeBadge.tooltip
+                }
               >
                 {pass.changed ? "Changed" : "No change"}
               </span>

@@ -19,12 +19,14 @@ import {
 import { CfgIcon } from "./cfg-icons";
 import { CfgNodeInspector } from "./cfg-node-inspector";
 
-type CfgViewProps = Readonly<{
-  cfg: DataAvailability<PassControlFlowGraphViewModel>;
-}>;
-
 type CfgSide = "before" | "after";
 type CfgViewMode = "split" | CfgSide;
+
+type CfgViewProps = Readonly<{
+  cfg: DataAvailability<PassControlFlowGraphViewModel>;
+  /** Passes that changed nothing open on one graph instead of a split view. */
+  initialMode?: CfgViewMode;
+}>;
 type ScaleState = Readonly<Record<CfgSide, number>>;
 
 const MIN_SCALE = 0.35;
@@ -275,11 +277,11 @@ function legend() {
   );
 }
 
-export function CfgView({ cfg }: CfgViewProps) {
+export function CfgView({ cfg, initialMode = "split" }: CfgViewProps) {
   const workspaceRef = useRef<HTMLDivElement>(null);
   const beforePaneRef = useRef<CfgGraphPaneHandle>(null);
   const afterPaneRef = useRef<CfgGraphPaneHandle>(null);
-  const [mode, setMode] = useState<CfgViewMode>("split");
+  const [mode, setMode] = useState<CfgViewMode>(initialMode);
   const [linked, setLinked] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
