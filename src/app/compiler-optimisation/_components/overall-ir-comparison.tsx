@@ -16,7 +16,9 @@ type OverallIrComparisonProps = Readonly<{
 
 export function OverallIrComparison({ model }: OverallIrComparisonProps) {
   const comparison = useMemo(() => deriveOverallIrComparison(model), [model]);
-  const [expanded, setExpanded] = useState(true);
+  // Collapsed by default: expanded, this diff runs past 2,000px and pushes the
+  // function list and Pass timeline several screens below the fold.
+  const [expanded, setExpanded] = useState(false);
   const [diffMode, setDiffMode] = useState<DiffMode>("side-by-side");
 
   return (
