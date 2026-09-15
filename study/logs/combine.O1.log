@@ -1,11 +1,11 @@
 *** IR Dump Before VerifierPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   %5 = alloca i32, align 4
@@ -18,21 +18,22 @@ define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
 8:                                                ; preds = %2
   %9 = load i32, i32* %5, align 4
   store i32 %9, i32* %3, align 4
-  br label %17
+  br label %18
 
 10:                                               ; preds = %2
   %11 = load i32, i32* %4, align 4
   %12 = sub nsw i32 %11, 1
   %13 = load i32, i32* %5, align 4
-  %14 = load i32, i32* %4, align 4
-  %15 = add nsw i32 %13, %14
-  %16 = call i32 @sumTo(i32 noundef %12, i32 noundef %15)
-  store i32 %16, i32* %3, align 4
-  br label %17
+  %14 = mul nsw i32 %13, 31
+  %15 = load i32, i32* %4, align 4
+  %16 = add nsw i32 %14, %15
+  %17 = call i32 @combine(i32 noundef %12, i32 noundef %16)
+  store i32 %17, i32* %3, align 4
+  br label %18
 
-17:                                               ; preds = %10, %8
-  %18 = load i32, i32* %3, align 4
-  ret i32 %18
+18:                                               ; preds = %10, %8
+  %19 = load i32, i32* %3, align 4
+  ret i32 %19
 }
 
 attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="generic" "target-features"="+neon,+outline-atomics,+v8a" }
@@ -51,13 +52,13 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After VerifierPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   %5 = alloca i32, align 4
@@ -70,21 +71,22 @@ define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
 8:                                                ; preds = %2
   %9 = load i32, i32* %5, align 4
   store i32 %9, i32* %3, align 4
-  br label %17
+  br label %18
 
 10:                                               ; preds = %2
   %11 = load i32, i32* %4, align 4
   %12 = sub nsw i32 %11, 1
   %13 = load i32, i32* %5, align 4
-  %14 = load i32, i32* %4, align 4
-  %15 = add nsw i32 %13, %14
-  %16 = call i32 @sumTo(i32 noundef %12, i32 noundef %15)
-  store i32 %16, i32* %3, align 4
-  br label %17
+  %14 = mul nsw i32 %13, 31
+  %15 = load i32, i32* %4, align 4
+  %16 = add nsw i32 %14, %15
+  %17 = call i32 @combine(i32 noundef %12, i32 noundef %16)
+  store i32 %17, i32* %3, align 4
+  br label %18
 
-17:                                               ; preds = %10, %8
-  %18 = load i32, i32* %3, align 4
-  ret i32 %18
+18:                                               ; preds = %10, %8
+  %19 = load i32, i32* %3, align 4
+  ret i32 %19
 }
 
 attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="generic" "target-features"="+neon,+outline-atomics,+v8a" }
@@ -103,13 +105,13 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump Before Annotation2MetadataPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   %5 = alloca i32, align 4
@@ -122,21 +124,22 @@ define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
 8:                                                ; preds = %2
   %9 = load i32, i32* %5, align 4
   store i32 %9, i32* %3, align 4
-  br label %17
+  br label %18
 
 10:                                               ; preds = %2
   %11 = load i32, i32* %4, align 4
   %12 = sub nsw i32 %11, 1
   %13 = load i32, i32* %5, align 4
-  %14 = load i32, i32* %4, align 4
-  %15 = add nsw i32 %13, %14
-  %16 = call i32 @sumTo(i32 noundef %12, i32 noundef %15)
-  store i32 %16, i32* %3, align 4
-  br label %17
+  %14 = mul nsw i32 %13, 31
+  %15 = load i32, i32* %4, align 4
+  %16 = add nsw i32 %14, %15
+  %17 = call i32 @combine(i32 noundef %12, i32 noundef %16)
+  store i32 %17, i32* %3, align 4
+  br label %18
 
-17:                                               ; preds = %10, %8
-  %18 = load i32, i32* %3, align 4
-  ret i32 %18
+18:                                               ; preds = %10, %8
+  %19 = load i32, i32* %3, align 4
+  ret i32 %19
 }
 
 attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="generic" "target-features"="+neon,+outline-atomics,+v8a" }
@@ -155,13 +158,13 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After Annotation2MetadataPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   %5 = alloca i32, align 4
@@ -174,21 +177,22 @@ define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
 8:                                                ; preds = %2
   %9 = load i32, i32* %5, align 4
   store i32 %9, i32* %3, align 4
-  br label %17
+  br label %18
 
 10:                                               ; preds = %2
   %11 = load i32, i32* %4, align 4
   %12 = sub nsw i32 %11, 1
   %13 = load i32, i32* %5, align 4
-  %14 = load i32, i32* %4, align 4
-  %15 = add nsw i32 %13, %14
-  %16 = call i32 @sumTo(i32 noundef %12, i32 noundef %15)
-  store i32 %16, i32* %3, align 4
-  br label %17
+  %14 = mul nsw i32 %13, 31
+  %15 = load i32, i32* %4, align 4
+  %16 = add nsw i32 %14, %15
+  %17 = call i32 @combine(i32 noundef %12, i32 noundef %16)
+  store i32 %17, i32* %3, align 4
+  br label %18
 
-17:                                               ; preds = %10, %8
-  %18 = load i32, i32* %3, align 4
-  ret i32 %18
+18:                                               ; preds = %10, %8
+  %19 = load i32, i32* %3, align 4
+  ret i32 %19
 }
 
 attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="generic" "target-features"="+neon,+outline-atomics,+v8a" }
@@ -207,13 +211,13 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump Before ForceFunctionAttrsPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   %5 = alloca i32, align 4
@@ -226,21 +230,22 @@ define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
 8:                                                ; preds = %2
   %9 = load i32, i32* %5, align 4
   store i32 %9, i32* %3, align 4
-  br label %17
+  br label %18
 
 10:                                               ; preds = %2
   %11 = load i32, i32* %4, align 4
   %12 = sub nsw i32 %11, 1
   %13 = load i32, i32* %5, align 4
-  %14 = load i32, i32* %4, align 4
-  %15 = add nsw i32 %13, %14
-  %16 = call i32 @sumTo(i32 noundef %12, i32 noundef %15)
-  store i32 %16, i32* %3, align 4
-  br label %17
+  %14 = mul nsw i32 %13, 31
+  %15 = load i32, i32* %4, align 4
+  %16 = add nsw i32 %14, %15
+  %17 = call i32 @combine(i32 noundef %12, i32 noundef %16)
+  store i32 %17, i32* %3, align 4
+  br label %18
 
-17:                                               ; preds = %10, %8
-  %18 = load i32, i32* %3, align 4
-  ret i32 %18
+18:                                               ; preds = %10, %8
+  %19 = load i32, i32* %3, align 4
+  ret i32 %19
 }
 
 attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="generic" "target-features"="+neon,+outline-atomics,+v8a" }
@@ -259,13 +264,13 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After ForceFunctionAttrsPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   %5 = alloca i32, align 4
@@ -278,21 +283,22 @@ define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
 8:                                                ; preds = %2
   %9 = load i32, i32* %5, align 4
   store i32 %9, i32* %3, align 4
-  br label %17
+  br label %18
 
 10:                                               ; preds = %2
   %11 = load i32, i32* %4, align 4
   %12 = sub nsw i32 %11, 1
   %13 = load i32, i32* %5, align 4
-  %14 = load i32, i32* %4, align 4
-  %15 = add nsw i32 %13, %14
-  %16 = call i32 @sumTo(i32 noundef %12, i32 noundef %15)
-  store i32 %16, i32* %3, align 4
-  br label %17
+  %14 = mul nsw i32 %13, 31
+  %15 = load i32, i32* %4, align 4
+  %16 = add nsw i32 %14, %15
+  %17 = call i32 @combine(i32 noundef %12, i32 noundef %16)
+  store i32 %17, i32* %3, align 4
+  br label %18
 
-17:                                               ; preds = %10, %8
-  %18 = load i32, i32* %3, align 4
-  ret i32 %18
+18:                                               ; preds = %10, %8
+  %19 = load i32, i32* %3, align 4
+  ret i32 %19
 }
 
 attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="generic" "target-features"="+neon,+outline-atomics,+v8a" }
@@ -311,13 +317,13 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump Before InferFunctionAttrsPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   %5 = alloca i32, align 4
@@ -330,21 +336,22 @@ define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
 8:                                                ; preds = %2
   %9 = load i32, i32* %5, align 4
   store i32 %9, i32* %3, align 4
-  br label %17
+  br label %18
 
 10:                                               ; preds = %2
   %11 = load i32, i32* %4, align 4
   %12 = sub nsw i32 %11, 1
   %13 = load i32, i32* %5, align 4
-  %14 = load i32, i32* %4, align 4
-  %15 = add nsw i32 %13, %14
-  %16 = call i32 @sumTo(i32 noundef %12, i32 noundef %15)
-  store i32 %16, i32* %3, align 4
-  br label %17
+  %14 = mul nsw i32 %13, 31
+  %15 = load i32, i32* %4, align 4
+  %16 = add nsw i32 %14, %15
+  %17 = call i32 @combine(i32 noundef %12, i32 noundef %16)
+  store i32 %17, i32* %3, align 4
+  br label %18
 
-17:                                               ; preds = %10, %8
-  %18 = load i32, i32* %3, align 4
-  ret i32 %18
+18:                                               ; preds = %10, %8
+  %19 = load i32, i32* %3, align 4
+  ret i32 %19
 }
 
 attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="generic" "target-features"="+neon,+outline-atomics,+v8a" }
@@ -363,13 +370,13 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After InferFunctionAttrsPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   %5 = alloca i32, align 4
@@ -382,21 +389,22 @@ define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
 8:                                                ; preds = %2
   %9 = load i32, i32* %5, align 4
   store i32 %9, i32* %3, align 4
-  br label %17
+  br label %18
 
 10:                                               ; preds = %2
   %11 = load i32, i32* %4, align 4
   %12 = sub nsw i32 %11, 1
   %13 = load i32, i32* %5, align 4
-  %14 = load i32, i32* %4, align 4
-  %15 = add nsw i32 %13, %14
-  %16 = call i32 @sumTo(i32 noundef %12, i32 noundef %15)
-  store i32 %16, i32* %3, align 4
-  br label %17
+  %14 = mul nsw i32 %13, 31
+  %15 = load i32, i32* %4, align 4
+  %16 = add nsw i32 %14, %15
+  %17 = call i32 @combine(i32 noundef %12, i32 noundef %16)
+  store i32 %17, i32* %3, align 4
+  br label %18
 
-17:                                               ; preds = %10, %8
-  %18 = load i32, i32* %3, align 4
-  ret i32 %18
+18:                                               ; preds = %10, %8
+  %19 = load i32, i32* %3, align 4
+  ret i32 %19
 }
 
 attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="generic" "target-features"="+neon,+outline-atomics,+v8a" }
@@ -414,9 +422,9 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !7 = !{i32 7, !"uwtable", i32 1}
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
-*** IR Dump Before LowerExpectIntrinsicPass on sumTo ***
+*** IR Dump Before LowerExpectIntrinsicPass on combine ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   %5 = alloca i32, align 4
@@ -429,25 +437,26 @@ define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
 8:                                                ; preds = %2
   %9 = load i32, i32* %5, align 4
   store i32 %9, i32* %3, align 4
-  br label %17
+  br label %18
 
 10:                                               ; preds = %2
   %11 = load i32, i32* %4, align 4
   %12 = sub nsw i32 %11, 1
   %13 = load i32, i32* %5, align 4
-  %14 = load i32, i32* %4, align 4
-  %15 = add nsw i32 %13, %14
-  %16 = call i32 @sumTo(i32 noundef %12, i32 noundef %15)
-  store i32 %16, i32* %3, align 4
-  br label %17
+  %14 = mul nsw i32 %13, 31
+  %15 = load i32, i32* %4, align 4
+  %16 = add nsw i32 %14, %15
+  %17 = call i32 @combine(i32 noundef %12, i32 noundef %16)
+  store i32 %17, i32* %3, align 4
+  br label %18
 
-17:                                               ; preds = %10, %8
-  %18 = load i32, i32* %3, align 4
-  ret i32 %18
+18:                                               ; preds = %10, %8
+  %19 = load i32, i32* %3, align 4
+  ret i32 %19
 }
-*** IR Dump After LowerExpectIntrinsicPass on sumTo ***
+*** IR Dump After LowerExpectIntrinsicPass on combine ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   %5 = alloca i32, align 4
@@ -460,25 +469,26 @@ define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
 8:                                                ; preds = %2
   %9 = load i32, i32* %5, align 4
   store i32 %9, i32* %3, align 4
-  br label %17
+  br label %18
 
 10:                                               ; preds = %2
   %11 = load i32, i32* %4, align 4
   %12 = sub nsw i32 %11, 1
   %13 = load i32, i32* %5, align 4
-  %14 = load i32, i32* %4, align 4
-  %15 = add nsw i32 %13, %14
-  %16 = call i32 @sumTo(i32 noundef %12, i32 noundef %15)
-  store i32 %16, i32* %3, align 4
-  br label %17
+  %14 = mul nsw i32 %13, 31
+  %15 = load i32, i32* %4, align 4
+  %16 = add nsw i32 %14, %15
+  %17 = call i32 @combine(i32 noundef %12, i32 noundef %16)
+  store i32 %17, i32* %3, align 4
+  br label %18
 
-17:                                               ; preds = %10, %8
-  %18 = load i32, i32* %3, align 4
-  ret i32 %18
+18:                                               ; preds = %10, %8
+  %19 = load i32, i32* %3, align 4
+  ret i32 %19
 }
-*** IR Dump Before SimplifyCFGPass on sumTo ***
+*** IR Dump Before SimplifyCFGPass on combine ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   %5 = alloca i32, align 4
@@ -491,25 +501,26 @@ define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
 8:                                                ; preds = %2
   %9 = load i32, i32* %5, align 4
   store i32 %9, i32* %3, align 4
-  br label %17
+  br label %18
 
 10:                                               ; preds = %2
   %11 = load i32, i32* %4, align 4
   %12 = sub nsw i32 %11, 1
   %13 = load i32, i32* %5, align 4
-  %14 = load i32, i32* %4, align 4
-  %15 = add nsw i32 %13, %14
-  %16 = call i32 @sumTo(i32 noundef %12, i32 noundef %15)
-  store i32 %16, i32* %3, align 4
-  br label %17
+  %14 = mul nsw i32 %13, 31
+  %15 = load i32, i32* %4, align 4
+  %16 = add nsw i32 %14, %15
+  %17 = call i32 @combine(i32 noundef %12, i32 noundef %16)
+  store i32 %17, i32* %3, align 4
+  br label %18
 
-17:                                               ; preds = %10, %8
-  %18 = load i32, i32* %3, align 4
-  ret i32 %18
+18:                                               ; preds = %10, %8
+  %19 = load i32, i32* %3, align 4
+  ret i32 %19
 }
-*** IR Dump After SimplifyCFGPass on sumTo ***
+*** IR Dump After SimplifyCFGPass on combine ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   %5 = alloca i32, align 4
@@ -522,25 +533,26 @@ define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
 8:                                                ; preds = %2
   %9 = load i32, i32* %5, align 4
   store i32 %9, i32* %3, align 4
-  br label %17
+  br label %18
 
 10:                                               ; preds = %2
   %11 = load i32, i32* %4, align 4
   %12 = sub nsw i32 %11, 1
   %13 = load i32, i32* %5, align 4
-  %14 = load i32, i32* %4, align 4
-  %15 = add nsw i32 %13, %14
-  %16 = call i32 @sumTo(i32 noundef %12, i32 noundef %15)
-  store i32 %16, i32* %3, align 4
-  br label %17
+  %14 = mul nsw i32 %13, 31
+  %15 = load i32, i32* %4, align 4
+  %16 = add nsw i32 %14, %15
+  %17 = call i32 @combine(i32 noundef %12, i32 noundef %16)
+  store i32 %17, i32* %3, align 4
+  br label %18
 
-17:                                               ; preds = %10, %8
-  %18 = load i32, i32* %3, align 4
-  ret i32 %18
+18:                                               ; preds = %10, %8
+  %19 = load i32, i32* %3, align 4
+  ret i32 %19
 }
-*** IR Dump Before SROAPass on sumTo ***
+*** IR Dump Before SROAPass on combine ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   %5 = alloca i32, align 4
@@ -553,139 +565,146 @@ define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
 8:                                                ; preds = %2
   %9 = load i32, i32* %5, align 4
   store i32 %9, i32* %3, align 4
-  br label %17
+  br label %18
 
 10:                                               ; preds = %2
   %11 = load i32, i32* %4, align 4
   %12 = sub nsw i32 %11, 1
   %13 = load i32, i32* %5, align 4
-  %14 = load i32, i32* %4, align 4
-  %15 = add nsw i32 %13, %14
-  %16 = call i32 @sumTo(i32 noundef %12, i32 noundef %15)
-  store i32 %16, i32* %3, align 4
-  br label %17
+  %14 = mul nsw i32 %13, 31
+  %15 = load i32, i32* %4, align 4
+  %16 = add nsw i32 %14, %15
+  %17 = call i32 @combine(i32 noundef %12, i32 noundef %16)
+  store i32 %17, i32* %3, align 4
+  br label %18
 
-17:                                               ; preds = %10, %8
-  %18 = load i32, i32* %3, align 4
-  ret i32 %18
+18:                                               ; preds = %10, %8
+  %19 = load i32, i32* %3, align 4
+  ret i32 %19
 }
-*** IR Dump After SROAPass on sumTo ***
+*** IR Dump After SROAPass on combine ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = icmp sle i32 %0, 0
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = sub nsw i32 %0, 1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
-*** IR Dump Before EarlyCSEPass on sumTo ***
+*** IR Dump Before EarlyCSEPass on combine ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = icmp sle i32 %0, 0
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = sub nsw i32 %0, 1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
-*** IR Dump After EarlyCSEPass on sumTo ***
+*** IR Dump After EarlyCSEPass on combine ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = icmp sle i32 %0, 0
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = sub nsw i32 %0, 1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
-*** IR Dump Before CoroEarlyPass on sumTo ***
+*** IR Dump Before CoroEarlyPass on combine ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = icmp sle i32 %0, 0
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = sub nsw i32 %0, 1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
-*** IR Dump After CoroEarlyPass on sumTo ***
+*** IR Dump After CoroEarlyPass on combine ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = icmp sle i32 %0, 0
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = sub nsw i32 %0, 1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
 *** IR Dump Before OpenMPOptPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = icmp sle i32 %0, 0
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = sub nsw i32 %0, 1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
 
@@ -705,27 +724,28 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After OpenMPOptPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = icmp sle i32 %0, 0
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = sub nsw i32 %0, 1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
 
@@ -745,27 +765,28 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump Before IPSCCPPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = icmp sle i32 %0, 0
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = sub nsw i32 %0, 1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
 
@@ -785,27 +806,28 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After IPSCCPPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = icmp sle i32 %0, 0
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = sub nsw i32 %0, 1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
 
@@ -825,27 +847,28 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump Before CalledValuePropagationPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = icmp sle i32 %0, 0
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = sub nsw i32 %0, 1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
 
@@ -865,27 +888,28 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After CalledValuePropagationPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = icmp sle i32 %0, 0
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = sub nsw i32 %0, 1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
 
@@ -905,27 +929,28 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump Before GlobalOptPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) #0 {
   %3 = icmp sle i32 %0, 0
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = sub nsw i32 %0, 1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
 
@@ -945,27 +970,28 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After GlobalOptPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp sle i32 %0, 0
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = sub nsw i32 %0, 1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
 
@@ -984,66 +1010,69 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !7 = !{i32 7, !"uwtable", i32 1}
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
-*** IR Dump Before PromotePass on sumTo ***
+*** IR Dump Before PromotePass on combine ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp sle i32 %0, 0
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = sub nsw i32 %0, 1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
-*** IR Dump After PromotePass on sumTo ***
+*** IR Dump After PromotePass on combine ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp sle i32 %0, 0
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = sub nsw i32 %0, 1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
 *** IR Dump Before DeadArgumentEliminationPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp sle i32 %0, 0
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = sub nsw i32 %0, 1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
 
@@ -1063,27 +1092,28 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After DeadArgumentEliminationPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp sle i32 %0, 0
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = sub nsw i32 %0, 1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
 
@@ -1102,98 +1132,103 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !7 = !{i32 7, !"uwtable", i32 1}
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
-*** IR Dump Before InstCombinePass on sumTo ***
+*** IR Dump Before InstCombinePass on combine ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp sle i32 %0, 0
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = sub nsw i32 %0, 1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
-*** IR Dump After InstCombinePass on sumTo ***
+*** IR Dump After InstCombinePass on combine ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = add nsw i32 %0, -1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
-*** IR Dump Before SimplifyCFGPass on sumTo ***
+*** IR Dump Before SimplifyCFGPass on combine ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
   br i1 %3, label %4, label %5
 
 4:                                                ; preds = %2
-  br label %9
+  br label %10
 
 5:                                                ; preds = %2
   %6 = add nsw i32 %0, -1
-  %7 = add nsw i32 %1, %0
-  %8 = call i32 @sumTo(i32 noundef %6, i32 noundef %7)
-  br label %9
+  %7 = mul nsw i32 %1, 31
+  %8 = add nsw i32 %7, %0
+  %9 = call i32 @combine(i32 noundef %6, i32 noundef %8)
+  br label %10
 
-9:                                                ; preds = %5, %4
-  %.0 = phi i32 [ %1, %4 ], [ %8, %5 ]
+10:                                               ; preds = %5, %4
+  %.0 = phi i32 [ %1, %4 ], [ %9, %5 ]
   ret i32 %.0
 }
-*** IR Dump After SimplifyCFGPass on sumTo ***
+*** IR Dump After SimplifyCFGPass on combine ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 *** IR Dump Before RequireAnalysisPass<llvm::GlobalsAA, llvm::Module> on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -1213,24 +1248,25 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After RequireAnalysisPass<llvm::GlobalsAA, llvm::Module> on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -1249,57 +1285,60 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !7 = !{i32 7, !"uwtable", i32 1}
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
-*** IR Dump Before InvalidateAnalysisPass<llvm::AAManager> on sumTo ***
+*** IR Dump Before InvalidateAnalysisPass<llvm::AAManager> on combine ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After InvalidateAnalysisPass<llvm::AAManager> on sumTo ***
+*** IR Dump After InvalidateAnalysisPass<llvm::AAManager> on combine ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 *** IR Dump Before RequireAnalysisPass<llvm::ProfileSummaryAnalysis, llvm::Module> on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -1319,24 +1358,25 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After RequireAnalysisPass<llvm::ProfileSummaryAnalysis, llvm::Module> on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -1355,889 +1395,944 @@ attributes #0 = { nounwind uwtable "frame-pointer"="non-leaf" "min-legal-vector-
 !7 = !{i32 7, !"uwtable", i32 1}
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
-*** IR Dump Before InlinerPass on (sumTo) ***
+*** IR Dump Before InlinerPass on (combine) ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After InlinerPass on (sumTo) ***
+*** IR Dump After InlinerPass on (combine) ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before InlinerPass on (sumTo) ***
+*** IR Dump Before InlinerPass on (combine) ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After InlinerPass on (sumTo) ***
+*** IR Dump After InlinerPass on (combine) ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before PostOrderFunctionAttrsPass on (sumTo) ***
+*** IR Dump Before PostOrderFunctionAttrsPass on (combine) ***
 ; Function Attrs: nounwind uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After PostOrderFunctionAttrsPass on (sumTo) ***
+*** IR Dump After PostOrderFunctionAttrsPass on (combine) ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before SROAPass on sumTo ***
+*** IR Dump Before SROAPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After SROAPass on sumTo ***
+*** IR Dump After SROAPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before EarlyCSEPass on sumTo ***
+*** IR Dump Before EarlyCSEPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After EarlyCSEPass on sumTo ***
+*** IR Dump After EarlyCSEPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before SimplifyCFGPass on sumTo ***
+*** IR Dump Before SimplifyCFGPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After SimplifyCFGPass on sumTo ***
+*** IR Dump After SimplifyCFGPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before InstCombinePass on sumTo ***
+*** IR Dump Before InstCombinePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After InstCombinePass on sumTo ***
+*** IR Dump After InstCombinePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before LibCallsShrinkWrapPass on sumTo ***
+*** IR Dump Before LibCallsShrinkWrapPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After LibCallsShrinkWrapPass on sumTo ***
+*** IR Dump After LibCallsShrinkWrapPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before SimplifyCFGPass on sumTo ***
+*** IR Dump Before SimplifyCFGPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After SimplifyCFGPass on sumTo ***
+*** IR Dump After SimplifyCFGPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before ReassociatePass on sumTo ***
+*** IR Dump Before ReassociatePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After ReassociatePass on sumTo ***
+*** IR Dump After ReassociatePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before RequireAnalysisPass<llvm::OptimizationRemarkEmitterAnalysis, llvm::Function> on sumTo ***
+*** IR Dump Before RequireAnalysisPass<llvm::OptimizationRemarkEmitterAnalysis, llvm::Function> on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After RequireAnalysisPass<llvm::OptimizationRemarkEmitterAnalysis, llvm::Function> on sumTo ***
+*** IR Dump After RequireAnalysisPass<llvm::OptimizationRemarkEmitterAnalysis, llvm::Function> on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before LoopSimplifyPass on sumTo ***
+*** IR Dump Before LoopSimplifyPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After LoopSimplifyPass on sumTo ***
+*** IR Dump After LoopSimplifyPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before LCSSAPass on sumTo ***
+*** IR Dump Before LCSSAPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After LCSSAPass on sumTo ***
+*** IR Dump After LCSSAPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before SimplifyCFGPass on sumTo ***
+*** IR Dump Before SimplifyCFGPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After SimplifyCFGPass on sumTo ***
+*** IR Dump After SimplifyCFGPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before InstCombinePass on sumTo ***
+*** IR Dump Before InstCombinePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After InstCombinePass on sumTo ***
+*** IR Dump After InstCombinePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before LoopSimplifyPass on sumTo ***
+*** IR Dump Before LoopSimplifyPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After LoopSimplifyPass on sumTo ***
+*** IR Dump After LoopSimplifyPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before LCSSAPass on sumTo ***
+*** IR Dump Before LCSSAPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After LCSSAPass on sumTo ***
+*** IR Dump After LCSSAPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before SROAPass on sumTo ***
+*** IR Dump Before SROAPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After SROAPass on sumTo ***
+*** IR Dump After SROAPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before MemCpyOptPass on sumTo ***
+*** IR Dump Before MemCpyOptPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After MemCpyOptPass on sumTo ***
+*** IR Dump After MemCpyOptPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before SCCPPass on sumTo ***
+*** IR Dump Before SCCPPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After SCCPPass on sumTo ***
+*** IR Dump After SCCPPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before BDCEPass on sumTo ***
+*** IR Dump Before BDCEPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After BDCEPass on sumTo ***
+*** IR Dump After BDCEPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before InstCombinePass on sumTo ***
+*** IR Dump Before InstCombinePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After InstCombinePass on sumTo ***
+*** IR Dump After InstCombinePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before CoroElidePass on sumTo ***
+*** IR Dump Before CoroElidePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After CoroElidePass on sumTo ***
+*** IR Dump After CoroElidePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before ADCEPass on sumTo ***
+*** IR Dump Before ADCEPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After ADCEPass on sumTo ***
+*** IR Dump After ADCEPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before SimplifyCFGPass on sumTo ***
+*** IR Dump Before SimplifyCFGPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After SimplifyCFGPass on sumTo ***
+*** IR Dump After SimplifyCFGPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before InstCombinePass on sumTo ***
+*** IR Dump Before InstCombinePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After InstCombinePass on sumTo ***
+*** IR Dump After InstCombinePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before CoroSplitPass on (sumTo) ***
+*** IR Dump Before CoroSplitPass on (combine) ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After CoroSplitPass on (sumTo) ***
+*** IR Dump After CoroSplitPass on (combine) ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 *** IR Dump Before GlobalOptPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -2257,24 +2352,25 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After GlobalOptPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -2294,24 +2390,25 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump Before GlobalDCEPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -2331,24 +2428,25 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After GlobalDCEPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -2368,24 +2466,25 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump Before EliminateAvailableExternallyPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -2405,24 +2504,25 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After EliminateAvailableExternallyPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -2442,24 +2542,25 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump Before ReversePostOrderFunctionAttrsPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -2479,24 +2580,25 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After ReversePostOrderFunctionAttrsPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -2516,24 +2618,25 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump Before RequireAnalysisPass<llvm::GlobalsAA, llvm::Module> on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -2553,24 +2656,25 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After RequireAnalysisPass<llvm::GlobalsAA, llvm::Module> on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -2589,793 +2693,842 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !7 = !{i32 7, !"uwtable", i32 1}
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
-*** IR Dump Before Float2IntPass on sumTo ***
+*** IR Dump Before Float2IntPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After Float2IntPass on sumTo ***
+*** IR Dump After Float2IntPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before LowerConstantIntrinsicsPass on sumTo ***
+*** IR Dump Before LowerConstantIntrinsicsPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After LowerConstantIntrinsicsPass on sumTo ***
+*** IR Dump After LowerConstantIntrinsicsPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before LoopSimplifyPass on sumTo ***
+*** IR Dump Before LoopSimplifyPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After LoopSimplifyPass on sumTo ***
+*** IR Dump After LoopSimplifyPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before LCSSAPass on sumTo ***
+*** IR Dump Before LCSSAPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After LCSSAPass on sumTo ***
+*** IR Dump After LCSSAPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before LoopDistributePass on sumTo ***
+*** IR Dump Before LoopDistributePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After LoopDistributePass on sumTo ***
+*** IR Dump After LoopDistributePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before InjectTLIMappings on sumTo ***
+*** IR Dump Before InjectTLIMappings on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After InjectTLIMappings on sumTo ***
+*** IR Dump After InjectTLIMappings on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before LoopVectorizePass on sumTo ***
+*** IR Dump Before LoopVectorizePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After LoopVectorizePass on sumTo ***
+*** IR Dump After LoopVectorizePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before LoopLoadEliminationPass on sumTo ***
+*** IR Dump Before LoopLoadEliminationPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After LoopLoadEliminationPass on sumTo ***
+*** IR Dump After LoopLoadEliminationPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before InstCombinePass on sumTo ***
+*** IR Dump Before InstCombinePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After InstCombinePass on sumTo ***
+*** IR Dump After InstCombinePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before SimplifyCFGPass on sumTo ***
+*** IR Dump Before SimplifyCFGPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After SimplifyCFGPass on sumTo ***
+*** IR Dump After SimplifyCFGPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before VectorCombinePass on sumTo ***
+*** IR Dump Before VectorCombinePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After VectorCombinePass on sumTo ***
+*** IR Dump After VectorCombinePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before InstCombinePass on sumTo ***
+*** IR Dump Before InstCombinePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After InstCombinePass on sumTo ***
+*** IR Dump After InstCombinePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before LoopUnrollPass on sumTo ***
+*** IR Dump Before LoopUnrollPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After LoopUnrollPass on sumTo ***
+*** IR Dump After LoopUnrollPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before WarnMissedTransformationsPass on sumTo ***
+*** IR Dump Before WarnMissedTransformationsPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After WarnMissedTransformationsPass on sumTo ***
+*** IR Dump After WarnMissedTransformationsPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before InstCombinePass on sumTo ***
+*** IR Dump Before InstCombinePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After InstCombinePass on sumTo ***
+*** IR Dump After InstCombinePass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before RequireAnalysisPass<llvm::OptimizationRemarkEmitterAnalysis, llvm::Function> on sumTo ***
+*** IR Dump Before RequireAnalysisPass<llvm::OptimizationRemarkEmitterAnalysis, llvm::Function> on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After RequireAnalysisPass<llvm::OptimizationRemarkEmitterAnalysis, llvm::Function> on sumTo ***
+*** IR Dump After RequireAnalysisPass<llvm::OptimizationRemarkEmitterAnalysis, llvm::Function> on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before LoopSimplifyPass on sumTo ***
+*** IR Dump Before LoopSimplifyPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After LoopSimplifyPass on sumTo ***
+*** IR Dump After LoopSimplifyPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before LCSSAPass on sumTo ***
+*** IR Dump Before LCSSAPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After LCSSAPass on sumTo ***
+*** IR Dump After LCSSAPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before AlignmentFromAssumptionsPass on sumTo ***
+*** IR Dump Before AlignmentFromAssumptionsPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After AlignmentFromAssumptionsPass on sumTo ***
+*** IR Dump After AlignmentFromAssumptionsPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before LoopSinkPass on sumTo ***
+*** IR Dump Before LoopSinkPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After LoopSinkPass on sumTo ***
+*** IR Dump After LoopSinkPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before InstSimplifyPass on sumTo ***
+*** IR Dump Before InstSimplifyPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After InstSimplifyPass on sumTo ***
+*** IR Dump After InstSimplifyPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before DivRemPairsPass on sumTo ***
+*** IR Dump Before DivRemPairsPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After DivRemPairsPass on sumTo ***
+*** IR Dump After DivRemPairsPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before SimplifyCFGPass on sumTo ***
+*** IR Dump Before SimplifyCFGPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After SimplifyCFGPass on sumTo ***
+*** IR Dump After SimplifyCFGPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump Before CoroCleanupPass on sumTo ***
+*** IR Dump Before CoroCleanupPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After CoroCleanupPass on sumTo ***
+*** IR Dump After CoroCleanupPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 *** IR Dump Before CGProfilePass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -3395,24 +3548,25 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After CGProfilePass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -3432,24 +3586,25 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump Before GlobalDCEPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -3469,24 +3624,25 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After GlobalDCEPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -3506,24 +3662,25 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump Before ConstantMergePass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -3543,24 +3700,25 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After ConstantMergePass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -3580,24 +3738,25 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump Before RelLookupTableConverterPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -3617,24 +3776,25 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After RelLookupTableConverterPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -3653,57 +3813,60 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !7 = !{i32 7, !"uwtable", i32 1}
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
-*** IR Dump Before AnnotationRemarksPass on sumTo ***
+*** IR Dump Before AnnotationRemarksPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
-*** IR Dump After AnnotationRemarksPass on sumTo ***
+*** IR Dump After AnnotationRemarksPass on combine ***
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 *** IR Dump Before VerifierPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -3723,24 +3886,25 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After VerifierPass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -3760,24 +3924,25 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump Before PrintModulePass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
@@ -3797,24 +3962,25 @@ attributes #0 = { nofree nosync nounwind readnone uwtable "frame-pointer"="non-l
 !8 = !{i32 7, !"frame-pointer", i32 1}
 !9 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
 *** IR Dump After PrintModulePass on [module] ***
-; ModuleID = 'sumTo.in.ll'
-source_filename = "sumTo.c"
+; ModuleID = 'combine.in.ll'
+source_filename = "combine.c"
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-unknown-linux-gnu"
 
 ; Function Attrs: nofree nosync nounwind readnone uwtable
-define dso_local i32 @sumTo(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
+define dso_local i32 @combine(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = icmp slt i32 %0, 1
-  br i1 %3, label %8, label %4
+  br i1 %3, label %9, label %4
 
 4:                                                ; preds = %2
   %5 = add nsw i32 %0, -1
-  %6 = add nsw i32 %1, %0
-  %7 = call i32 @sumTo(i32 noundef %5, i32 noundef %6)
-  br label %8
+  %6 = mul nsw i32 %1, 31
+  %7 = add nsw i32 %6, %0
+  %8 = call i32 @combine(i32 noundef %5, i32 noundef %7)
+  br label %9
 
-8:                                                ; preds = %2, %4
-  %.0 = phi i32 [ %7, %4 ], [ %1, %2 ]
+9:                                                ; preds = %2, %4
+  %.0 = phi i32 [ %8, %4 ], [ %1, %2 ]
   ret i32 %.0
 }
 
