@@ -12,9 +12,12 @@
 #include "llvm/IR/PassManager.h"
 #include "llvm/IR/ValueHandle.h"
 #include "llvm/IRReader/IRReader.h"
+#include "llvm/MC/TargetRegistry.h"
 #include "llvm/Passes/PassBuilder.h"
 #include "llvm/Support/SourceMgr.h"
+#include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/Target/TargetMachine.h"
 
 #include <algorithm>
 #include <cstdint>
@@ -366,6 +369,23 @@ void printSyntheticModulePass(StringRef PassId, const Module &ModuleValue) {
 
 } // namespace
 
+// Mirrors how `opt` derives a target from the module under test. A missing
+// target is not fatal: the pipeline still runs, it simply measures whatever a
+// target-less pipeline produces, which is what this collector did before.
+static std::unique_ptr<TargetMachine> createTargetMachine(const Module &M) {
+  const std::string Triple = M.getTargetTriple();
+  if (Triple.empty())
+    return nullptr;
+
+  std::string Error;
+  const Target *Found = TargetRegistry::lookupTarget(Triple, Error);
+  if (Found == nullptr)
+    return nullptr;
+
+  return std::unique_ptr<TargetMachine>(Found->createTargetMachine(
+      Triple, /*CPU=*/"", /*Features=*/"", TargetOptions(), None));
+}
+
 // Maps an `opt`-style level flag to the matching OptimizationLevel constant.
 // Must be run with the same level as the `opt` invocation that produced the
 // dump log being measured, or pass events will not align with the dumps.
@@ -380,6 +400,10 @@ static std::optional<OptimizationLevel> parseOptimizationLevel(StringRef Level) 
 }
 
 int main(int ArgumentCount, char **Arguments) {
+  // Required before TargetRegistry can resolve the module's triple.
+  InitializeNativeTarget();
+  InitializeNativeTargetAsmPrinter();
+
   if (ArgumentCount != 3) {
     errs() << "usage: llvm-ir-metrics <original-ir> <O0|O1|O2|O3|Os|Oz>\n";
     return 2;
@@ -440,7 +464,17 @@ int main(int ArgumentCount, char **Arguments) {
   PipelineTuningOptions TuningOptions;
   TuningOptions.SLPVectorization = true;
 
-  PassBuilder Builder(nullptr, TuningOptions, None, &InstrumentationCallbacks);
+  /*
+   * `opt` builds a TargetMachine from the module triple, so its pipeline gets
+   * real TargetTransformInfo. Without one the loop vectoriser cannot know the
+   * target's vector width and quietly declines to vectorise, so the collector
+   * ran a different pipeline from the one being measured: on a vectorising
+   * program `opt` ran LICM over the extra %vector.body loop and the collector
+   * did not, leaving those dumps unmeasurable and failing the whole request.
+   */
+  std::unique_ptr<TargetMachine> Machine = createTargetMachine(*Module);
+  PassBuilder Builder(Machine.get(), TuningOptions, None,
+                      &InstrumentationCallbacks);
 
   FunctionAnalyses.registerPass([&] { return Builder.buildDefaultAAPipeline(); });
   Builder.registerModuleAnalyses(ModuleAnalyses);
