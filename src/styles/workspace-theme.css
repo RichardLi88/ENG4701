@@ -86,9 +86,11 @@
 
 [data-workspace-theme]
   :where(
+    [class~="bg-slate-500"],
     [class~="bg-slate-600"],
     [class~="bg-slate-700"],
-    [class~="bg-slate-800"]
+    [class~="bg-slate-800"],
+    [class~="bg-slate-800/80"]
   ) {
   background-color: var(--workspace-surface-raised);
 }
@@ -127,7 +129,11 @@
 }
 
 [data-workspace-theme]
-  :where([class~="border-slate-800"], [class~="border-slate-800/70"]) {
+  :where(
+    [class~="border-slate-800"],
+    [class~="border-slate-800/70"],
+    [class~="border-slate-800/80"]
+  ) {
   border-color: var(--workspace-border-muted);
 }
 
