@@ -138,7 +138,12 @@ export const PassDetail = memo(function PassDetail({
                     scope="row"
                     className="px-4 py-3 font-medium text-slate-300"
                   >
-                    {label}
+                    <span
+                      className="cursor-help underline decoration-slate-700 decoration-dotted underline-offset-4"
+                      title={passDetailContent.metrics.glossary[key]}
+                    >
+                      {label}
+                    </span>
                   </th>
                   {metric.status === "available" ? (
                     <>

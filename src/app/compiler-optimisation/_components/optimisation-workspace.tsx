@@ -243,8 +243,7 @@ function OptimisationWorkspaceSession({
                 Optimisation workspace
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
-                Follow each compiler pass and compare the LLVM IR it receives
-                with the IR it produces.
+                {compilerWorkspaceContent.intro}
               </p>
             </div>
             <dl className="grid min-w-0 grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3">

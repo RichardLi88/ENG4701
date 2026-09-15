@@ -1,7 +1,7 @@
 export const compilerWorkflowContent = {
   heading: "Upload C/C++ source",
   description:
-    "Choose a local source file to compile and inspect its LLVM optimisation passes.",
+    "Choose a local source file. The compiler improves your program through a long series of small steps, and this tool shows you what each step changed.",
   uploadHelp: ".c and .cpp files up to 50,000 characters",
   compactRegionLabel: "Source file actions",
   level: {
@@ -67,6 +67,8 @@ export const compilerWorkflowContent = {
 } as const;
 
 export const compilerWorkspaceContent = {
+  intro:
+    "A compiler improves your program in many small steps, each called a Pass. Pick one below to see the code it was given, the code it produced, and what changed in between.",
   overallIr: {
     heading: "Whole program, before and after",
     description:
@@ -145,6 +147,19 @@ export const passDetailContent = {
     },
     measured: "Measured",
     estimated: "Estimated",
+    /** Plain-English gloss for each row, surfaced as a tooltip on the label. */
+    glossary: {
+      instructions:
+        "One low-level operation, such as a single add or a single load. Roughly the unit of work the processor carries out.",
+      memoryOperations:
+        "Reads from and writes to memory, as opposed to values held in registers. Memory access is usually slower than arithmetic.",
+      basicBlocks:
+        "A straight run of instructions with no way in or out except at its start and end. The boxes in the control flow graph are basic blocks.",
+      branches:
+        "Points where the program can take more than one path, such as an if or the test at the end of a loop.",
+      cyclomaticComplexity:
+        "A count of the independent paths through the function. Higher means more branching, so more possible routes through the code.",
+    },
     unchangedDeltaNote:
       "Every delta is zero because this Pass did not change the IR it ran on.",
   },
