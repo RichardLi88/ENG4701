@@ -35,10 +35,16 @@ import {
 import { FunctionSelector } from "./function-selector";
 import { OptimisationSummary } from "./optimisation-summary";
 import { OverallIrComparison } from "./overall-ir-comparison";
+import { SourcePanel } from "./source-panel";
 import { PassDetail } from "./pass-detail";
 import { PassFiltersControl } from "./pass-filters";
 import { PASS_VIRTUALISATION_THRESHOLD, PassList } from "./pass-list";
 import { StatusPanel } from "~/app/_components/status-panel";
+
+const UNAVAILABLE_SOURCE = {
+  status: "unavailable",
+  reason: "not-provided",
+} as const;
 
 type InteractiveOptimisationWorkspaceProps = OptimisationWorkspaceProps &
   Readonly<{
@@ -50,6 +56,7 @@ type InteractiveOptimisationWorkspaceProps = OptimisationWorkspaceProps &
 
 export function OptimisationWorkspace({
   model,
+  source,
   resultKey,
   initialWorkspaceState,
   children,
@@ -58,6 +65,7 @@ export function OptimisationWorkspace({
     <OptimisationWorkspaceSession
       key={resultKey}
       model={model}
+      source={source}
       initialWorkspaceState={initialWorkspaceState}
     >
       {children}
@@ -67,6 +75,7 @@ export function OptimisationWorkspace({
 
 function OptimisationWorkspaceSession({
   model,
+  source = UNAVAILABLE_SOURCE,
   initialWorkspaceState,
   children,
 }: OptimisationWorkspaceProps &
@@ -263,6 +272,8 @@ function OptimisationWorkspaceSession({
             </dl>
           </div>
         </header>
+
+        <SourcePanel source={source} />
 
         <OverallIrComparison model={model} />
 

@@ -16,6 +16,23 @@ function renderWorkspace() {
   render(<OptimisationWorkspace model={result.data} resultKey="test-result" />);
 }
 
+function renderWorkspaceWithSource() {
+  const result = parseOptimisationResult(multiFunctionFixture);
+
+  if (!result.ok) throw new Error(result.error.message);
+
+  render(
+    <OptimisationWorkspace
+      model={result.data}
+      resultKey="with-source"
+      source={{
+        status: "available",
+        data: { name: "demo.c", text: "int main(void) {\n  return 0;\n}" },
+      }}
+    />,
+  );
+}
+
 function renderManyPassWorkspace() {
   const result = parseOptimisationResult(manyPassesFixture);
 
@@ -118,6 +135,38 @@ describe("OptimisationWorkspace", () => {
     expect(screen.getByRole("button", { name: /Transform/ })).toHaveTextContent(
       "Transform1",
     );
+  });
+
+  test("keeps the uploaded source available across Pass selections", async () => {
+    const user = userEvent.setup();
+    renderWorkspaceWithSource();
+
+    const sourcePanel = within(
+      screen.getByRole("region", { name: "Original source" }),
+    );
+    expect(sourcePanel.getByText("demo.c")).toBeInTheDocument();
+    expect(sourcePanel.getByText("int main(void) {")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /helper 2 Passes/ }));
+
+    expect(
+      within(screen.getByRole("region", { name: "Original source" })).getByText(
+        "int main(void) {",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  test("reports an unavailable source rather than an empty panel", () => {
+    const result = parseOptimisationResult(multiFunctionFixture);
+    if (!result.ok) throw new Error(result.error.message);
+
+    render(<OptimisationWorkspace model={result.data} resultKey="no-source" />);
+
+    expect(
+      screen.getByText(
+        "The uploaded source file is not available for this run.",
+      ),
+    ).toBeInTheDocument();
   });
 
   test("navigates between function and global Pass timelines", async () => {
