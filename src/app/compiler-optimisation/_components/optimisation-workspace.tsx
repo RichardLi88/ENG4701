@@ -263,12 +263,6 @@ function OptimisationWorkspaceSession({
                   {model.optimisationLevel}
                 </dd>
               </div>
-              <div>
-                <dt className="text-xs text-slate-500">Protocol</dt>
-                <dd className="mt-1 font-mono text-slate-200">
-                  v{model.schemaVersion}
-                </dd>
-              </div>
             </dl>
           </div>
         </header>

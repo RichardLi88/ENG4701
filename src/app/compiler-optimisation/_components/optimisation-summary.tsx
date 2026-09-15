@@ -51,12 +51,14 @@ export function OptimisationSummary({ model }: OptimisationSummaryProps) {
             {model.summary.analysisPassCount}
           </dd>
         </div>
-        <div className="rounded-full border border-slate-800 px-3 py-1.5 text-slate-400">
-          <dt className="inline">Unknown </dt>
-          <dd className="inline font-mono text-slate-200">
-            {model.summary.unknownPassCount}
-          </dd>
-        </div>
+        {model.summary.unknownPassCount > 0 ? (
+          <div className="rounded-full border border-slate-800 px-3 py-1.5 text-slate-400">
+            <dt className="inline">Unknown </dt>
+            <dd className="inline font-mono text-slate-200">
+              {model.summary.unknownPassCount}
+            </dd>
+          </div>
+        ) : null}
       </dl>
     </section>
   );
