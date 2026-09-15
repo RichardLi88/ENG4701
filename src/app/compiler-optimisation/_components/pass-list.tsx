@@ -230,9 +230,6 @@ export const PassList = memo(function PassList({
                 >
                   {pass.name}
                 </span>
-                <span className="mt-0.5 block text-[0.68rem] tracking-wide text-slate-500 uppercase">
-                  {pass.type} · {scopeLevel}
-                </span>
               </span>
               <span
                 className={`rounded-full px-2 py-1 text-[0.65rem] font-semibold uppercase ${

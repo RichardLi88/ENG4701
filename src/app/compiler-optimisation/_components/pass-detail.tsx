@@ -90,10 +90,10 @@ export const PassDetail = memo(function PassDetail({
             id="pass-metrics-heading"
             className="text-xs font-semibold tracking-[0.14em] text-slate-400 uppercase"
           >
-            Core metrics
+            {passDetailContent.metrics.heading}
           </h3>
           <p className="mt-1 text-xs text-slate-500">
-            Before and after this Pass; delta is after minus before.
+            {passDetailContent.metrics.description}
           </p>
         </div>
         {pass.metrics.status === "unavailable" ? (
@@ -107,13 +107,13 @@ export const PassDetail = memo(function PassDetail({
           <thead className="bg-slate-950/70 text-xs text-slate-500">
             <tr>
               <th scope="col" className="px-4 py-3 font-medium">
-                Metric
+                {passDetailContent.metrics.columns.metric}
               </th>
               <th scope="col" className="px-4 py-3 text-right font-medium">
-                Before
+                {passDetailContent.metrics.columns.before}
               </th>
               <th scope="col" className="px-4 py-3 text-right font-medium">
-                After
+                {passDetailContent.metrics.columns.after}
               </th>
               <th
                 scope="col"
@@ -121,10 +121,10 @@ export const PassDetail = memo(function PassDetail({
                   pass.changed ? "" : "text-slate-700"
                 }`}
               >
-                Delta
+                {passDetailContent.metrics.columns.change}
               </th>
               <th scope="col" className="px-4 py-3 font-medium">
-                Quality
+                {passDetailContent.metrics.columns.measurement}
               </th>
             </tr>
           </thead>
@@ -164,11 +164,11 @@ export const PassDetail = memo(function PassDetail({
                       <td className="px-4 py-3">
                         {metric.data.estimated ? (
                           <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-1 text-xs font-medium text-amber-200">
-                            Estimated
+                            {passDetailContent.metrics.estimated}
                           </span>
                         ) : (
                           <span className="text-xs text-slate-500">
-                            Measured
+                            {passDetailContent.metrics.measured}
                           </span>
                         )}
                       </td>

@@ -133,6 +133,18 @@ export const passDetailContent = {
     functionOrder: "Function",
   },
   metrics: {
+    heading: "Core metrics",
+    description:
+      "Counted before and after this Pass. Change is after minus before.",
+    columns: {
+      metric: "Metric",
+      before: "Before",
+      after: "After",
+      change: "Change",
+      measurement: "Measurement",
+    },
+    measured: "Measured",
+    estimated: "Estimated",
     unchangedDeltaNote:
       "Every delta is zero because this Pass did not change the IR it ran on.",
   },
