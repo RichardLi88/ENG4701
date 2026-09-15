@@ -32,7 +32,7 @@ COPY llvm-service/ .
 # measurements. Keep -std=c++17 after llvm-config flags because LLVM's flags
 # may specify an older language standard.
 RUN clang++ $(llvm-config --cxxflags) -std=c++17 -O2 llvm-ir-metrics.cpp \
-    $(llvm-config --ldflags --system-libs --libs core irreader passes analysis) \
+    $(llvm-config --ldflags --system-libs --libs core irreader passes analysis native) \
     -o /usr/local/bin/llvm-ir-metrics
 
 # Run as non-root user for security
