@@ -33,6 +33,7 @@ import {
 } from "../_lib/workspace-url-state";
 import { FunctionSelector } from "./function-selector";
 import { OptimisationSummary } from "./optimisation-summary";
+import { OverallIrComparison } from "./overall-ir-comparison";
 import { PassDetail } from "./pass-detail";
 import { PassFiltersControl } from "./pass-filters";
 import { PASS_VIRTUALISATION_THRESHOLD, PassList } from "./pass-list";
@@ -251,6 +252,8 @@ function OptimisationWorkspaceSession({
             </dl>
           </div>
         </header>
+
+        <OverallIrComparison model={model} />
 
         <OptimisationSummary model={model} />
 

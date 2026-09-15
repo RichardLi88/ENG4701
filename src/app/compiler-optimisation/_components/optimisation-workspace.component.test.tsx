@@ -66,7 +66,8 @@ describe("OptimisationWorkspace", () => {
     await user.click(screen.getByRole("button", { name: /helper 2 Passes/ }));
     await user.click(screen.getByRole("button", { name: /^Unchanged/ }));
     await user.click(screen.getByRole("button", { name: "Next Pass" }));
-    await user.click(screen.getByRole("button", { name: "Unified" }));
+    const passDetail = within(screen.getByRole("article"));
+    await user.click(passDetail.getByRole("button", { name: "Unified" }));
 
     const params = new URLSearchParams(window.location.search);
     expect(params.get("campaign")).toBe("demo");
@@ -75,7 +76,7 @@ describe("OptimisationWorkspace", () => {
     expect(params.get("change")).toBe("unchanged");
     expect(params.get("diff")).toBe("unified");
     expect(
-      screen.getByRole("region", { name: "Unified optimisation IR" }),
+      passDetail.getByRole("region", { name: "Unified optimisation IR" }),
     ).toBeInTheDocument();
   });
 
