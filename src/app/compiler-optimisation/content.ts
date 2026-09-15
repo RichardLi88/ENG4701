@@ -159,6 +159,60 @@ export const passDetailContent = {
   },
 } as const;
 
+/**
+ * Hand-written, plain-English descriptions for the Passes that actually change
+ * something across the study set. Each one describes what the Pass does in
+ * general. None of them describes what happened to the program on screen:
+ * the reader combines this with the metrics, Diff and CFG to work that out.
+ */
+export const passDescriptionContent = {
+  heading: "What this Pass does",
+  fallbackLabel: "General description",
+  categoryLabel: "Category",
+  descriptions: {
+    InstCombinePass:
+      "Rewrites small groups of instructions into cheaper equivalent ones: folding arithmetic on known constants, cancelling operations that undo each other, and replacing costly operations with simpler ones. It works locally, a few instructions at a time, rather than restructuring the program.",
+    SimplifyCFGPass:
+      "Cleans up the shape of the program's control flow: merges blocks that always run one after another, and removes branches where both paths lead to the same place. It does not change what the program computes, only the route it takes through the code.",
+    SROAPass:
+      "Local variables start out as slots in memory. This splits them apart and keeps them in registers instead, so later steps can reason about them as plain values. Small structs and arrays are broken into their individual fields where possible.",
+    PostOrderFunctionAttrsPass:
+      "Works out properties of each function that the rest of the pipeline can rely on, such as whether it reads or writes memory, or whether its result depends only on its arguments. It records these as annotations rather than changing any code. Later Passes use them to justify optimisations they would otherwise have to skip.",
+    LCSSAPass:
+      "Rewrites a loop so that any value computed inside it and used afterwards passes through a dedicated variable at the loop's exit. This is bookkeeping rather than an optimisation: it gives later loop Passes a single, predictable place to update when they rewrite the loop.",
+    GlobalOptPass:
+      "Looks at variables and functions shared across the whole file rather than those inside a single function. It can turn a global that is only ever read into a constant, narrow one that never escapes into a local, and delete those nothing refers to.",
+    ReassociatePass:
+      "Reorders chains of arithmetic that can legally be regrouped, such as a run of additions or multiplications. This does not make the code faster by itself; it arranges operands into a consistent order so later Passes can spot repeated sub-expressions and constants to fold.",
+    LoopSimplifyPass:
+      "Puts every loop into a standard shape: one entry point, a single place that jumps back to the start, and dedicated blocks for leaving. It inserts those blocks when they are missing. Nothing about the computation changes, but later loop Passes rely on the regular structure.",
+    EarlyCSEPass:
+      "Spots expressions computed more than once from the same inputs and reuses the first result instead of recomputing it. It is a fast, local version of that clean-up, run early so later Passes see fewer redundant values.",
+    LoopRotatePass:
+      "Rewrites a loop that tests its condition at the top into one that checks once before entering and then tests at the bottom. This does not change how many times the body runs, but it puts the loop into the form later Passes need in order to unroll or vectorise it.",
+    IndVarSimplifyPass:
+      "Tidies up the variables that track a loop's progress, such as its counter. Where the compiler can work out a direct formula, it replaces step-by-step updates with plain arithmetic, and it can simplify or remove the test that ends the loop.",
+    LoopDeletionPass:
+      "Removes a loop entirely when the compiler can prove the program does not need to run it. That happens when nothing afterwards uses the loop's result, or when the value it computes can be worked out with plain arithmetic instead.",
+    GVNPass:
+      "Finds values that are provably equal even when they are computed in different places or written in different ways, and keeps just one of them. It reasons across branches, so it catches redundancy that the earlier local clean-ups miss.",
+    LoopUnrollPass:
+      "Repeats a loop body several times per iteration so the loop runs fewer times, or removes the loop altogether by writing out every iteration when the number of iterations is small and known. This trades larger code for less per-iteration overhead.",
+    InstSimplifyPass:
+      "Replaces instructions whose result is already known with that value, without building any new instructions. Where InstCombine rewrites code into a better form, this Pass only removes work that is provably redundant.",
+    CorrelatedValuePropagationPass:
+      "Uses facts implied by earlier branches to simplify later code. If reaching a block means a value must sit in a certain range or equal a particular constant, comparisons and branches that depend on it can be settled on the spot.",
+    TailCallElimPass:
+      "Recognises a call in the last position of a function whose result is returned straight back, and turns that recursion into a loop where it can. This stops the call stack growing with every repetition.",
+    JumpThreadingPass:
+      "When the outcome of a branch is already decided by the path taken to reach it, this redirects the jump straight to its destination and skips the redundant test. It can duplicate small blocks to expose those shortcuts.",
+    LoopVectorizePass:
+      "Rewrites a loop so that each iteration works on several elements at once using wide instructions, when it can prove the iterations do not depend on each other. Fewer iterations then cover the same work.",
+    LoopLoadEliminationPass:
+      "Spots a loop that reads a memory location one iteration after writing it, and carries the value forward in a register instead of loading it again. The repeated memory access disappears while the computation stays the same.",
+  },
+} as const;
+
 export const routeErrorContent = {
   eyebrow: "Route error",
   title: "The optimisation workspace could not be loaded",
