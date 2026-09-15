@@ -305,6 +305,11 @@ export const irDiffContent = {
     regionLabel: "IR at this point in the pipeline, read only",
   },
   viewLabel: "Diff view",
+  fold: {
+    expand: "Show",
+    unchangedLine: "unchanged line",
+    unchangedLines: "unchanged lines",
+  },
   modes: {
     sideBySide: "Side by side",
     unified: "Unified",

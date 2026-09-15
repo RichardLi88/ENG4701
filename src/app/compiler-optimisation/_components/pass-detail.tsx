@@ -405,6 +405,7 @@ export const PassDetail = memo(function PassDetail({
 
       {pass.changed ? (
         <IrDiffViewer
+          key={`ir-diff:${pass.id}`}
           before={pass.ir.before}
           after={pass.ir.after}
           structuredDiff={
