@@ -24,6 +24,10 @@
 - `day3-basic.c`, `day3-control-flow.c`, `day3-special-function.c`, and
   `day3-operators.cpp`: stable real-service success cases used by
   `npm run test:e2e:llvm` together with `e2e-multi-function.c`.
+- `e2e-static-helper.c`: a `static` helper called from the same translation
+  unit. `npm run test:e2e:llvm` asserts that `InlinerPass` appears in the trace
+  and changes the IR, which only holds because the service strips clang's
+  `noinline` attribute. See "LLVM pipeline caveats" in the root `README.md`.
 - `invalid.json`: intentionally invalid because `schemaVersion` is missing and `passes[0].order` is a string.
 
 The optional values in `multi-function.json` describe only the explicit hand-written IR in that fixture. Other fixtures omit unavailable optional data instead of supplying placeholders.

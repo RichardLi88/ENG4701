@@ -26,6 +26,14 @@ const cases = [
     minimumFunctions: 2,
     expectedFunctionPattern: /^_ZN10arithmetic/,
   },
+  {
+    sourceFile: "e2e-static-helper.c",
+    minimumFunctions: 2,
+    // clang stamps `noinline` on every `-O0` function; the service strips it so
+    // the pipeline can inline the `static` helper.
+    expectedPassPattern: /^InlinerPass$/,
+    expectedChangedPassPattern: /^InlinerPass$/,
+  },
 ];
 
 async function fetchWithTimeout(endpoint, init) {
@@ -116,6 +124,26 @@ function assertPayloadInvariants(payload, payloadText, testCase) {
       payload.functions.some((fn) =>
         testCase.expectedFunctionPattern.test(fn.name),
       ),
+    );
+  }
+
+  if (testCase.expectedPassPattern !== undefined) {
+    assert.ok(
+      payload.passes.some((pass) =>
+        testCase.expectedPassPattern.test(pass.fullName ?? pass.name),
+      ),
+      `expected a Pass matching ${testCase.expectedPassPattern} in ${testCase.sourceFile}`,
+    );
+  }
+
+  if (testCase.expectedChangedPassPattern !== undefined) {
+    assert.ok(
+      payload.passes.some(
+        (pass) =>
+          pass.changed &&
+          testCase.expectedChangedPassPattern.test(pass.fullName ?? pass.name),
+      ),
+      `expected a changed Pass matching ${testCase.expectedChangedPassPattern} in ${testCase.sourceFile}`,
     );
   }
 }

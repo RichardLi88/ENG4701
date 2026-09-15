@@ -6,6 +6,7 @@ const { join } = require("path");
 const { promisify } = require("util");
 const { measureIrDumpData } = require("./measured-metrics");
 const { createOptimisationPayload } = require("./optimisation-payload");
+const { stripNoinlineAttributes } = require("./strip-noinline");
 
 const execAsync = promisify(exec);
 const app = express();
@@ -71,12 +72,15 @@ async function optimiseIr(ir, level = DEFAULT_OPTIMISATION_LEVEL) {
     throw new Error(`Unsupported optimisation level: ${level}`);
   }
 
+  // Strip here rather than at the call sites so that `opt`, the metrics
+  // collector and the reported unoptimised IR all describe the same module.
+  const preparedIr = stripNoinlineAttributes(ir);
   const id = crypto.randomUUID();
   const inPath = join(tmpdir(), `${id}_in.ll`);
   const outPath = join(tmpdir(), `${id}_out.ll`);
 
   try {
-    await writeFile(inPath, ir);
+    await writeFile(inPath, preparedIr);
 
     const { stderr } = await execAsync(
       `opt -passes="default<${level}>" -print-before-all -print-after-all -S "${inPath}" -o "${outPath}"`,
@@ -84,7 +88,7 @@ async function optimiseIr(ir, level = DEFAULT_OPTIMISATION_LEVEL) {
     );
 
     const optimisedIr = await readFile(outPath, "utf-8");
-    return { optimisedIr, beforeAfterLog: stderr };
+    return { optimisedIr, beforeAfterLog: stderr, preparedIr };
   } finally {
     await Promise.allSettled([unlink(inPath), unlink(outPath)]);
   }
@@ -105,7 +109,8 @@ app.post("/optimise", async (req, res) => {
   }
 
   try {
-    res.json(await optimiseIr(ir, level));
+    const { optimisedIr, beforeAfterLog } = await optimiseIr(ir, level);
+    res.json({ optimisedIr, beforeAfterLog });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown LLVM error";
     res.status(500).json({ error: message });
@@ -140,7 +145,11 @@ app.post("/optimise-structured", async (req, res) => {
       analysesByDump,
       cfgByDump: measuredCfgByDump,
       metricsByDump: measuredMetricsByDump,
-    } = await measureIrDumpData(result.beforeAfterLog, ir, level);
+    } = await measureIrDumpData(
+      result.beforeAfterLog,
+      result.preparedIr,
+      level,
+    );
     res.json(
       createOptimisationPayload({
         beforeAfterLog: result.beforeAfterLog,
@@ -148,7 +157,7 @@ app.post("/optimise-structured", async (req, res) => {
         measuredCfgByDump,
         measuredMetricsByDump,
         sourceFile: filename,
-        unoptimisedIr: ir,
+        unoptimisedIr: result.preparedIr,
         optimisationLevel: level,
       }),
     );
