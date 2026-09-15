@@ -128,7 +128,7 @@ export const compilerWorkspaceContent = {
 
 export const passDetailContent = {
   metadata: {
-    fullName: "Full name",
+    llvmName: "LLVM name",
     globalOrder: "Global",
     functionOrder: "Function",
   },
@@ -175,7 +175,6 @@ export const sourcePanelContent = {
 } as const;
 
 export const passDescriptionContent = {
-  heading: "What this Pass does",
   fallbackLabel: "General description",
   categoryLabel: "Category",
   descriptions: {

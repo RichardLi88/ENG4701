@@ -328,64 +328,61 @@ export const PassDetail = memo(function PassDetail({
           {pass.name}
         </h2>
         {description.status === "available" ? (
-          <section className="mt-3" aria-labelledby="pass-description-heading">
-            <h3 id="pass-description-heading" className="sr-only">
-              {passDescriptionContent.heading}
-            </h3>
-            <p className="max-w-3xl text-sm leading-6 text-slate-300">
+          <div className="mt-3">
+            <p className="max-w-prose text-base leading-7 text-slate-200">
               {description.data.text}
             </p>
-            <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500">
-              {description.data.category.status === "available" ? (
-                <span>
-                  <span className="tracking-wide uppercase">
-                    {passDescriptionContent.categoryLabel}
-                  </span>{" "}
-                  <span className="font-mono text-slate-400">
-                    {description.data.category.data}
-                  </span>
-                </span>
-              ) : null}
-              {description.data.source === "generated" ? (
-                <span className="rounded-full bg-slate-800/80 px-2 py-0.5">
+            {description.data.source === "generated" ? (
+              <p className="mt-2">
+                <span className="rounded-full bg-slate-800/80 px-2 py-0.5 text-xs text-slate-400">
                   {passDescriptionContent.fallbackLabel}
                 </span>
-              ) : null}
-            </p>
-          </section>
+              </p>
+            ) : null}
+          </div>
         ) : null}
-        <div className="mt-2 flex min-w-0 flex-wrap items-end justify-between gap-x-6 gap-y-3">
-          <code
-            className="min-w-0 truncate text-xs text-slate-400"
-            title={fullName}
-            aria-label={`${passDetailContent.metadata.fullName}: ${fullName}`}
-          >
-            {fullName}
-          </code>
-          <dl className="flex shrink-0 items-center gap-2 text-xs">
+        <dl className="mt-4 flex min-w-0 flex-wrap items-baseline gap-x-6 gap-y-2 text-xs">
+          {description.status === "available" &&
+          description.data.category.status === "available" ? (
             <div className="flex items-baseline gap-1.5">
               <dt className="font-medium tracking-wide text-slate-500 uppercase">
-                {passDetailContent.metadata.globalOrder}
+                {passDescriptionContent.categoryLabel}
               </dt>
-              <dd className="font-mono text-slate-200 tabular-nums">
-                {pass.position.global + 1}
+              <dd className="font-mono text-slate-300">
+                {description.data.category.data}
               </dd>
             </div>
-            {pass.position.withinFunction.status === "available" ? (
-              <div className="flex items-baseline gap-2">
-                <dt className="flex items-baseline gap-2 font-medium tracking-wide text-slate-500 uppercase">
-                  <span className="font-mono text-cyan-700" aria-hidden="true">
-                    →
-                  </span>
-                  {passDetailContent.metadata.functionOrder}
-                </dt>
-                <dd className="font-mono text-slate-200 tabular-nums">
-                  {localPosition}
-                </dd>
-              </div>
-            ) : null}
-          </dl>
-        </div>
+          ) : null}
+          <div className="flex min-w-0 items-baseline gap-1.5">
+            <dt className="shrink-0 font-medium tracking-wide text-slate-500 uppercase">
+              {passDetailContent.metadata.llvmName}
+            </dt>
+            <dd
+              className="min-w-0 truncate font-mono text-slate-300"
+              title={fullName}
+            >
+              {fullName}
+            </dd>
+          </div>
+          <div className="flex items-baseline gap-1.5">
+            <dt className="font-medium tracking-wide text-slate-500 uppercase">
+              {passDetailContent.metadata.globalOrder}
+            </dt>
+            <dd className="font-mono text-slate-300 tabular-nums">
+              {pass.position.global + 1}
+            </dd>
+          </div>
+          {pass.position.withinFunction.status === "available" ? (
+            <div className="flex items-baseline gap-1.5">
+              <dt className="font-medium tracking-wide text-slate-500 uppercase">
+                {passDetailContent.metadata.functionOrder}
+              </dt>
+              <dd className="font-mono text-slate-300 tabular-nums">
+                {localPosition}
+              </dd>
+            </div>
+          ) : null}
+        </dl>
       </header>
 
       {pass.changed ? (
