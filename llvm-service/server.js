@@ -150,17 +150,21 @@ app.post("/optimise-structured", async (req, res) => {
       result.preparedIr,
       level,
     );
-    res.json(
-      createOptimisationPayload({
-        beforeAfterLog: result.beforeAfterLog,
-        analysesByDump,
-        measuredCfgByDump,
-        measuredMetricsByDump,
-        sourceFile: filename,
-        unoptimisedIr: result.preparedIr,
-        optimisationLevel: level,
-      }),
-    );
+    const { stdout: versionText } = await execAsync("opt --version", {
+      timeout: 5000,
+    });
+    const toolVersion = versionText.match(/LLVM version (\d+\.\d+\.\d+)/i)?.[1];
+    const payload = createOptimisationPayload({
+      beforeAfterLog: result.beforeAfterLog,
+      analysesByDump,
+      measuredCfgByDump,
+      measuredMetricsByDump,
+      sourceFile: filename,
+      unoptimisedIr: result.preparedIr,
+      optimisationLevel: level,
+    });
+    if (toolVersion) payload.meta.toolVersion = toolVersion;
+    res.json(payload);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown LLVM error";
     res.status(500).json({ error: message });

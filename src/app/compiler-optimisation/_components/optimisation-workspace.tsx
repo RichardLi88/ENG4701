@@ -8,7 +8,10 @@ import {
   type ReactNode,
 } from "react";
 
-import type { OptimisationWorkspaceProps } from "../_lib/optimisation-types";
+import type {
+  OptimisationPassViewModel,
+  OptimisationWorkspaceProps,
+} from "../_lib/optimisation-types";
 import { compilerWorkspaceContent } from "../content";
 import {
   calculatePassFilterCounts,
@@ -51,6 +54,7 @@ type InteractiveOptimisationWorkspaceProps = OptimisationWorkspaceProps &
     /** Stable identity for one loaded result; changing it resets navigation. */
     resultKey: string;
     initialWorkspaceState?: WorkspaceState;
+    renderPassExtras?: (pass: OptimisationPassViewModel) => ReactNode;
     children?: ReactNode;
   }>;
 
@@ -59,6 +63,7 @@ export function OptimisationWorkspace({
   source,
   resultKey,
   initialWorkspaceState,
+  renderPassExtras,
   children,
 }: InteractiveOptimisationWorkspaceProps) {
   return (
@@ -67,6 +72,7 @@ export function OptimisationWorkspace({
       model={model}
       source={source}
       initialWorkspaceState={initialWorkspaceState}
+      renderPassExtras={renderPassExtras}
     >
       {children}
     </OptimisationWorkspaceSession>
@@ -77,10 +83,12 @@ function OptimisationWorkspaceSession({
   model,
   source = UNAVAILABLE_SOURCE,
   initialWorkspaceState,
+  renderPassExtras,
   children,
 }: OptimisationWorkspaceProps &
   Readonly<{
     initialWorkspaceState?: WorkspaceState;
+    renderPassExtras?: (pass: OptimisationPassViewModel) => ReactNode;
     children?: ReactNode;
   }>) {
   const [workspaceState, setWorkspaceState] = useState(
@@ -359,13 +367,16 @@ function OptimisationWorkspaceSession({
                   compact
                 />
               ) : (
-                <PassDetail
-                  pass={selectedPass}
-                  previousPass={adjacentPasses.previousPass}
-                  nextPass={adjacentPasses.nextPass}
-                  diffMode={workspaceState.diffMode}
-                  onDiffModeChange={setDiffMode}
-                />
+                <>
+                  <PassDetail
+                    pass={selectedPass}
+                    previousPass={adjacentPasses.previousPass}
+                    nextPass={adjacentPasses.nextPass}
+                    diffMode={workspaceState.diffMode}
+                    onDiffModeChange={setDiffMode}
+                  />
+                  {renderPassExtras?.(selectedPass)}
+                </>
               )}
             </section>
           </div>

@@ -17,6 +17,8 @@ export type ReductionFileComparison = Readonly<{
 }>;
 
 export type ReductionStepView = Readonly<{
+  testStatus?: ReductionCandidate["status"];
+  exitCode?: number | null;
   index: number;
   candidateId: string | null;
   fromStateId: string;
@@ -69,6 +71,9 @@ export type CandidateComparisonResult =
   | Readonly<{ ok: false; message: string }>;
 
 export type ReductionTraceViewModel = Readonly<{
+  toolVersion?: string | null;
+  testScript?: string | null;
+  testDescription?: string | null;
   schemaVersion: string;
   status: ReductionTrace["meta"]["status"];
   sourceFile: string | null;
@@ -306,6 +311,9 @@ function adaptTrace(trace: ReductionTrace): ReductionTraceViewModel {
     trace.states.map((state) => [state.stateId, state] as const),
   );
   const candidatesByState: Record<string, Array<ReductionCandidateView>> = {};
+  const candidatesById = new Map(
+    trace.candidates.map((candidate) => [candidate.candidateId, candidate]),
+  );
 
   for (const candidate of trace.candidates) {
     if (candidate.becameBest) {
@@ -357,6 +365,9 @@ function adaptTrace(trace: ReductionTrace): ReductionTraceViewModel {
   return {
     schemaVersion: trace.schemaVersion,
     status: trace.meta.status,
+    toolVersion: trace.meta.toolVersion ?? null,
+    testScript: trace.meta.testScript ?? null,
+    testDescription: trace.meta.testDescription ?? null,
     sourceFile: trace.meta.sourceFile ?? null,
     language: trace.meta.language ?? null,
     originalStateId: trace.originalStateId,
@@ -374,6 +385,10 @@ function adaptTrace(trace: ReductionTrace): ReductionTraceViewModel {
     candidateCount: trace.candidates.length,
     candidatesByState,
     steps: trace.steps.map((step) => {
+      const candidate =
+        step.candidateId === null
+          ? undefined
+          : candidatesById.get(step.candidateId);
       const beforeProgram = trace.programs[step.baseProgramRef]!;
       const afterProgram = trace.programs[step.programRef]!;
       const { files, initialFilePath } = buildFiles(
@@ -383,6 +398,9 @@ function adaptTrace(trace: ReductionTrace): ReductionTraceViewModel {
       );
 
       return {
+        ...(candidate
+          ? { testStatus: candidate.status, exitCode: candidate.exitCode }
+          : {}),
         index: step.index,
         candidateId: step.candidateId,
         fromStateId: step.fromStateId,
