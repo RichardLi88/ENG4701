@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useMemo, useState, type ReactNode } from "react";
 
 import { reductionWorkspaceContent, units } from "../content";
 import {
@@ -16,6 +16,10 @@ import { ReductionDiffViewer } from "./reduction-diff-viewer";
 type ReductionWorkspaceProps = Readonly<{
   model: ReductionTraceViewModel;
   resultKey: string;
+  renderExplanation?: (
+    step: ReductionTraceViewModel["steps"][number] | undefined,
+    candidate: ReductionCandidateView | null,
+  ) => ReactNode;
 }>;
 
 type TimelineMode = "accepted" | "all";
@@ -188,13 +192,21 @@ function CandidateBlock({
 export function ReductionWorkspace({
   model,
   resultKey,
+  renderExplanation,
 }: ReductionWorkspaceProps) {
-  return <ReductionWorkspaceSession key={resultKey} model={model} />;
+  return (
+    <ReductionWorkspaceSession
+      key={resultKey}
+      model={model}
+      renderExplanation={renderExplanation}
+    />
+  );
 }
 
 function ReductionWorkspaceSession({
   model,
-}: Readonly<{ model: ReductionTraceViewModel }>) {
+  renderExplanation,
+}: Pick<ReductionWorkspaceProps, "model" | "renderExplanation">) {
   const [timelineMode, setTimelineMode] = useState<TimelineMode>("accepted");
   const [selectedStepIndex, setSelectedStepIndex] = useState(0);
   const selectedStep = model.steps[selectedStepIndex];
@@ -593,6 +605,7 @@ function ReductionWorkspaceSession({
                 )}
               </>
             )}
+            {renderExplanation?.(selectedStep, selectedCandidate)}
           </section>
         </div>
       )}

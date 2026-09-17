@@ -1,0 +1,57 @@
+export const aiContent = {
+  title: "AI step explanation",
+  model: "gpt-5.6-luna · medium · trace + knowledge + grounding",
+  explain: "Explain this step",
+  loading: "Generating explanation…",
+  retry: "Try again",
+  download: "Export research record",
+  idle: "Generate an explanation of this selected step using its recorded evidence and reference material.",
+  notice:
+    "AI-generated. References identify supplied evidence; they do not prove that every claim is correct. Static metric checks do not verify the whole explanation.",
+  error:
+    "The request failed. Check the connection or service configuration and try again.",
+  budget:
+    "This step exceeds the explanation input budget or lacks required evidence. No request was sent.",
+  unavailable: "Not recorded",
+  references: "Reference knowledge",
+  evidence: "Trace evidence",
+  record: "Generation details",
+  privacy:
+    "Generating sends this step's code and evidence to OpenAI. Export includes the supplied code, prompt and raw response.",
+  sections: {
+    generalPurpose: "General purpose",
+    observedChanges: "Changes in this execution",
+    conclusions: "Conclusions",
+    limitations: "Limitations",
+  },
+  metrics: "Static metric checks",
+  metric: "Metric",
+  claimed: "Claimed delta",
+  actual: "Recorded delta",
+  check: "Check",
+  verdict: {
+    match: "Matches input",
+    mismatch: "Does not match input",
+    unsupported: "Not in input",
+  },
+  fields: {
+    status: "Status",
+    model: "Returned model",
+    strategy: "Strategy",
+    version: "Release",
+    prompt: "Prompt SHA-256",
+    knowledge: "Knowledge SHA-256",
+    input: "Evidence SHA-256",
+    elapsed: "Elapsed (ms)",
+    tool: "Recorded tool version",
+  },
+  statuses: {
+    completed: "Completed",
+    blocked: "Unavailable for this evidence",
+    failed: "Generation failed",
+  },
+  source: "Source",
+  scope: "Applicability",
+  sourceVersion: "Reference version",
+  history: "Earlier attempts are retained in the exported record.",
+} as const;

@@ -144,6 +144,8 @@ export const reductionTraceSchema = z
     meta: z
       .object({
         tool: z.literal("perses"),
+        toolVersion: nullableString.optional(),
+        testDescription: nullableString.optional(),
         status: z.enum(["COMPLETED", "FAILED", "INCOMPLETE"]),
         sourceFile: nullableString.optional(),
         testScript: nullableString.optional(),

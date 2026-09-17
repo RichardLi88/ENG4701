@@ -291,6 +291,9 @@ function adaptValidatedResult(
     ok: true,
     data: {
       schemaVersion: payload.schemaVersion,
+      ...(payload.meta.toolVersion
+        ? { toolVersion: payload.meta.toolVersion }
+        : {}),
       sourceFile: payload.meta.sourceFile,
       optimisationLevel: payload.meta.optimisationLevel,
       summary: {
