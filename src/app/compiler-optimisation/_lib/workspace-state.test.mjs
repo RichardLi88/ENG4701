@@ -51,6 +51,7 @@ test("initial state opens on the whole run and its first Pass", () => {
     selectedPassId: model.passes[0].id,
     passFilters: ALL_FILTERS,
     diffMode: "side-by-side",
+    irEmphasis: "guided",
   });
   assert.equal(
     deriveWorkspaceSelection(model, state).selectedFunction,
@@ -137,6 +138,7 @@ test("switching functions atomically selects the new function's first Pass", () 
     selectedPassId: "pass:000002:c2ltcGxpZnljZmc",
     passFilters: ALL_FILTERS,
     diffMode: "side-by-side",
+    irEmphasis: "guided",
   });
   assert.equal(
     deriveWorkspaceSelection(model, next).selectedPass?.scope.functionId,
@@ -173,6 +175,7 @@ test("empty functions and functions without Passes create no invalid IDs", () =>
       selectedPassId: undefined,
       passFilters: ALL_FILTERS,
       diffMode: "side-by-side",
+      irEmphasis: "guided",
     },
   );
 

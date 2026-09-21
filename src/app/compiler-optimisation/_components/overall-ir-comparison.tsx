@@ -5,16 +5,22 @@ import { useMemo, useState } from "react";
 import { compilerWorkspaceContent } from "../content";
 import type { OptimisationViewModel } from "../_lib/optimisation-types";
 import { deriveOverallIrComparison } from "../_lib/overall-ir";
-import type { DiffMode } from "../_lib/workspace-state";
+import type { DiffMode, IrEmphasis } from "../_lib/workspace-state";
 import { IrDiffViewer } from "./ir-diff-viewer";
 
 const content = compilerWorkspaceContent.overallIr;
 
 type OverallIrComparisonProps = Readonly<{
   model: OptimisationViewModel;
+  irEmphasis?: IrEmphasis;
+  onIrEmphasisChange?: (irEmphasis: IrEmphasis) => void;
 }>;
 
-export function OverallIrComparison({ model }: OverallIrComparisonProps) {
+export function OverallIrComparison({
+  model,
+  irEmphasis = "guided",
+  onIrEmphasisChange,
+}: OverallIrComparisonProps) {
   const comparison = useMemo(() => deriveOverallIrComparison(model), [model]);
   // Collapsed by default: expanded, this diff runs past 2,000px and pushes the
   // function list and Pass timeline several screens below the fold.
@@ -65,6 +71,8 @@ export function OverallIrComparison({ model }: OverallIrComparisonProps) {
             after={comparison.data.after}
             mode={diffMode}
             onModeChange={setDiffMode}
+            emphasis={irEmphasis}
+            onEmphasisChange={onIrEmphasisChange}
             headingId="overall-ir-diff-heading"
             heading={content.diffHeading}
             description={content.diffDescription}

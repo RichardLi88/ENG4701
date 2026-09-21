@@ -1,17 +1,24 @@
 import { irDiffContent } from "../content";
+import type { IrEmphasis } from "../_lib/workspace-state";
+import { IrLine } from "./ir-line";
 
 const content = irDiffContent.snapshot;
 
 type IrSnapshotViewProps = Readonly<{
   ir: string;
   headingId: string;
+  emphasis?: IrEmphasis;
 }>;
 
 /**
  * The IR shown once, for a Pass that changed nothing. Two identical panes with
  * no highlighting invite a hunt for a difference that is not there.
  */
-export function IrSnapshotView({ ir, headingId }: IrSnapshotViewProps) {
+export function IrSnapshotView({
+  ir,
+  headingId,
+  emphasis = "guided",
+}: IrSnapshotViewProps) {
   const lines = ir.split("\n");
 
   return (
@@ -44,7 +51,9 @@ export function IrSnapshotView({ ir, headingId }: IrSnapshotViewProps) {
                 <span className="border-r border-slate-800/70 pr-3 text-right text-slate-600 select-none">
                   {index + 1}
                 </span>
-                <code className="px-4 whitespace-pre">{line || " "}</code>
+                <code className="px-4 whitespace-pre">
+                  <IrLine content={line} emphasis={emphasis} />
+                </code>
               </div>
             ))}
           </div>

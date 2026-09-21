@@ -6,12 +6,14 @@ import {
   selectWorkspaceGlobalPasses,
   selectWorkspacePass,
   setWorkspaceDiffMode,
+  setWorkspaceIrEmphasis,
   setWorkspacePassChangeFilter,
   setWorkspacePassSearch,
   setWorkspacePassTypeFilter,
   type PassChangeFilter,
   type PassTypeFilter,
   type DiffMode,
+  type IrEmphasis,
   type WorkspaceState,
 } from "./workspace-state.ts";
 
@@ -23,6 +25,7 @@ export const WORKSPACE_QUERY_KEYS = Object.freeze({
   change: "change",
   search: "search",
   diffMode: "diff",
+  irEmphasis: "ir",
 });
 
 type SearchParamsReader = Readonly<{
@@ -39,6 +42,10 @@ function isPassChangeFilter(value: string | null): value is PassChangeFilter {
 
 function isDiffMode(value: string | null): value is DiffMode {
   return value === "side-by-side" || value === "unified";
+}
+
+function isIrEmphasis(value: string | null): value is IrEmphasis {
+  return value === "guided" || value === "plain";
 }
 
 function findPassFunctionId(
@@ -103,6 +110,12 @@ export function parseWorkspaceUrlState(
     state = setWorkspaceDiffMode(state, requestedDiffMode);
   }
 
+  const requestedIrEmphasis = searchParams.get(WORKSPACE_QUERY_KEYS.irEmphasis);
+
+  if (isIrEmphasis(requestedIrEmphasis)) {
+    state = setWorkspaceIrEmphasis(state, requestedIrEmphasis);
+  }
+
   return requestedPassId === null
     ? state
     : selectWorkspacePass(model, state, requestedPassId);
@@ -154,6 +167,10 @@ export function createWorkspaceUrlSearchParams(
 
   if (state.diffMode !== "side-by-side") {
     nextSearchParams.set(WORKSPACE_QUERY_KEYS.diffMode, state.diffMode);
+  }
+
+  if (state.irEmphasis !== "guided") {
+    nextSearchParams.set(WORKSPACE_QUERY_KEYS.irEmphasis, state.irEmphasis);
   }
 
   return nextSearchParams;
