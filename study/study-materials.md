@@ -151,8 +151,11 @@ optimisations: (a) instruction combining, (c) unrolling, (d) interprocedural cod
 no back edge.
 
 *Raw:* search the log for `LoopDeletionPass` and compare its Before and After dumps.
-*Tool:* the pass timeline shows `loop-deletion` with a CHANGED badge; its description
-explains what loop deletion does in general and the participant connects that to their loop.
+*Tool:* search the timeline for "loop" under All Passes or under `accumulate`;
+`loop-deletion` carries a CHANGED badge, and its description explains what loop deletion
+does in general, which the participant connects to their own loop. See
+[D4](#d4--loop-passes-were-filed-away-from-their-function-fixed): before that fix this
+question was close to unanswerable in the tool condition.
 
 **Q4. RQ2. Free text.**
 > In one or two sentences, say what the finished program does instead of your loop, and why
@@ -279,6 +282,28 @@ scopes are prose (`Parallel Loop at depth 1 containing: %2<header>`), so a heade
 built on non-space runs silently swallowed those dumps into the previous body and shifted
 every later pairing. The first run reported `classify.c` as 78 passes with an analysis pass
 apparently rewriting the IR; after the fix it reproduced the brief exactly.
+
+### D4 - Loop passes were filed away from their function (fixed)
+
+**Symptom.** Searching "loop" under the `accumulate` function returned nine passes and did
+not include `loop-deletion`, the pass that removes the participant's loop. It and
+`loop-rotate` sat under "Global Passes / Module and unassigned" instead, where nobody
+reasoning about their own function would look. Q3 was close to unanswerable in the tool
+condition for that reason.
+
+**Root cause.** The service reads the owning function out of the dump text by finding the
+`define` line. A loop dump prints only the loop's blocks, starting at `; Preheader:`, so
+there is no `define` and the scope fell back to `{"level": "unknown"}`. `createScope`
+already had a `level: "loop"` branch; it could never fire.
+
+**Fix.** The metrics collector resolves the loop's owning function itself and reports it
+against the same dump (`C B <LoopDeletionPass> <accumulate>`). The payload builder now
+falls back to that when the IR text carries no function name. On `accumulate.c` O1 the
+unattributed count went from 9 to 0: the function scope went 61 -> 70 passes and the
+global scope 31 -> 22.
+
+**No effect on the answer key.** Pass count, order, names, `changed` flags and last-change
+positions are unchanged for all four traces; only the `scope` field moved.
 
 ### Non-discrepancies (checked, agree)
 

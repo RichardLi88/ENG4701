@@ -557,7 +557,23 @@ function parseDumpBlocks(log, sourceFile) {
   }));
 }
 
-function createScope(target, ir, functionNames, order) {
+/**
+ * A loop dump prints only the loop's blocks, starting at "; Preheader:", so it
+ * carries no `define` line to read a function name from. The metrics collector
+ * resolves the loop's owning function itself and reports it against the same
+ * dump, so use that rather than leaving the Pass unattributed: without it the
+ * Passes that rewrite a loop are filed away from the function containing it.
+ */
+function functionFromCfgSnapshot(cfgByFunction, functionNames) {
+  if (!cfgByFunction) return undefined;
+
+  const named = [...cfgByFunction.keys()].filter((name) =>
+    functionNames.has(name),
+  );
+  return named.length === 1 ? named[0] : undefined;
+}
+
+function createScope(target, ir, functionNames, order, cfgByFunction) {
   if (target === "[module]") {
     return { level: "module" };
   }
@@ -567,7 +583,9 @@ function createScope(target, ir, functionNames, order) {
     return { level: "function", functionId: functionId(normalisedTarget) };
   }
 
-  const irFunction = extractFunctionName(ir);
+  const irFunction =
+    extractFunctionName(ir) ??
+    functionFromCfgSnapshot(cfgByFunction, functionNames);
   if (/\bLoop\b/i.test(target) && irFunction && functionNames.has(irFunction)) {
     return {
       level: "loop",
@@ -629,7 +647,13 @@ function createOptimisationPayload({
       );
     const name = passName(before.fullName);
     const type = isAnalysis ? "analysis" : "transform";
-    const scope = createScope(before.target, before.ir, functionNames, order);
+    const scope = createScope(
+      before.target,
+      before.ir,
+      functionNames,
+      order,
+      measuredCfgByDump?.[before.dumpIndex],
+    );
     const beforeAnalysis = analysisFor(before.ir);
     const afterAnalysis = analysisFor(after.ir);
     const metrics =
