@@ -314,22 +314,90 @@ export const irDiffContent = {
     description:
       "Guided dims the parts of each line that describe the machine rather than your program. Nothing is hidden: switch to Plain to see every token at the same weight.",
   },
-  legend: {
-    heading: "How to read this",
-    entries: [
-      ["define", "starts a function"],
-      ["%3", "a value the program computed earlier"],
-      ["@name", "a function or a global variable"],
-      ["label:", "starts a basic block, a straight-line chunk of code"],
-      ["br", "a branch: jumps to one block or another"],
-      ["ret", "returns from the function"],
-      ["i32", "the size of a value, in bits. Dimmed under Guided"],
-    ],
-  },
   fold: {
     expand: "Show",
     unchangedLine: "unchanged line",
     unchangedLines: "unchanged lines",
+  },
+  legend: {
+    heading: "How to read this",
+    /**
+     * Only entries whose notation appears in the IR on screen are shown, so the
+     * list stays as short as the program allows. Every entry says what the
+     * notation means and never what this program does.
+     */
+    groups: {
+      structure: "Structure",
+      controlFlow: "Control flow",
+      values: "Working with values",
+      memory: "Memory",
+      promises: "Promises to the optimiser",
+    },
+    entries: [
+      ["define", "structure", "Starts a function."],
+      [
+        "%0",
+        "structure",
+        "A value worked out earlier, or a parameter. These are numbered rather than named.",
+      ],
+      ["@name", "structure", "A function or a global variable."],
+      [
+        "label:",
+        "structure",
+        "Starts a basic block: a straight run of code with no branches inside it.",
+      ],
+      ["; preds =", "structure", "Lists the blocks that can jump to this one."],
+      [
+        "br",
+        "controlFlow",
+        "A branch. With one label it always jumps there; with a condition and two labels it picks one.",
+      ],
+      ["ret", "controlFlow", "Returns from the function."],
+      [
+        "phi",
+        "controlFlow",
+        "Picks a value based on which block control arrived from. This is how a variable that changes each time round a loop is written.",
+      ],
+      ["call", "controlFlow", "Calls a function."],
+      ["add", "values", "Adds two values."],
+      ["sub", "values", "Subtracts one value from another."],
+      ["mul", "values", "Multiplies two values."],
+      [
+        "icmp",
+        "values",
+        "Compares two values: sgt greater than, slt less than, sle less than or equal, ult unsigned less than.",
+      ],
+      [
+        "lshr",
+        "values",
+        "Shifts the bits right, which halves the value once per step.",
+      ],
+      ["zext", "values", "Widens a value to more bits, padding with zeros."],
+      ["trunc", "values", "Narrows a value to fewer bits."],
+      ["alloca", "memory", "Reserves space for a local variable."],
+      ["load", "memory", "Reads a value out of memory."],
+      ["store", "memory", "Writes a value into memory."],
+      [
+        "nsw",
+        "promises",
+        "Promises the arithmetic will not overflow. Dimmed: it does not change what is computed.",
+      ],
+      [
+        "align",
+        "promises",
+        "States how the value is laid out in memory. Dimmed.",
+      ],
+      [
+        "noundef",
+        "promises",
+        "Promises the value is always properly defined. Dimmed.",
+      ],
+      [
+        "i32",
+        "promises",
+        "How many bits a value uses. i33 and similar come from the optimiser widening a calculation to prove it cannot overflow. Dimmed.",
+      ],
+    ],
   },
   modes: {
     sideBySide: "Side by side",
