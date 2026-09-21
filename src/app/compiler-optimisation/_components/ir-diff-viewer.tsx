@@ -10,6 +10,7 @@ import { createIrDiff, type IrDiffLine } from "~/app/_helpers/text-diff";
 
 import { irDiffContent } from "../content";
 import type { DiffMode, IrEmphasis } from "../_lib/workspace-state";
+import { selectIrGlossary } from "../_lib/ir-glossary";
 import { IrLine } from "./ir-line";
 
 export type IrDiffViewerProps = Readonly<{
@@ -392,6 +393,10 @@ export function IrDiffViewer({
   const [expandedFolds, setExpandedFolds] = useState<
     Readonly<Record<DiffMode, ReadonlySet<number>>>
   >(() => ({ "side-by-side": new Set(), unified: new Set() }));
+  const glossary = useMemo(
+    () => selectIrGlossary(before, after),
+    [before, after],
+  );
   const expandFold = useCallback(
     (index: number) => {
       setExpandedFolds((current) => ({
@@ -509,19 +514,45 @@ export function IrDiffViewer({
         </div>
       </div>
 
-      {onEmphasisChange === undefined ? null : (
+      {onEmphasisChange === undefined || glossary.length === 0 ? null : (
         <details className="mb-3 rounded-lg border border-slate-800 bg-slate-900/40">
           <summary className="cursor-pointer px-4 py-2 text-xs font-semibold text-slate-300 transition hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:outline-none focus-visible:ring-inset">
             {irDiffContent.legend.heading}
           </summary>
-          <dl className="grid gap-x-6 gap-y-2 border-t border-slate-800 px-4 py-3 text-xs sm:grid-cols-2">
-            {irDiffContent.legend.entries.map(([token, meaning]) => (
-              <div key={token} className="flex min-w-0 items-baseline gap-2">
-                <dt className="shrink-0 font-mono text-slate-200">{token}</dt>
-                <dd className="min-w-0 text-slate-500">{meaning}</dd>
-              </div>
-            ))}
-          </dl>
+          <div className="space-y-3 border-t border-slate-800 px-4 py-3">
+            {Object.entries(irDiffContent.legend.groups).map(
+              ([groupKey, groupLabel]) => {
+                const groupEntries = glossary.filter(
+                  (entry) => entry.group === groupKey,
+                );
+
+                if (groupEntries.length === 0) return null;
+
+                return (
+                  <div key={groupKey}>
+                    <p className="mb-1 text-[0.68rem] font-semibold tracking-[0.14em] text-slate-500 uppercase">
+                      {groupLabel}
+                    </p>
+                    <dl className="grid gap-x-6 gap-y-1.5 text-xs sm:grid-cols-2">
+                      {groupEntries.map((entry) => (
+                        <div
+                          key={entry.token}
+                          className="flex min-w-0 items-baseline gap-2"
+                        >
+                          <dt className="shrink-0 font-mono text-slate-200">
+                            {entry.token}
+                          </dt>
+                          <dd className="min-w-0 text-slate-500">
+                            {entry.meaning}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
+                );
+              },
+            )}
+          </div>
         </details>
       )}
 
