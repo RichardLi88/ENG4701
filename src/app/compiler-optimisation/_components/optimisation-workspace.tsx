@@ -16,6 +16,7 @@ import {
   createInitialWorkspaceState,
   deriveWorkspaceSelection,
   selectAdjacentWorkspacePass,
+  selectWorkspaceAllPasses,
   selectWorkspaceGlobalPasses,
   selectWorkspaceFunction,
   selectWorkspacePass,
@@ -117,17 +118,21 @@ function OptimisationWorkspaceSession({
     [model, workspaceState],
   );
   const selectedFunctionPasses = selectedFunction?.passes;
-  const selectedScopePasses = useMemo(
-    () =>
-      workspaceState.selectedFunctionId === undefined
-        ? model.globalPasses
-        : (selectedFunctionPasses ?? []),
-    [
-      model.globalPasses,
-      selectedFunctionPasses,
-      workspaceState.selectedFunctionId,
-    ],
-  );
+  const selectedScopePasses = useMemo(() => {
+    switch (workspaceState.scope.kind) {
+      case "all":
+        return model.passes;
+      case "global":
+        return model.globalPasses;
+      case "function":
+        return selectedFunctionPasses ?? [];
+    }
+  }, [
+    model.passes,
+    model.globalPasses,
+    selectedFunctionPasses,
+    workspaceState.scope,
+  ]);
   const adjacentPasses = useMemo(() => {
     if (selectedPass === undefined) return {};
     const selectedIndex = selectedScopePasses.findIndex(
@@ -173,6 +178,10 @@ function OptimisationWorkspaceSession({
 
   const selectGlobalPasses = useCallback(() => {
     setWorkspaceState((state) => selectWorkspaceGlobalPasses(model, state));
+  }, [model]);
+
+  const selectAllPasses = useCallback(() => {
+    setWorkspaceState((state) => selectWorkspaceAllPasses(model, state));
   }, [model]);
 
   const selectPass = useCallback(
@@ -293,7 +302,9 @@ function OptimisationWorkspaceSession({
               <FunctionSelector
                 functions={model.functions}
                 globalPassCount={model.globalPasses.length}
-                selectedFunctionId={workspaceState.selectedFunctionId}
+                totalPassCount={model.passes.length}
+                scope={workspaceState.scope}
+                onSelectAll={selectAllPasses}
                 onSelectGlobal={selectGlobalPasses}
                 onSelect={selectFunction}
               />
@@ -308,7 +319,9 @@ function OptimisationWorkspaceSession({
                 passes={visiblePasses}
                 scopeName={
                   selectedFunction?.name ??
-                  compilerWorkspaceContent.scopes.globalName
+                  (workspaceState.scope.kind === "all"
+                    ? compilerWorkspaceContent.scopes.allName
+                    : compilerWorkspaceContent.scopes.globalName)
                 }
                 selectedPassId={selectedPass?.id}
                 selectedPassIndex={selectedPassIndex}
