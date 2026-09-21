@@ -10,7 +10,7 @@ import type {
   OptimisationPassViewModel,
   OptimisationPassViewProps,
 } from "../_lib/optimisation-types";
-import type { DiffMode } from "../_lib/workspace-state";
+import type { DiffMode, IrEmphasis } from "../_lib/workspace-state";
 import {
   describePassScope,
   formatMetricDelta,
@@ -33,6 +33,8 @@ type PassDetailProps = OptimisationPassViewProps &
     nextPass?: OptimisationPassViewModel;
     diffMode?: DiffMode;
     onDiffModeChange?: (diffMode: DiffMode) => void;
+    irEmphasis?: IrEmphasis;
+    onIrEmphasisChange?: (irEmphasis: IrEmphasis) => void;
   }>;
 
 export const PassDetail = memo(function PassDetail({
@@ -41,6 +43,8 @@ export const PassDetail = memo(function PassDetail({
   nextPass,
   diffMode = "side-by-side",
   onDiffModeChange = ignoreDiffModeChange,
+  irEmphasis = "guided",
+  onIrEmphasisChange,
 }: PassDetailProps) {
   const scope = describePassScope(pass);
   const localPosition =
@@ -413,9 +417,15 @@ export const PassDetail = memo(function PassDetail({
           }
           mode={diffMode}
           onModeChange={onDiffModeChange}
+          emphasis={irEmphasis}
+          onEmphasisChange={onIrEmphasisChange}
         />
       ) : (
-        <IrSnapshotView ir={pass.ir.after} headingId="ir-snapshot-heading" />
+        <IrSnapshotView
+          ir={pass.ir.after}
+          headingId="ir-snapshot-heading"
+          emphasis={irEmphasis}
+        />
       )}
 
       {pass.changed ? (

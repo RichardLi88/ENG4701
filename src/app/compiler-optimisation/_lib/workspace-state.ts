@@ -23,6 +23,7 @@ export type WorkspaceState = Readonly<{
   selectedPassId: string | undefined;
   passFilters: PassFilters;
   diffMode: DiffMode;
+  irEmphasis: IrEmphasis;
 }>;
 
 export const ALL_PASSES_SCOPE: WorkspaceScope = Object.freeze({ kind: "all" });
@@ -34,6 +35,11 @@ export type PassTypeFilter = "all" | "transform" | "analysis";
 export type PassChangeFilter = "all" | "changed" | "unchanged";
 export type PassNavigationDirection = "previous" | "next";
 export type DiffMode = "side-by-side" | "unified";
+/**
+ * "guided" dims IR that says nothing about the program; "plain" shows every
+ * token at the same weight. Nothing is hidden either way.
+ */
+export type IrEmphasis = "guided" | "plain";
 
 export type PassFilters = Readonly<{
   type: PassTypeFilter;
@@ -196,6 +202,7 @@ export function createInitialWorkspaceState(
     selectedPassId: model.passes[0]?.id,
     passFilters: DEFAULT_PASS_FILTERS,
     diffMode: "side-by-side",
+    irEmphasis: "guided",
   };
 }
 
@@ -224,6 +231,7 @@ export function selectWorkspaceFunction(
     selectedPassId: selectedFunction.passes[0]?.id,
     passFilters: DEFAULT_PASS_FILTERS,
     diffMode: state.diffMode,
+    irEmphasis: state.irEmphasis,
   };
 }
 
@@ -239,6 +247,7 @@ export function selectWorkspaceGlobalPasses(
     selectedPassId: model.globalPasses[0]?.id,
     passFilters: DEFAULT_PASS_FILTERS,
     diffMode: state.diffMode,
+    irEmphasis: state.irEmphasis,
   };
 }
 
@@ -254,6 +263,7 @@ export function selectWorkspaceAllPasses(
     selectedPassId: model.passes[0]?.id,
     passFilters: DEFAULT_PASS_FILTERS,
     diffMode: state.diffMode,
+    irEmphasis: state.irEmphasis,
   };
 }
 
@@ -340,6 +350,13 @@ export function clearWorkspacePassFilters(
     ...state,
     passFilters: DEFAULT_PASS_FILTERS,
   });
+}
+
+export function setWorkspaceIrEmphasis(
+  state: WorkspaceState,
+  irEmphasis: IrEmphasis,
+): WorkspaceState {
+  return state.irEmphasis === irEmphasis ? state : { ...state, irEmphasis };
 }
 
 export function setWorkspaceDiffMode(

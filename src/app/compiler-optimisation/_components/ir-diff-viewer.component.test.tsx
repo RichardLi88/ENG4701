@@ -4,6 +4,16 @@ import { describe, expect, test, vi } from "vitest";
 
 import { IrDiffViewer } from "./ir-diff-viewer";
 
+/**
+ * Guided emphasis splits a line into muted and unmuted spans, so a line is
+ * matched on the rendered <code> element rather than a single text node.
+ */
+const irLine = (container: HTMLElement, text: string) =>
+  within(container).getByText(
+    (_content, element) =>
+      element?.tagName === "CODE" && element.textContent === text,
+  );
+
 describe("IrDiffViewer", () => {
   test("renders a unified edit stream and exposes a controlled mode toggle", async () => {
     const user = userEvent.setup();
@@ -20,8 +30,8 @@ describe("IrDiffViewer", () => {
     const unified = screen.getByRole("region", {
       name: "Unified optimisation IR",
     });
-    expect(within(unified).getByText("ret i32 0")).toBeInTheDocument();
-    expect(within(unified).getByText("ret i32 1")).toBeInTheDocument();
+    expect(irLine(unified, "  ret i32 0")).toBeInTheDocument();
+    expect(irLine(unified, "  ret i32 1")).toBeInTheDocument();
     expect(within(unified).getByLabelText("Removed line")).toBeInTheDocument();
     expect(within(unified).getByLabelText("Added line")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Unified" })).toHaveAttribute(
@@ -46,9 +56,9 @@ describe("IrDiffViewer", () => {
     });
     const after = screen.getByRole("region", { name: "After optimisation IR" });
 
-    expect(within(before).getByText("ret i32 0")).toBeInTheDocument();
+    expect(irLine(before, "  ret i32 0")).toBeInTheDocument();
     expect(within(before).getByLabelText("Removed line")).toBeInTheDocument();
-    expect(within(after).getByText("ret i32 1")).toBeInTheDocument();
+    expect(irLine(after, "  ret i32 1")).toBeInTheDocument();
     expect(within(after).getByLabelText("Added line")).toBeInTheDocument();
   });
 

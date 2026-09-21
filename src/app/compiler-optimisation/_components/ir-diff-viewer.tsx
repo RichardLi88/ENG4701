@@ -9,7 +9,8 @@ import {
 import { createIrDiff, type IrDiffLine } from "~/app/_helpers/text-diff";
 
 import { irDiffContent } from "../content";
-import type { DiffMode } from "../_lib/workspace-state";
+import type { DiffMode, IrEmphasis } from "../_lib/workspace-state";
+import { IrLine } from "./ir-line";
 
 export type IrDiffViewerProps = Readonly<{
   before?: string | null;
@@ -17,6 +18,8 @@ export type IrDiffViewerProps = Readonly<{
   structuredDiff?: ReadonlyArray<IrDiffLine> | null;
   mode?: DiffMode;
   onModeChange?: (mode: DiffMode) => void;
+  emphasis?: IrEmphasis;
+  onEmphasisChange?: (emphasis: IrEmphasis) => void;
   /** Distinguishes headings when more than one viewer is on the page. */
   headingId?: string;
   heading?: string;
@@ -111,6 +114,7 @@ type DiffPaneProps = Readonly<{
   segments: ReadonlyArray<DiffSegment<DiffRow>>;
   expandedFolds: ReadonlySet<number>;
   onExpandFold: (index: number) => void;
+  emphasis: IrEmphasis;
 }>;
 
 function DiffPane({
@@ -118,6 +122,7 @@ function DiffPane({
   segments,
   expandedFolds,
   onExpandFold,
+  emphasis,
 }: DiffPaneProps) {
   const isBefore = side === "before";
   const label = isBefore ? "Before" : "After";
@@ -212,7 +217,7 @@ function DiffPane({
                       {lineNumber}
                     </span>
                     <code className="px-4 whitespace-pre">
-                      {line.content || " "}
+                      <IrLine content={line.content} emphasis={emphasis} />
                     </code>
                   </div>
                 );
@@ -229,12 +234,14 @@ type UnifiedDiffProps = Readonly<{
   segments: ReadonlyArray<DiffSegment<IrDiffLine>>;
   expandedFolds: ReadonlySet<number>;
   onExpandFold: (index: number) => void;
+  emphasis: IrEmphasis;
 }>;
 
 function UnifiedDiff({
   segments,
   expandedFolds,
   onExpandFold,
+  emphasis,
 }: UnifiedDiffProps) {
   return (
     <section
@@ -331,7 +338,7 @@ function UnifiedDiff({
                       {line.afterLineNumber}
                     </span>
                     <code className="px-4 whitespace-pre">
-                      {line.content || " "}
+                      <IrLine content={line.content} emphasis={emphasis} />
                     </code>
                   </div>
                 );
@@ -352,6 +359,8 @@ export function IrDiffViewer({
   structuredDiff,
   mode = "side-by-side",
   onModeChange = ignoreModeChange,
+  emphasis = "guided",
+  onEmphasisChange,
   headingId = "ir-diff-heading",
   heading = irDiffContent.heading,
   description,
@@ -460,6 +469,35 @@ export function IrDiffViewer({
               </button>
             ))}
           </div>
+          {onEmphasisChange === undefined ? null : (
+            <div
+              className="inline-flex rounded-lg border border-slate-700 bg-slate-950 p-1"
+              role="group"
+              aria-label={irDiffContent.emphasis.label}
+            >
+              {(
+                [
+                  ["guided", irDiffContent.emphasis.guided],
+                  ["plain", irDiffContent.emphasis.plain],
+                ] as const
+              ).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => onEmphasisChange(value)}
+                  aria-pressed={emphasis === value}
+                  title={irDiffContent.emphasis.description}
+                  className={`rounded-md px-3 py-1.5 text-xs font-semibold transition focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:outline-none ${
+                    emphasis === value
+                      ? "bg-cyan-400/15 text-cyan-100"
+                      : "text-slate-500 hover:text-slate-200"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="flex items-center gap-3 font-mono text-[0.68rem] tracking-wide text-slate-500 uppercase">
             <span>
               <strong className="mr-1 text-rose-300">-</strong> Removed
@@ -470,6 +508,22 @@ export function IrDiffViewer({
           </div>
         </div>
       </div>
+
+      {onEmphasisChange === undefined ? null : (
+        <details className="mb-3 rounded-lg border border-slate-800 bg-slate-900/40">
+          <summary className="cursor-pointer px-4 py-2 text-xs font-semibold text-slate-300 transition hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:outline-none focus-visible:ring-inset">
+            {irDiffContent.legend.heading}
+          </summary>
+          <dl className="grid gap-x-6 gap-y-2 border-t border-slate-800 px-4 py-3 text-xs sm:grid-cols-2">
+            {irDiffContent.legend.entries.map(([token, meaning]) => (
+              <div key={token} className="flex min-w-0 items-baseline gap-2">
+                <dt className="shrink-0 font-mono text-slate-200">{token}</dt>
+                <dd className="min-w-0 text-slate-500">{meaning}</dd>
+              </div>
+            ))}
+          </dl>
+        </details>
+      )}
 
       {diff.status === "unchanged" ? (
         <div
@@ -497,12 +551,14 @@ export function IrDiffViewer({
             segments={rowSegments}
             expandedFolds={expandedFolds[mode]}
             onExpandFold={expandFold}
+            emphasis={emphasis}
           />
           <DiffPane
             side="after"
             segments={rowSegments}
             expandedFolds={expandedFolds[mode]}
             onExpandFold={expandFold}
+            emphasis={emphasis}
           />
         </div>
       ) : (
@@ -510,6 +566,7 @@ export function IrDiffViewer({
           segments={lineSegments}
           expandedFolds={expandedFolds[mode]}
           onExpandFold={expandFold}
+          emphasis={emphasis}
         />
       )}
     </section>

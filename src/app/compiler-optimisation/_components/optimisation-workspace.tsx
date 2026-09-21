@@ -21,11 +21,13 @@ import {
   selectWorkspaceFunction,
   selectWorkspacePass,
   setWorkspaceDiffMode,
+  setWorkspaceIrEmphasis,
   setWorkspacePassChangeFilter,
   setWorkspacePassSearch,
   setWorkspacePassTypeFilter,
   type PassChangeFilter,
   type DiffMode,
+  type IrEmphasis,
   type PassTypeFilter,
   type WorkspaceState,
 } from "../_lib/workspace-state";
@@ -238,6 +240,10 @@ function OptimisationWorkspaceSession({
     setWorkspaceState((state) => setWorkspaceDiffMode(state, diffMode));
   }, []);
 
+  const setIrEmphasis = useCallback((irEmphasis: IrEmphasis) => {
+    setWorkspaceState((state) => setWorkspaceIrEmphasis(state, irEmphasis));
+  }, []);
+
   return (
     <div className="text-slate-100">
       <div className="mx-auto w-full max-w-[112rem] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
@@ -277,7 +283,11 @@ function OptimisationWorkspaceSession({
 
         <SourcePanel source={source} />
 
-        <OverallIrComparison model={model} />
+        <OverallIrComparison
+          model={model}
+          irEmphasis={workspaceState.irEmphasis}
+          onIrEmphasisChange={setIrEmphasis}
+        />
 
         <OptimisationSummary model={model} />
 
@@ -378,6 +388,8 @@ function OptimisationWorkspaceSession({
                   nextPass={adjacentPasses.nextPass}
                   diffMode={workspaceState.diffMode}
                   onDiffModeChange={setDiffMode}
+                  irEmphasis={workspaceState.irEmphasis}
+                  onIrEmphasisChange={setIrEmphasis}
                 />
               )}
             </section>

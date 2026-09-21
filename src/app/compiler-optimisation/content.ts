@@ -307,6 +307,25 @@ export const irDiffContent = {
     regionLabel: "IR at this point in the pipeline, read only",
   },
   viewLabel: "Diff view",
+  emphasis: {
+    label: "IR detail",
+    guided: "Guided",
+    plain: "Plain",
+    description:
+      "Guided dims the parts of each line that describe the machine rather than your program. Nothing is hidden: switch to Plain to see every token at the same weight.",
+  },
+  legend: {
+    heading: "How to read this",
+    entries: [
+      ["define", "starts a function"],
+      ["%3", "a value the program computed earlier"],
+      ["@name", "a function or a global variable"],
+      ["label:", "starts a basic block, a straight-line chunk of code"],
+      ["br", "a branch: jumps to one block or another"],
+      ["ret", "returns from the function"],
+      ["i32", "the size of a value, in bits. Dimmed under Guided"],
+    ],
+  },
   fold: {
     expand: "Show",
     unchangedLine: "unchanged line",
