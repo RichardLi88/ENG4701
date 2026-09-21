@@ -5,15 +5,30 @@ import type {
 } from "./optimisation-types";
 
 /**
+ * Which Passes the timeline is showing. "all" is the whole run, which is the
+ * framing most questions about a run use; the narrower scopes exist to isolate
+ * one function or the Passes that belong to no function.
+ */
+export type WorkspaceScope =
+  | Readonly<{ kind: "all" }>
+  | Readonly<{ kind: "global" }>
+  | Readonly<{ kind: "function"; functionId: string }>;
+
+/**
  * The complete client-owned navigation state for one optimisation result.
  * Function and Pass objects are derived from the current View Model.
  */
 export type WorkspaceState = Readonly<{
-  selectedFunctionId: string | undefined;
+  scope: WorkspaceScope;
   selectedPassId: string | undefined;
   passFilters: PassFilters;
   diffMode: DiffMode;
 }>;
+
+export const ALL_PASSES_SCOPE: WorkspaceScope = Object.freeze({ kind: "all" });
+export const GLOBAL_PASSES_SCOPE: WorkspaceScope = Object.freeze({
+  kind: "global",
+});
 
 export type PassTypeFilter = "all" | "transform" | "analysis";
 export type PassChangeFilter = "all" | "changed" | "unchanged";
@@ -45,11 +60,21 @@ const EMPTY_PASSES: ReadonlyArray<OptimisationPassViewModel> = Object.freeze(
 
 function getSelectedScopePasses(
   model: OptimisationViewModel,
-  selectedFunctionId: string | undefined,
+  scope: WorkspaceScope,
 ): ReadonlyArray<OptimisationPassViewModel> {
-  return selectedFunctionId === undefined
-    ? model.globalPasses
-    : (model.functionsById[selectedFunctionId]?.passes ?? EMPTY_PASSES);
+  switch (scope.kind) {
+    case "all":
+      return model.passes;
+    case "global":
+      return model.globalPasses;
+    case "function":
+      return model.functionsById[scope.functionId]?.passes ?? EMPTY_PASSES;
+  }
+}
+
+/** The function a scope is pinned to, if it is pinned to one. */
+export function scopeFunctionId(scope: WorkspaceScope): string | undefined {
+  return scope.kind === "function" ? scope.functionId : undefined;
 }
 
 export const DEFAULT_PASS_FILTERS: PassFilters = Object.freeze({
@@ -144,7 +169,7 @@ function normaliseWorkspacePassSelection(
   state: WorkspaceState,
 ): WorkspaceState {
   const visiblePasses = filterPasses(
-    getSelectedScopePasses(model, state.selectedFunctionId),
+    getSelectedScopePasses(model, state.scope),
     state.passFilters,
   );
   const selectedPassIsVisible = visiblePasses.some(
@@ -159,17 +184,16 @@ function normaliseWorkspacePassSelection(
   };
 }
 
-/** Select the first function and its first Pass, if either exists. */
+/**
+ * Open on the whole run. Scoping to one function first hides the rest of the
+ * pipeline behind a choice the reader has to know to make.
+ */
 export function createInitialWorkspaceState(
   model: OptimisationViewModel,
 ): WorkspaceState {
-  const selectedFunction = model.functions[0];
-
   return {
-    selectedFunctionId: selectedFunction?.id,
-    selectedPassId:
-      selectedFunction?.passes[0]?.id ??
-      (selectedFunction === undefined ? model.globalPasses[0]?.id : undefined),
+    scope: ALL_PASSES_SCOPE,
+    selectedPassId: model.passes[0]?.id,
     passFilters: DEFAULT_PASS_FILTERS,
     diffMode: "side-by-side",
   };
@@ -196,7 +220,7 @@ export function selectWorkspaceFunction(
   if (selectedFunction === undefined) return state;
 
   return {
-    selectedFunctionId: selectedFunction.id,
+    scope: { kind: "function", functionId: selectedFunction.id },
     selectedPassId: selectedFunction.passes[0]?.id,
     passFilters: DEFAULT_PASS_FILTERS,
     diffMode: state.diffMode,
@@ -211,8 +235,23 @@ export function selectWorkspaceGlobalPasses(
   if (model.globalPasses.length === 0) return state;
 
   return {
-    selectedFunctionId: undefined,
+    scope: GLOBAL_PASSES_SCOPE,
     selectedPassId: model.globalPasses[0]?.id,
+    passFilters: DEFAULT_PASS_FILTERS,
+    diffMode: state.diffMode,
+  };
+}
+
+/** Select the complete Pass stream for the run. */
+export function selectWorkspaceAllPasses(
+  model: OptimisationViewModel,
+  state: WorkspaceState,
+): WorkspaceState {
+  if (model.passes.length === 0) return state;
+
+  return {
+    scope: ALL_PASSES_SCOPE,
+    selectedPassId: model.passes[0]?.id,
     passFilters: DEFAULT_PASS_FILTERS,
     diffMode: state.diffMode,
   };
@@ -226,7 +265,7 @@ export function selectWorkspacePass(
 ): WorkspaceState {
   if (
     !filterPasses(
-      getSelectedScopePasses(model, state.selectedFunctionId),
+      getSelectedScopePasses(model, state.scope),
       state.passFilters,
     ).some((pass) => pass.id === passId)
   ) {
@@ -316,11 +355,11 @@ export function deriveWorkspaceSelection(
   state: WorkspaceState,
 ): WorkspaceSelection {
   const selectedFunction =
-    state.selectedFunctionId === undefined
-      ? undefined
-      : model.functionsById[state.selectedFunctionId];
+    state.scope.kind === "function"
+      ? model.functionsById[state.scope.functionId]
+      : undefined;
   const visiblePasses = filterPasses(
-    getSelectedScopePasses(model, state.selectedFunctionId),
+    getSelectedScopePasses(model, state.scope),
     state.passFilters,
   );
   const selectedPass = visiblePasses.find(

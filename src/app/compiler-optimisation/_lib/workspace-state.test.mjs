@@ -42,34 +42,49 @@ function readModel(name) {
   return parseModel(readFixture(name));
 }
 
-test("initial state selects the first function and its first Pass by ID", () => {
+test("initial state opens on the whole run and its first Pass", () => {
   const model = readModel("multi-function.json");
   const state = createInitialWorkspaceState(model);
 
   assert.deepEqual(state, {
-    selectedFunctionId: "fn:bWFpbg",
-    selectedPassId: "pass:000001:aW5zdGNvbWJpbmU",
+    scope: { kind: "all" },
+    selectedPassId: model.passes[0].id,
     passFilters: ALL_FILTERS,
     diffMode: "side-by-side",
   });
   assert.equal(
-    deriveWorkspaceSelection(model, state).selectedFunction?.name,
-    "main",
+    deriveWorkspaceSelection(model, state).selectedFunction,
+    undefined,
   );
   assert.deepEqual(
     deriveWorkspaceSelection(model, state).visiblePasses.map((pass) => pass.id),
-    ["pass:000001:aW5zdGNvbWJpbmU", "pass:000003:bG9vcC1kZWxldGU"],
+    model.passes.map((pass) => pass.id),
+    "the whole run is visible before any scope is chosen",
   );
 });
 
-test("a single-function result selects its only function and Pass", () => {
+test("a single-function result shows its only Pass, scoped or not", () => {
   const model = readModel("minimal.json");
-  const state = createInitialWorkspaceState(model);
-  const selection = deriveWorkspaceSelection(model, state);
+  const initial = deriveWorkspaceSelection(
+    model,
+    createInitialWorkspaceState(model),
+  );
 
-  assert.equal(selection.selectedFunction?.id, "fn:bWFpbg");
-  assert.equal(selection.selectedPass?.id, "pass:000000:aW5zdGNvbWJpbmU");
-  assert.equal(selection.visiblePasses.length, 1);
+  assert.equal(initial.selectedFunction, undefined);
+  assert.equal(initial.selectedPass?.id, "pass:000000:aW5zdGNvbWJpbmU");
+  assert.equal(initial.visiblePasses.length, 1);
+
+  const scoped = deriveWorkspaceSelection(
+    model,
+    selectWorkspaceFunction(
+      model,
+      createInitialWorkspaceState(model),
+      "fn:bWFpbg",
+    ),
+  );
+
+  assert.equal(scoped.selectedFunction?.id, "fn:bWFpbg");
+  assert.equal(scoped.selectedPass?.id, "pass:000000:aW5zdGNvbWJpbmU");
 });
 
 test("module and unassigned Passes can be selected as a global timeline", () => {
@@ -89,7 +104,7 @@ test("module and unassigned Passes can be selected as a global timeline", () => 
   );
   const selection = deriveWorkspaceSelection(model, globalState);
 
-  assert.equal(globalState.selectedFunctionId, undefined);
+  assert.deepEqual(globalState.scope, { kind: "global" });
   assert.equal(selection.selectedFunction, undefined);
   assert.deepEqual(
     selection.visiblePasses.map((pass) => pass.id),
@@ -106,10 +121,10 @@ test("a global-only result selects its first Pass initially", () => {
   const state = createInitialWorkspaceState(model);
   const selection = deriveWorkspaceSelection(model, state);
 
-  assert.equal(state.selectedFunctionId, undefined);
+  assert.deepEqual(state.scope, { kind: "all" });
   assert.equal(selection.selectedFunction, undefined);
   assert.equal(selection.selectedPass?.id, input.passes[0].id);
-  assert.deepEqual(selection.visiblePasses, model.globalPasses);
+  assert.deepEqual(selection.visiblePasses, model.passes);
 });
 
 test("switching functions atomically selects the new function's first Pass", () => {
@@ -118,7 +133,7 @@ test("switching functions atomically selects the new function's first Pass", () 
   const next = selectWorkspaceFunction(model, initial, "fn:aGVscGVy");
 
   assert.deepEqual(next, {
-    selectedFunctionId: "fn:aGVscGVy",
+    scope: { kind: "function", functionId: "fn:aGVscGVy" },
     selectedPassId: "pass:000002:c2ltcGxpZnljZmc",
     passFilters: ALL_FILTERS,
     diffMode: "side-by-side",
@@ -154,7 +169,7 @@ test("empty functions and functions without Passes create no invalid IDs", () =>
   assert.deepEqual(
     createInitialWorkspaceState(readModel("empty-functions.json")),
     {
-      selectedFunctionId: undefined,
+      scope: { kind: "all" },
       selectedPassId: undefined,
       passFilters: ALL_FILTERS,
       diffMode: "side-by-side",
@@ -164,7 +179,7 @@ test("empty functions and functions without Passes create no invalid IDs", () =>
   const noPassesState = createInitialWorkspaceState(
     readModel("empty-passes.json"),
   );
-  assert.notEqual(noPassesState.selectedFunctionId, undefined);
+  assert.deepEqual(noPassesState.scope, { kind: "all" });
   assert.equal(noPassesState.selectedPassId, undefined);
   assert.deepEqual(
     deriveWorkspaceSelection(readModel("empty-passes.json"), noPassesState)
@@ -197,13 +212,15 @@ test("loading a second result resets both selections from the new model", () => 
   const reset = resetWorkspaceState(secondModel);
 
   assert.notDeepEqual(reset, previous);
+  assert.deepEqual(reset.scope, { kind: "all" });
   assert.equal(
-    deriveWorkspaceSelection(secondModel, reset).selectedFunction?.id,
-    secondModel.functions[0]?.id,
+    deriveWorkspaceSelection(secondModel, reset).selectedPass?.id,
+    secondModel.passes[0]?.id,
   );
   assert.equal(
     deriveWorkspaceSelection(secondModel, previous).selectedFunction,
     undefined,
+    "a scope from the previous result resolves to nothing in the new one",
   );
 });
 
@@ -383,12 +400,20 @@ test("previous and next navigation stay within visible Pass boundaries", () => {
     initial,
   );
 
-  const next = selectAdjacentWorkspacePass(model, initial, "next");
-  assert.equal(next.selectedPassId, "pass:000003:bG9vcC1kZWxldGU");
-  assert.equal(selectAdjacentWorkspacePass(model, next, "next"), next);
+  let cursor = initial;
+  for (const pass of model.passes.slice(1)) {
+    cursor = selectAdjacentWorkspacePass(model, cursor, "next");
+    assert.equal(cursor.selectedPassId, pass.id);
+  }
+
   assert.equal(
-    selectAdjacentWorkspacePass(model, next, "previous").selectedPassId,
-    initial.selectedPassId,
+    selectAdjacentWorkspacePass(model, cursor, "next"),
+    cursor,
+    "next stops at the end of the run",
+  );
+  assert.equal(
+    selectAdjacentWorkspacePass(model, cursor, "previous").selectedPassId,
+    model.passes[model.passes.length - 2].id,
   );
 });
 
@@ -458,7 +483,7 @@ test("a search that hides the current Pass moves the selection into the results"
   const initial = createInitialWorkspaceState(model);
   const searched = setWorkspacePassSearch(model, initial, "loop-delete");
 
-  assert.equal(initial.selectedPassId, "pass:000001:aW5zdGNvbWJpbmU");
+  assert.equal(initial.selectedPassId, model.passes[0].id);
   assert.equal(searched.selectedPassId, "pass:000003:bG9vcC1kZWxldGU");
   assert.deepEqual(
     clearWorkspacePassFilters(model, searched).passFilters,

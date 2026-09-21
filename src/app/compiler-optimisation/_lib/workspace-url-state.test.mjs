@@ -33,7 +33,7 @@ test("restores a function, visible Pass, and filters from the URL", () => {
     }),
   );
 
-  assert.equal(state.selectedFunctionId, helper.id);
+  assert.deepEqual(state.scope, { kind: "function", functionId: helper.id });
   assert.equal(state.selectedPassId, simplifyPass.id);
   assert.deepEqual(state.passFilters, {
     type: "transform",
@@ -52,7 +52,7 @@ test("restores a global Pass without a function ID", () => {
     new URLSearchParams({ scope: "global", pass: globalPass.id }),
   );
 
-  assert.equal(state.selectedFunctionId, undefined);
+  assert.deepEqual(state.scope, { kind: "global" });
   assert.equal(state.selectedPassId, globalPass.id);
 });
 
@@ -67,7 +67,7 @@ test("infers the owning scope from a valid Pass link", () => {
     new URLSearchParams({ pass: helperPass.id }),
   );
 
-  assert.equal(state.selectedFunctionId, helper.id);
+  assert.deepEqual(state.scope, { kind: "function", functionId: helper.id });
   assert.equal(state.selectedPassId, helperPass.id);
 });
 
@@ -82,8 +82,8 @@ test("invalid URL values safely fall back to the default workspace state", () =>
     }),
   );
 
-  assert.equal(state.selectedFunctionId, model.functions[0]?.id);
-  assert.equal(state.selectedPassId, model.functions[0]?.passes[0]?.id);
+  assert.deepEqual(state.scope, { kind: "all" });
+  assert.equal(state.selectedPassId, model.passes[0]?.id);
   assert.deepEqual(state.passFilters, {
     type: "all",
     change: "all",
@@ -100,7 +100,7 @@ test("serialises state while preserving unrelated query parameters", () => {
   const query = createWorkspaceUrlSearchParams(
     model,
     {
-      selectedFunctionId: helper.id,
+      scope: { kind: "function", functionId: helper.id },
       selectedPassId: futurePass.id,
       passFilters: { type: "transform", change: "unchanged", search: "" },
       diffMode: "unified",
@@ -125,7 +125,7 @@ test("serialises the global scope and omits default filters", () => {
   const query = createWorkspaceUrlSearchParams(
     model,
     {
-      selectedFunctionId: undefined,
+      scope: { kind: "global" },
       selectedPassId: globalPass.id,
       passFilters: { type: "all", change: "all", search: "" },
       diffMode: "side-by-side",
@@ -170,4 +170,23 @@ test("a blank search is not written to the URL", () => {
     ),
     false,
   );
+});
+
+test("round-trips the all-Passes scope without naming a function", () => {
+  const state = parseWorkspaceUrlState(
+    model,
+    new URLSearchParams({ scope: "all" }),
+  );
+
+  assert.deepEqual(state.scope, { kind: "all" });
+  assert.equal(state.selectedPassId, model.passes[0].id);
+
+  const query = createWorkspaceUrlSearchParams(
+    model,
+    state,
+    new URLSearchParams({ function: "stale" }),
+  );
+
+  assert.equal(query.get("function"), null);
+  assert.equal(query.get("scope"), null, "the default scope is not serialised");
 });

@@ -80,6 +80,7 @@ describe("OptimisationWorkspace", () => {
     );
     renderWorkspace();
 
+    await user.click(screen.getByRole("button", { name: /main 2 Passes/ }));
     await user.click(
       within(screen.getByRole("article")).getByRole("button", {
         name: "Unified",
@@ -173,6 +174,10 @@ describe("OptimisationWorkspace", () => {
     const user = userEvent.setup();
     renderWorkspace();
 
+    expect(screen.getByRole("heading", { name: "verify" })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /main 2 Passes/ }));
+
     expect(
       screen.getByRole("heading", { name: "instcombine" }),
     ).toBeInTheDocument();
@@ -223,6 +228,7 @@ describe("OptimisationWorkspace", () => {
     const user = userEvent.setup();
     renderWorkspace();
 
+    await user.click(screen.getByRole("button", { name: /main 2 Passes/ }));
     await user.click(screen.getByRole("button", { name: /^Analysis/ }));
 
     expect(

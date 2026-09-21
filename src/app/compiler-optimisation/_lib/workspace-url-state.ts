@@ -1,6 +1,7 @@
 import type { OptimisationViewModel } from "./optimisation-types";
 import {
   createInitialWorkspaceState,
+  selectWorkspaceAllPasses,
   selectWorkspaceFunction,
   selectWorkspaceGlobalPasses,
   selectWorkspacePass,
@@ -58,7 +59,11 @@ export function parseWorkspaceUrlState(
   const requestedFunctionId = searchParams.get(WORKSPACE_QUERY_KEYS.functionId);
   let state = createInitialWorkspaceState(model);
 
-  if (searchParams.get(WORKSPACE_QUERY_KEYS.scope) === "global") {
+  const requestedScope = searchParams.get(WORKSPACE_QUERY_KEYS.scope);
+
+  if (requestedScope === "all") {
+    state = selectWorkspaceAllPasses(model, state);
+  } else if (requestedScope === "global") {
     state = selectWorkspaceGlobalPasses(model, state);
   } else if (
     requestedFunctionId !== null &&
@@ -119,13 +124,13 @@ export function createWorkspaceUrlSearchParams(
     return nextSearchParams;
   }
 
-  if (state.selectedFunctionId === undefined) {
-    nextSearchParams.set(WORKSPACE_QUERY_KEYS.scope, "global");
-  } else {
+  if (state.scope.kind === "function") {
     nextSearchParams.set(
       WORKSPACE_QUERY_KEYS.functionId,
-      state.selectedFunctionId,
+      state.scope.functionId,
     );
+  } else if (state.scope.kind === "global") {
+    nextSearchParams.set(WORKSPACE_QUERY_KEYS.scope, "global");
   }
 
   if (state.selectedPassId !== undefined) {

@@ -115,6 +115,8 @@ export const compilerWorkspaceContent = {
   },
   scopes: {
     heading: "Functions",
+    allName: "All Passes",
+    allDescription: "Every Pass in this run, in order",
     globalName: "Global Passes",
     globalDescription: "Module and unassigned Passes",
   },
