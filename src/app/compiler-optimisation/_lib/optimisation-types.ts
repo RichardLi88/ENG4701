@@ -205,6 +205,7 @@ export type OptimisationSummaryViewModel = Readonly<{
 }>;
 
 export type OptimisationViewModel = Readonly<{
+  toolVersion?: string;
   schemaVersion: string;
   sourceFile: string;
   optimisationLevel: string;
