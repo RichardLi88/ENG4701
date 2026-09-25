@@ -42,6 +42,51 @@ function renderManyPassWorkspace() {
 }
 
 describe("OptimisationWorkspace", () => {
+  test("keeps Pass extras aligned with All Passes navigation and IR emphasis", async () => {
+    const user = userEvent.setup();
+    const result = parseOptimisationResult(multiFunctionFixture);
+    if (!result.ok) throw new Error(result.error.message);
+
+    render(
+      <OptimisationWorkspace
+        model={result.data}
+        resultKey="combined-features"
+        renderPassExtras={(pass) => (
+          <output data-testid="pass-extras">{pass.id}</output>
+        )}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: /All Passes/ })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await user.click(screen.getByRole("button", { name: "Next Pass" }));
+    const initialPassId = screen.getByTestId("pass-extras").textContent;
+    await user.click(
+      within(screen.getByRole("article")).getByRole("button", {
+        name: "Plain",
+      }),
+    );
+    expect(screen.getByTestId("pass-extras")).toHaveTextContent(initialPassId);
+    expect(new URLSearchParams(location.search).get("ir")).toBe("plain");
+
+    await user.click(screen.getByRole("button", { name: "Next Pass" }));
+    expect(screen.getByTestId("pass-extras").textContent).not.toBe(
+      initialPassId,
+    );
+    expect(screen.getByTestId("pass-extras").textContent).toBe(
+      new URLSearchParams(location.search).get("pass"),
+    );
+    await user.click(screen.getByRole("button", { name: "Previous Pass" }));
+    expect(screen.getByTestId("pass-extras")).toHaveTextContent(initialPassId);
+    expect(
+      within(screen.getByRole("article")).getByRole("button", {
+        name: "Plain",
+      }),
+    ).toHaveAttribute("aria-pressed", "true");
+  });
+
   test("virtualises a large Pass timeline and keeps End-key navigation", async () => {
     const user = userEvent.setup();
     renderManyPassWorkspace();

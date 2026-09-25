@@ -1,6 +1,11 @@
 "use client";
 
 import { useRef, useState } from "react";
+import {
+  ExplanationContainer,
+  ExplanationSessionProvider,
+} from "~/app/_components/ai/explanation-container";
+import { toExplainInput } from "../_lib/ai-explain-input";
 
 import type {
   DataAvailability,
@@ -52,11 +57,18 @@ export function CompilerOptimisationExplorer() {
       </div>
 
       {displayResult !== undefined ? (
-        <OptimisationWorkspace
-          model={displayResult.model}
-          source={displayResult.source}
-          resultKey={displayResult.key}
-        />
+        <ExplanationSessionProvider key={displayResult.key}>
+          <OptimisationWorkspace
+            model={displayResult.model}
+            source={displayResult.source}
+            resultKey={displayResult.key}
+            renderPassExtras={(pass) => (
+              <ExplanationContainer
+                input={toExplainInput(pass, displayResult.model)}
+              />
+            )}
+          />
+        </ExplanationSessionProvider>
       ) : null}
     </main>
   );

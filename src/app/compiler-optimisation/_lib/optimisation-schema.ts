@@ -33,6 +33,7 @@ export const optimisationSchemaVersionSchema = z
   );
 
 export const optimisationMetadataSchema = z.object({
+  toolVersion: nonEmptyString.optional(),
   sourceFile: nonEmptyString,
   optimisationLevel: nonEmptyString,
   totalPasses: z.number().int().nonnegative().max(MAX_PASSES),

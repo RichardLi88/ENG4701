@@ -1,6 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import {
+  ExplanationContainer,
+  ExplanationSessionProvider,
+} from "~/app/_components/ai/explanation-container";
+import { toExplainInput } from "../_lib/ai-explain-input";
 
 import type { ReductionTraceViewModel } from "../_lib/reduction-trace-adapter";
 import { JsonFileUpload } from "./json-file-upload";
@@ -29,10 +34,20 @@ export function ProgramReductionHome() {
         />
 
         {loadedTrace !== null ? (
-          <ReductionWorkspace
-            model={loadedTrace.model}
-            resultKey={loadedTrace.resultKey}
-          />
+          <ExplanationSessionProvider key={loadedTrace.resultKey}>
+            <ReductionWorkspace
+              model={loadedTrace.model}
+              resultKey={loadedTrace.resultKey}
+              renderExplanation={(step, candidate) => {
+                const input = toExplainInput(
+                  loadedTrace.model,
+                  step,
+                  candidate,
+                );
+                return input ? <ExplanationContainer input={input} /> : null;
+              }}
+            />
+          </ExplanationSessionProvider>
         ) : null}
       </section>
     </main>
